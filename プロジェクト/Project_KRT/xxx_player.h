@@ -1,0 +1,53 @@
+//===============================================================================
+//
+//  プレイヤー処理(playerX.h)
+//								制作：元地弘汰
+// 
+//===============================================================================
+#ifndef _PLAYERX_H_
+#define _PLAYERX_H_
+
+#include "main.h"
+#include "objectX.h"
+#include "modelparts.h"
+
+
+#include "manager.h"
+
+class CPlayerX :public CObjectX
+{
+public:
+	CPlayerX();					//コンストラクタ
+	~CPlayerX()override;		//デストラクタ
+	void Init()override;		//初期化
+	void Uninit()override;		//終了
+	void Update()override;		//更新
+	void Draw()override;		//描画
+
+	bool PMove(float fCamRotZ);
+	static CPlayerX* Create(D3DXVECTOR3 pos);
+
+	inline D3DXVECTOR3 GetPos() { return m_pos; };
+	inline D3DXVECTOR3 GetMove() { return m_move; };
+private:
+
+
+	//ステータス用定数
+	static constexpr int MAX_LIFE = 1000;			//体力
+
+
+	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
+	D3DXVECTOR3 m_move;						//移動量
+	D3DXVECTOR3 m_OldPos;					//過去の位置
+	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
+
+	void FloorCollision();					//床との当たり判定
+
+	//========================			クオータニオン用		====================================
+	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
+	D3DXQUATERNION m_quat;		//クオータニオン
+	D3DXVECTOR3 m_vecAxis;		//回転軸のベクトル
+	float m_fValueRot;			//回転量
+};
+
+#endif
