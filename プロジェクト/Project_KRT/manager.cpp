@@ -36,8 +36,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//ライトの生成
 	m_pLight = new CLight();
 	////サウンドの生成
-	//m_pSound = new CSound();
-	m_pMouse = new CMouse();
+	m_pSound = new CSound();
 	//キーボードの生成
 	m_pKeyboard = new CKeyboard();
 	//ジョイパッドの生成
@@ -56,11 +55,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_pKeyboard->Init(hInstance, hWnd);
 	//ジョイパッドの初期化
 	m_pJoypad->Init(hInstance,hWnd);
-	m_pMouse->Init(hInstance, hWnd);
 	//カメラの初期化
 	m_pCamera->Init();
 	////サウンドの初期化
-	//m_pSound->Init(hWnd);
+	m_pSound->Init(hWnd);
 	//ライトの初期化
 	m_pLight->Init();
 
@@ -98,23 +96,17 @@ void CManager::Uninit()
 		delete m_pLight;
 		m_pLight = nullptr;
 	}
-	/*if (m_pSound != nullptr)
+	if (m_pSound != nullptr)
 	{
 		m_pSound->Uninit();
 		delete m_pSound;
 		m_pSound = nullptr;
-	}*/
+	}
 	if (m_pTexture != nullptr)
 	{
 		m_pTexture->Unload();
 		delete m_pTexture;
 		m_pTexture = nullptr;
-	}
-	if (m_pMouse != nullptr)
-	{
-		m_pMouse->Uninit();
-		delete m_pMouse;
-		m_pMouse = nullptr;
 	}
 	if (m_pJoypad != nullptr)
 	{
@@ -146,7 +138,6 @@ void CManager::Update()
 	
 	m_pScene->Update();
 	m_pRenderer->Update();
-	m_pMouse->Update();
 	m_pKeyboard->Update();
 	m_pJoypad->Update();
 	m_pCamera->Update();

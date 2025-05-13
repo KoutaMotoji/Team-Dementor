@@ -10,13 +10,13 @@
 #include "main.h"
 
 #include "renderer.h"
+#include "sound.h"
 #include "texture.h"
 #include "keyboard.h"
 #include "joypad.h"
 #include "camera.h"
 #include "light.h"
 #include "scene.h"
-#include "mouse.h"
 #include "fade.h"
 
 class CManager
@@ -43,10 +43,10 @@ public:
 	inline CKeyboard* GetKeyboard() { return m_pKeyboard; };
 	inline CTexture* GetTexture() { return m_pTexture; };
 	inline CJoypad* GetJoypad() { return m_pJoypad; };
+	inline CSound* GetSound() { return m_pSound; }
 	inline CCamera* GetCamera() { return m_pCamera; };
 	inline CLight* GetLight() { return m_pLight; };
 	inline CScene* GetScene() { return m_pScene; };
-	inline CMouse* GetMouse() { return m_pMouse; };
 	inline CFade* GetFade() { return m_pFade; };
 	 void SetMode(CScene::MODE mode);
 	 const int MAP_SLICE_X;
@@ -56,10 +56,10 @@ private:
 	 CKeyboard* m_pKeyboard;
 	 CTexture* m_pTexture;
 	 CJoypad* m_pJoypad;
+	 CSound* m_pSound;
 	 CCamera* m_pCamera;
 	 CLight* m_pLight;
 	 CScene* m_pScene;
-	 CMouse* m_pMouse;
 	 CFade* m_pFade;
 };
 
