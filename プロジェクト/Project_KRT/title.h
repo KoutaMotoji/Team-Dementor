@@ -11,7 +11,6 @@
 #include "object2D.h"
 #include "objectX.h"
 
-class CStarter;
 class CTitleButton;
 class CTitleUI;
 
@@ -29,7 +28,7 @@ private:
 	int m_AnimTimer;
 	bool m_bNowAnim;
 	int m_nSelect;
-	CStarter* m_tSt;
+
 	CTitleButton* m_tBut;
 	CTitleUI* m_tUI;
 

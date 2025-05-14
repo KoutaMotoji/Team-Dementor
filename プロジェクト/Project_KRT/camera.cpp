@@ -9,7 +9,10 @@
 
 namespace
 {
-	float _CAM_ROTSPEED = 0.07f;
+	float _CAM_ROTSPEED = 0.05f;
+	float _CAM_UPSPEED = 15.0f;
+	float _CAM_MAX_HEIGHT = 600.0f;
+	float _CAM_MIN_HEIGHT = 100.0f;
 }
 
 CCamera::CCamera():m_nShakeFlame(0)
@@ -70,6 +73,23 @@ void CCamera::Update(void)
 		if (m_fRotZ < -1 * D3DX_PI)
 		{
 			m_fRotZ = D3DX_PI;
+		}
+	}
+
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DUP) == true)
+	{
+		m_camHeight += _CAM_UPSPEED;
+		if (m_camHeight > _CAM_MAX_HEIGHT)
+		{
+			m_camHeight = _CAM_MAX_HEIGHT;
+		}
+	}
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DDOWN) == true)
+	{
+		m_camHeight -= _CAM_UPSPEED;
+		if (m_camHeight < _CAM_MIN_HEIGHT)
+		{
+			m_camHeight = _CAM_MIN_HEIGHT;
 		}
 	}
 #if _DEBUG

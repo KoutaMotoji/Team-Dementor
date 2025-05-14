@@ -5,6 +5,7 @@
 // 
 //===============================================================================
 #include "xxx_player.h"
+#include "player_keyUI.h"
 #include "floor_stone.h"
 
 #include "game.h"
@@ -13,16 +14,23 @@ namespace
 {
 	float Damage_Ratio = 0.2f;
 	float _GRAVITY = 4.0f;
-	float _MOVE_SPEED = 3.0f;
+	float _MOVE_SPEED = 2.5f;
 	float _JUMP_HEIGHT = 120.0f;
+	int _GAUGE_CTVALUE = 120;
+	std::vector<D3DXVECTOR3>SetButtonUIpos = {
+		{220.0f - 220.0f / 3,250.0f,0.0f},
+		{220.0f,250.0f,0.0f},
+		{220.0f + 220.0f / 3,250.0f,0.0f}
+	};
 };
 
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX() 
+CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0)
 {
-	
+	m_pCctBarUI = nullptr;
+	m_vButtonUI = { nullptr,nullptr,nullptr };
 }
 
 //==========================================================================================
@@ -38,9 +46,7 @@ CPlayerX::~CPlayerX()
 //==========================================================================================
 void CPlayerX::Init()
 {
-
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
-	
 }
 
 //==========================================================================================
@@ -60,7 +66,7 @@ void CPlayerX::Update()
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 	PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
-
+	PAttackInfo();
 
 	CObjectX::AddPos(m_move);
 	
@@ -212,7 +218,6 @@ bool CPlayerX::PMove(float fCamRotZ)
 	return true;
 }
 
-
 //==========================================================================================
 // プレイヤーの移動制限判定
 //==========================================================================================
@@ -272,3 +277,59 @@ void CPlayerX::FloorCollision()
 	}
 }
 
+//==========================================================================================
+// プレイヤーの攻撃入力
+//==========================================================================================
+bool CPlayerX::PAttackInfo()
+{
+	bool pushed = false;
+	if(m_nPushedKey <= 2){
+		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
+		{
+			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9);
+			++m_nPushedKey;
+			pushed = true;
+		}
+		else if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_Y))
+		{
+			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey]);
+			++m_nPushedKey;
+			pushed = true;
+		}
+	}
+	if (pushed)
+	{
+		m_bAttackCt = true;
+		if (m_pCctBarUI == nullptr)
+		{
+			m_pCctBarUI = CCTBarUI::Create(_GAUGE_CTVALUE);
+		}
+		else
+		{
+			m_pCctBarUI->ResetGauge();
+		}
+	}
+	if (m_pCctBarUI != nullptr)
+	{
+		if (m_pCctBarUI->GetEndFrag())
+		{
+			m_pCctBarUI->Release();
+			m_pCctBarUI = nullptr;
+			m_bAttackCt = false;
+			m_nPushedKey = 0;
+		}
+	}
+	if (!m_bAttackCt)
+	{
+		for (auto& e : m_vButtonUI)
+		{
+			if (e != nullptr)
+			{
+				e->Release();
+				e = nullptr;
+			}
+		}
+		
+	}
+	return true;
+}

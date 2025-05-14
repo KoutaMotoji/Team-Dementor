@@ -166,6 +166,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="Obj_manager.cpp" />
+    <ClCompile Include="player_keyUI.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -196,6 +197,7 @@
     <ClInclude Include="object3D.h" />
     <ClInclude Include="objectX.h" />
     <ClInclude Include="Obj_manager.h" />
+    <ClInclude Include="player_keyUI.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />

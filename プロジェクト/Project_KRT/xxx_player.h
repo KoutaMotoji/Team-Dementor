@@ -14,6 +14,10 @@
 
 #include "manager.h"
 
+//前方宣言
+class CCTBarUI;
+class CButtonUI;
+
 class CPlayerX :public CObjectX
 {
 public:
@@ -25,6 +29,7 @@ public:
 	void Draw()override;		//描画
 
 	bool PMove(float fCamRotZ);
+	bool PAttackInfo();
 	static CPlayerX* Create(D3DXVECTOR3 pos);
 
 	inline D3DXVECTOR3 GetPos() { return m_pos; };
@@ -42,7 +47,10 @@ private:
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
 
 	void FloorCollision();					//床との当たり判定
-
+	CCTBarUI* m_pCctBarUI;
+	bool m_bAttackCt;
+	int m_nPushedKey;
+	std::vector<CButtonUI*>m_vButtonUI;
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
 	D3DXQUATERNION m_quat;		//クオータニオン
