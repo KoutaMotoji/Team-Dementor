@@ -16,15 +16,11 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CCharacter::CCharacter() :m_nLife(1000), m_fWeaponRadius(25),
+CCharacter::CCharacter() :m_nLife(1000),
 						m_bMotion(false),
 						m_bBlend(false)
 {
-	//モデルパーツを一括で初期化
-	for (int i = 0; i < MAX_MODELPARTS; ++i)
-	{
-		m_apModelParts[i] = nullptr;
-	}
+
 }
 
 //==========================================================================================
@@ -49,10 +45,9 @@ void CCharacter::Init()
 //==========================================================================================
 void CCharacter::Uninit()
 {
-	//モデルパーツの終了処理
-	for (int i = 0; i < MAX_MODELPARTS; ++i)
+	for (auto& e : m_apModelParts)
 	{
-		m_apModelParts[i]->Uninit();
+		e->Uninit();
 	}
 }
 
@@ -61,16 +56,10 @@ void CCharacter::Uninit()
 //==========================================================================================
 void CCharacter::Update()
 {
-
 	if (!MotionBlending())	//モーションブレンド中か判断
 	{//モーションブレンド中でなければ通常のモーション再生
 		SetNextKey();
 	}
-
-}
-
-void CCharacter::SetDamageState()
-{
 
 }
 
@@ -133,9 +122,9 @@ void CCharacter::Draw()
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD,
 		&m_mtxWorld);
-	for (int i = 0; i < MAX_MODELPARTS; ++i)
+	for (auto& e : m_apModelParts)
 	{
-		m_apModelParts[i]->Draw();
+		e->Draw();
 	}
 }
 
@@ -155,22 +144,6 @@ CCharacter* CCharacter::Create(D3DXVECTOR3 pos)
 	return charactor;
 }
 
-//==========================================================================================
-//移動処理
-//==========================================================================================
-bool CCharacter::PMove(float fCamRotZ)
-{
-	m_move += {CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x* MOVE_ROBO_SPEED, CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y* MOVE_ROBO_SPEED, 0.0f};
-	m_vecAxis = { m_move.y,m_move.x,0.0f };
-	
-
-	D3DXVec3Normalize(&m_vecAxis, &m_vecAxis);
-
-	m_fValueRot = (2 * sqrtf((m_move.x * m_move.x) + (m_move.y * m_move.y)) * 10) / (120 * D3DX_PI);
-
-	return true;
-}
-
 
 //==========================================================================================
 // プレイヤーの移動制限判定
@@ -185,8 +158,6 @@ void CCharacter::FloorCollision()
 //==========================================================================================
 void CCharacter::MotionInit()
 {
-	MotionDataLoad();
-
 	m_CurMotion = 0;
 	m_CurKey = 0;
 	m_NowFrame = 0;
@@ -197,10 +168,13 @@ void CCharacter::MotionInit()
 //==========================================================================================
 void CCharacter::SetNextMotion(int nNextMotionNum)
 {
+	if (m_NextMotion == nNextMotionNum)
+	{
+		return;
+	}
 	m_NextMotion = nNextMotionNum;
 	m_NowFrame = 0;
 	m_bBlend = true;
-	MotionBlending();
 }
 
 //==========================================================================================
@@ -228,8 +202,8 @@ void CCharacter::SetNextKey()
 	int nNowMotion = m_CurMotion;
 	int nNextKey = (m_CurKey + 1) % m_aMotion[nNowMotion].nKeyNum;
 	float fRatioFrame = (float)m_NowFrame / (float)m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame;
-
-	for (int nCntParts = 0; nCntParts < MAX_PARTS; ++nCntParts)
+	int nCntParts = 0;
+	for (auto& e : m_apModelParts)
 	{
 		//現在の向きと位置の情報
 		NowPos = m_aMotion[nNowMotion].aKetSet[nNowKey].aKey[nCntParts].pos;
@@ -269,11 +243,13 @@ void CCharacter::SetNextKey()
 			DifRot.z += D3DX_PI * 2;
 		}
 
-		DigitPos = DifPos * fRatioFrame + m_apModelParts[nCntParts]->GetDefaultPos() + NowPos;
-		DigitRot = DifRot * fRatioFrame + m_apModelParts[nCntParts]->GetDefaultRot() + NowRot;
+		DigitPos = DifPos * fRatioFrame + e->GetDefaultPos() + NowPos;
+		DigitRot = DifRot * fRatioFrame + e->GetDefaultRot() + NowRot;
 
-		m_apModelParts[nCntParts]->SetPos(DigitPos);
-		m_apModelParts[nCntParts]->SetRot(DigitRot);
+		e->SetPos(DigitPos);
+		e->SetRot(DigitRot);
+
+		++nCntParts;
 	}
 
 	++m_NowFrame;
@@ -287,7 +263,9 @@ void CCharacter::SetNextKey()
 			if (!m_aMotion[nNowMotion].bLoop)
 			{
 				--m_CurKey;
-				m_bMotion = false;
+				m_CurKey = 0;
+				m_NowFrame = 0;
+				m_CurMotion = m_NextMotion = 0;
 			}
 			else
 			{
@@ -325,8 +303,9 @@ bool CCharacter::MotionBlending()
 	int nNowMotion = m_CurMotion;
 
 	float fRatioFrame = ((float)m_NowFrame / (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame);
+	int nCntParts = 0;
 
-	for (int nCntParts = 0; nCntParts < MAX_PARTS; ++nCntParts)
+	for (auto& e : m_apModelParts)
 	{
 		//現在の向きと位置の情報
 		NowPos = m_aMotion[nNowMotion].aKetSet[nLastKey].aKey[nCntParts].pos;
@@ -366,22 +345,24 @@ bool CCharacter::MotionBlending()
 			DifRot.z += D3DX_PI * 2;
 		}
 
-		DigitPos = DifPos * fRatioFrame + m_apModelParts[nCntParts]->GetDefaultPos() + NowPos;
-		DigitRot = DifRot * fRatioFrame + m_apModelParts[nCntParts]->GetDefaultRot() + NowRot;
+		DigitPos = DifPos * fRatioFrame + e->GetDefaultPos() + NowPos;
+		DigitRot = DifRot * fRatioFrame + e->GetDefaultRot() + NowRot;
 
-		m_apModelParts[nCntParts]->SetPos(DigitPos);
-		m_apModelParts[nCntParts]->SetRot(DigitRot);
+		e->SetPos(DigitPos);
+		e->SetRot(DigitRot);
+
+		++nCntParts;
 	}
 
 	++m_NowFrame;
 
-	if (m_NowFrame >= m_aMotion[m_NextMotion].aKetSet[0].nFrame)
+	if (m_NowFrame > m_aMotion[m_NextMotion].aKetSet[0].nFrame)
 	{
 		m_CurKey = 0;
 		m_NowFrame = 0;
 		m_CurMotion = m_NextMotion;
-		m_bBlend = false;
 		SetNextKey();
+		m_bBlend = false;
 	}
 
 	return m_bBlend;
@@ -390,7 +371,7 @@ bool CCharacter::MotionBlending()
 //==========================================================================================
 //モーションをファイルから読み込み
 //==========================================================================================
-void CCharacter::MotionDataLoad()
+void CCharacter::MotionDataLoad(std::string filename)
 {
 	char LoadData[128];
 	char ModelPath[128];
@@ -408,8 +389,12 @@ void CCharacter::MotionDataLoad()
 	int nParent = 0;
 	int nIndex = 0;
 	int nModelCnt = 0;
+	Motion GetMotionData;
+	Key GetKeyData;
+	KeySet GetKeySetData;
 
-	pFile = fopen("data\\TEXT\\motion_Player.txt", "r");
+
+	pFile = fopen(filename.c_str(), "r");
 
 	if (pFile != nullptr)
 	{
@@ -441,9 +426,9 @@ void CCharacter::MotionDataLoad()
 
 				fscanf(pFile, "%s", ModelPath);
 
-				m_pModelFileName[nFilenameCnt] = ModelPath;
+				m_pModelFileName.push_back(ModelPath);
 
-				m_apModelParts[nFilenameCnt] = CModelParts::Create(pos, m_pModelFileName[nFilenameCnt]);
+				m_apModelParts.push_back(CModelParts::Create(pos, m_pModelFileName[nFilenameCnt]));
 
 				++nFilenameCnt;
 			}
@@ -529,20 +514,27 @@ void CCharacter::MotionDataLoad()
 
 					if (!strcmp(LoadData, "END_MOTIONSET"))//読み込みを終了
 					{
+						m_aMotion.push_back(GetMotionData);
+						GetMotionData.aKetSet.clear();
 						break;
 					}
 					//ループの判断
 					else if (!strcmp(LoadData, "LOOP"))
 					{
+						int bloop;
+					
 						fscanf(pFile, "%s", LoadData);
-						fscanf(pFile, "%d", &m_aMotion[nMotionCnt].bLoop);
+						fscanf(pFile, "%d", &bloop);
+						GetMotionData.bLoop = bloop;
 					}
 
 					//全体のキー数の読み込み
 					else  if (!strcmp(LoadData, "NUM_KEY"))
 					{
+						int nNum;
 						fscanf(pFile, "%s", LoadData);
-						fscanf(pFile, "%d", &m_aMotion[nMotionCnt].nKeyNum);
+						fscanf(pFile, "%d", &nNum);
+						GetMotionData.nKeyNum = nNum;
 					}
 
 					//各キーを読み込み
@@ -560,6 +552,8 @@ void CCharacter::MotionDataLoad()
 
 							if (!strcmp(LoadData, "END_KEYSET"))
 							{
+								GetMotionData.aKetSet.push_back(GetKeySetData);
+								GetKeySetData.aKey.clear();
 								//読み込みを終了
 								break;
 							}
@@ -567,8 +561,10 @@ void CCharacter::MotionDataLoad()
 							//現在のキーのフレーム数を読み込み
 							else if (!strcmp(LoadData, "FRAME"))
 							{
+								int nFrame;
 								fscanf(pFile, "%s", LoadData);
-								fscanf(pFile, "%d", &m_aMotion[nMotionCnt].aKetSet[nKeySet].nFrame);
+								fscanf(pFile, "%d", &nFrame);
+								GetKeySetData.nFrame = nFrame;
 							}
 
 							//現在のキーの読み込み
@@ -580,6 +576,7 @@ void CCharacter::MotionDataLoad()
 
 									if (!strcmp(LoadData, "END_KEY"))
 									{
+										GetKeySetData.aKey.push_back(GetKeyData);
 										// 読み込みを終了
 										break;
 									}
@@ -587,33 +584,28 @@ void CCharacter::MotionDataLoad()
 									//各パーツのモーションpos値
 									else if (!strcmp(LoadData, "POS"))
 									{
+
 										fscanf(pFile, "%s", LoadData);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].pos.x);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].pos.y);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].pos.z);
+										fscanf(pFile, "%f", &GetKeyData.pos.x);
+										fscanf(pFile, "%f", &GetKeyData.pos.y);
+										fscanf(pFile, "%f", &GetKeyData.pos.z);
 									}
 
 									//各パーツのモーションrot値
 									else if (!strcmp(LoadData, "ROT"))
 									{
 										fscanf(pFile, "%s", LoadData);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].rot.x);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].rot.y);
-										fscanf(pFile, "%f", &m_aMotion[nMotionCnt].aKetSet[nKeySet].aKey[nKey].rot.z);
+										fscanf(pFile, "%f", &GetKeyData.rot.x);
+										fscanf(pFile, "%f", &GetKeyData.rot.y);
+										fscanf(pFile, "%f", &GetKeyData.rot.z);
 									}
 								}
-								//キー番号を進める
-								++nKey;
+
 							}
 						}
-						//キー番号を初期化、キーセット番号を進める
-						nKey = 0;
-						++nKeySet;
+
 					}
 				}
-				//キーセット番号を初期化、モーション番号を進める
-				nKeySet = 0;
-				++nMotionCnt;
 			}
 		}
 	}
@@ -621,50 +613,4 @@ void CCharacter::MotionDataLoad()
 	{
 		assert(pFile == nullptr);
 	}
-}
-
-//==============================　　レイとメッシュの衝突をつかった当たり判定用　　=============================================================================
-//
-
-bool CCharacter::TestUseMeshCollision()
-{	//=============================		地形メッシュ判定		==========================================================================
-	// 地形判定
-	BOOL  bIsHit = false;
-	float fLandDistance;
-	DWORD dwHitIndex = 0U;
-	float fHitU;
-	float fHitV;
-	LPD3DXMESH pMesh = nullptr;
-	for (int j = 0; j < SET_PRIORITY; ++j) {
-		for (int i = 0; i < MAX_OBJECT; ++i) {
-			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_MESHOBJECT) {
-					CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
-					if (pTest != nullptr) {
-						pMesh = pTest->GetMesh();
-						if (pTest != nullptr) {
-							// 地形判定
-							LPD3DXMESH pMesh = nullptr;
-
-							pMesh = pTest->GetMesh();
-							D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-							D3DXVECTOR3 objpos = m_pos - pTest->GetPos();
-							D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
-
-							// ----- 接地時処理 -----
-							if (bIsHit)
-							{
-							
-								m_pos.y += fLandDistance - m_move.y;
-								return true;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	return false;
 }

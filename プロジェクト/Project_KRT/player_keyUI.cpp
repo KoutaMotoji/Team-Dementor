@@ -13,7 +13,6 @@ namespace
 	D3DXVECTOR3 BarPos = {220.0f,300.0f,0.0f};
 	D3DXVECTOR2 ButtonSize = { 220.0f / 3,220.0f / 3 };
 
-
 	D3DXCOLOR BarColNormal = { 1.0f,1.0f,1.0f,1.0f };
 	D3DXCOLOR BarColHalf = { 1.0f,0.0f,0.0f,1.0f };
 }

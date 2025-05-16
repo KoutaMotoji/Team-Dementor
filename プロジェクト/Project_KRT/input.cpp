@@ -7,6 +7,10 @@
 #include "input.h"
 //マクロ定義
 
+////グローバル変数
+//XINPUT_STATE g_joyKeyState;
+//XINPUT_STATE g_joyKeyStateTrigger;
+
 //静的メンバ初期化
 LPDIRECTINPUT8 CInput::m_pInput = nullptr;
 

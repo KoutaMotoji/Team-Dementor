@@ -9,7 +9,7 @@
 
 #include "main.h"
 
-#define MAX_MODEL_TEX	(10)
+#define MAX_MODEL_TEX	(20)
 
 class CModelParts 
 {

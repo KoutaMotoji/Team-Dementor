@@ -11,8 +11,12 @@ namespace
 {
 	float _CAM_ROTSPEED = 0.05f;
 	float _CAM_UPSPEED = 15.0f;
+	float _CAM_ZOOMSPEED = 15.0f;
+
 	float _CAM_MAX_HEIGHT = 600.0f;
 	float _CAM_MIN_HEIGHT = 100.0f;
+	float _CAM_MAX_ZOOM = 1500.0f;
+	float _CAM_MIN_ZOOM = 100.0f;
 }
 
 CCamera::CCamera():m_nShakeFlame(0)
@@ -39,7 +43,7 @@ HRESULT CCamera::Init(void)
 	m_fRotZ = 0.0f;
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();		//デバイスへのポインタを取得
 
-//デバッグ表示用フォントの生成
+	//デバッグ表示用フォントの生成	
 	D3DXCreateFont(pDevice, 20, 0, 0, 0, FALSE, SHIFTJIS_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH, "HGPｺﾞｼｯｸE", &m_pFont);
 	return S_OK;
 }
@@ -90,6 +94,22 @@ void CCamera::Update(void)
 		if (m_camHeight < _CAM_MIN_HEIGHT)
 		{
 			m_camHeight = _CAM_MIN_HEIGHT;
+		}
+	}
+	if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_UP) == true)
+	{
+		m_camDistance += _CAM_ZOOMSPEED;
+		if (m_camDistance > _CAM_MAX_ZOOM)
+		{
+			m_camDistance = _CAM_MAX_ZOOM;
+		}
+	}
+	if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_DOWN) == true)
+	{
+		m_camDistance -= _CAM_ZOOMSPEED;
+		if (m_camDistance < _CAM_MIN_ZOOM)
+		{
+			m_camDistance = _CAM_MIN_ZOOM;
 		}
 	}
 #if _DEBUG

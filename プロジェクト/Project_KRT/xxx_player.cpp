@@ -5,29 +5,43 @@
 // 
 //===============================================================================
 #include "xxx_player.h"
+#include "character.h"
 #include "player_keyUI.h"
 #include "floor_stone.h"
 
+#include "inimanager.h"
 #include "game.h"
 
 namespace
 {
+	float _WORLD_WALL = 1300.0f;
 	float Damage_Ratio = 0.2f;
 	float _GRAVITY = 4.0f;
-	float _MOVE_SPEED = 2.5f;
+	float _MOVE_SPEED = 1.5f;
 	float _JUMP_HEIGHT = 120.0f;
-	int _GAUGE_CTVALUE = 120;
+	int _GAUGE_CTVALUE = 60;
 	std::vector<D3DXVECTOR3>SetButtonUIpos = {
 		{220.0f - 220.0f / 3,250.0f,0.0f},
 		{220.0f,250.0f,0.0f},
 		{220.0f + 220.0f / 3,250.0f,0.0f}
+	};
+	struct _FILENAME
+	{
+		std::string config;
+		std::string section;
+		std::string keyword;
+	};
+	_FILENAME st_filename = {
+		"data\\TEXT\\Config.ini",
+		 "ModelData",
+		 "PlayerMotion"
 	};
 };
 
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0)
+CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0), m_pModel(nullptr)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -47,6 +61,8 @@ CPlayerX::~CPlayerX()
 void CPlayerX::Init()
 {
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
+	m_pModel = CCharacter::Create({0.0f,0.0f,0.0f});
+	m_pModel->MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 }
 
 //==========================================================================================
@@ -54,6 +70,7 @@ void CPlayerX::Init()
 //==========================================================================================
 void CPlayerX::Uninit()
 {
+	m_pModel->Uninit();
 }
 
 //==========================================================================================
@@ -65,7 +82,23 @@ void CPlayerX::Update()
 	m_OldPos = CObjectX::GetPos();
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
-	PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
+	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
+	{
+		m_pModel->SetNextMotion(MOTION_ATTACK);
+	}
+	if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER))
+	{
+		m_pModel->SetNextMotion(MOTION_NUTORAL);
+	}
+	if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER))
+	{
+		m_pModel->SetNextMotion(MOTION_PARRY);
+	}
+
+	if (m_pModel->GetNextMotion() != MOTION_ATTACK && m_pModel->GetNextMotion() != MOTION_PARRY)
+	{
+		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
+	}
 	PAttackInfo();
 
 	CObjectX::AddPos(m_move);
@@ -75,6 +108,10 @@ void CPlayerX::Update()
 	m_move.y += (0.0f - m_move.y) * 0.14f;
 	m_move.z += (0.0f - m_move.z) * 0.17f;
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(CObjectX::GetPos());
+	D3DXVECTOR3 MODELPOS = CObjectX::GetPos();
+	MODELPOS.y += 10.0f;
+	m_pModel->SetPos(MODELPOS);
+	m_pModel->SetRot(CObjectX::GetRot());
 }
 
 //==========================================================================================
@@ -136,7 +173,8 @@ void CPlayerX::Draw()
 	//ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD,
 		&m_mtxWorld);
-	CObjectX::Draw();
+	//CObjectX::Draw();
+	m_pModel->Draw();
 }
 
 //==========================================================================================
@@ -203,9 +241,10 @@ bool CPlayerX::PMove(float fCamRotZ)
 
 	moveYrot = atan2f(moveDir.x, moveDir.z) + fCamRotZ;
 	
-	if (moveDir.x == 0.0f || moveDir.z == 0.0f)
+	if (moveDir.x == 0.0f && moveDir.z == 0.0f)
 	{
 		m_move.y -= _GRAVITY;
+		m_pModel->SetNextMotion(MOTION_NUTORAL);
 		return true;
 	}
 
@@ -215,6 +254,9 @@ bool CPlayerX::PMove(float fCamRotZ)
 
 	m_move.y -= _GRAVITY;
 
+	m_pModel->SetNextMotion(MOTION_WALK);
+	
+
 	return true;
 }
 
@@ -223,21 +265,21 @@ bool CPlayerX::PMove(float fCamRotZ)
 //==========================================================================================
 void CPlayerX::FloorCollision()
 {
-	if (CObjectX::GetPos().z < -1000)
+	if (CObjectX::GetPos().z < -_WORLD_WALL)
 	{
-		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, -1000 });
+		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, -_WORLD_WALL });
 	}
-	else if (CObjectX::GetPos().z > 1000)
+	else if (CObjectX::GetPos().z > _WORLD_WALL)
 	{
-		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, 1000 });
+		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, _WORLD_WALL });
 	}
-	if (CObjectX::GetPos().x < -1200)
+	if (CObjectX::GetPos().x < -_WORLD_WALL)
 	{
-		CObjectX::SetPos({ -1200, CObjectX::GetPos().y, CObjectX::GetPos().z });
+		CObjectX::SetPos({ -_WORLD_WALL, CObjectX::GetPos().y, CObjectX::GetPos().z });
 	}
-	else if (CObjectX::GetPos().x > 1200)
+	else if (CObjectX::GetPos().x > _WORLD_WALL)
 	{
-		CObjectX::SetPos({ 1200, CObjectX::GetPos().y, CObjectX::GetPos().z });
+		CObjectX::SetPos({ _WORLD_WALL, CObjectX::GetPos().y, CObjectX::GetPos().z });
 	}
 
 	// 地形判定
@@ -276,6 +318,26 @@ void CPlayerX::FloorCollision()
 		}
 	}
 }
+
+//==========================================================================================
+// プレイヤーの地形の起伏移動
+//==========================================================================================
+bool FloorbumpyMesh(LPD3DXMESH pMesh)
+{
+	struct RayInfo
+	{
+		// 地形判定
+		BOOL  bIsHit = false;
+		float fLandDistance = {};
+		DWORD dwHitIndex = 0U;
+		float fHitU;
+		float fHitV;
+	};
+
+	std::vector<RayInfo>RI();
+	return true;
+}
+
 
 //==========================================================================================
 // プレイヤーの攻撃入力

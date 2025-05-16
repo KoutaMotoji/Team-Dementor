@@ -152,6 +152,7 @@
     <ClCompile Include="floor.cpp" />
     <ClCompile Include="floor_stone.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="inimanager.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="joypad.cpp" />
     <ClCompile Include="keyboard.cpp" />
@@ -183,6 +184,8 @@
     <ClInclude Include="floor.h" />
     <ClInclude Include="floor_stone.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="inicpp.h" />
+    <ClInclude Include="inimanager.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="joypad.h" />
     <ClInclude Include="keyboard.h" />
@@ -205,6 +208,9 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="xxx_player.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="data\TEXT\Config.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -17,6 +17,7 @@
 //前方宣言
 class CCTBarUI;
 class CButtonUI;
+class CCharacter;
 
 class CPlayerX :public CObjectX
 {
@@ -34,19 +35,29 @@ public:
 
 	inline D3DXVECTOR3 GetPos() { return m_pos; };
 	inline D3DXVECTOR3 GetMove() { return m_move; };
+	enum
+	{
+		MOTION_NUTORAL = 0,
+		MOTION_WALK,
+		MOTION_ATTACK,
+		MOTION_JUMP,
+		MOTION_LANDING,
+		MOTION_PARRY
+	};
 private:
 
 
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
-
+	CCharacter* m_pModel;
 	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
 	D3DXVECTOR3 m_move;						//移動量
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
 
 	void FloorCollision();					//床との当たり判定
+	bool FloorbumpyMesh(LPD3DXMESH pMesh);
 	CCTBarUI* m_pCctBarUI;
 	bool m_bAttackCt;
 	int m_nPushedKey;
