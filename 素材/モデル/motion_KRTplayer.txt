@@ -16,7 +16,7 @@ NUM_MODEL = 15
 #------------------------------------------------------------------------------
 MODEL_FILENAME = data/MODEL/KRTplayer/00_bodyD.x	# [0]腹
 MODEL_FILENAME = data/MODEL/KRTplayer/01_bodyU.x	# [1]胸
-MODEL_FILENAME = data/MODEL/KRTplayer/02_head.x	# [2]頭
+MODEL_FILENAME = data/MODEL/KRTplayer/02_head.x		# [2]頭
 MODEL_FILENAME = data/MODEL/KRTplayer/03_armUR.x	# [3]右上腕
 MODEL_FILENAME = data/MODEL/KRTplayer/04_armDR.x	# [4]右前腕
 MODEL_FILENAME = data/MODEL/KRTplayer/05_handR.x	# [5]右手
@@ -1441,6 +1441,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
+	COLLISION = 3 0.0 0.0 0.0 20.0 6 12	# 当たり判定(パーツNo./オフセットXYZ/半径/開始F/終了F)
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 10
@@ -1761,7 +1762,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-
+	
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 40
 		KEY	# ----- [ 0 ] -----
