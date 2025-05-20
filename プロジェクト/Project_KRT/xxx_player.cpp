@@ -17,7 +17,7 @@ namespace
 	float _WORLD_WALL = 1300.0f;
 	float Damage_Ratio = 0.2f;
 	float _GRAVITY = 4.0f;
-	float _MOVE_SPEED = 1.5f;
+	float _MOVE_SPEED = 1.2f;
 	float _JUMP_HEIGHT = 120.0f;
 	int _GAUGE_CTVALUE = 60;
 	std::vector<D3DXVECTOR3>SetButtonUIpos = {

@@ -36,7 +36,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CG_Gorira::CG_Gorira() : m_bAttackCt(false)
+CG_Gorira::CG_Gorira() : m_bAttackCt(false), m_nAttackcnt(0), m_moveFlag(true)
 {
 
 }
@@ -49,6 +49,7 @@ void CG_Gorira::Init()
 	CObject::SetType(TYPE_3D_ENEMY);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
+	CCharacter::SetSize({ 3.0f,3.0f,3.0f });
 }
 
 //==========================================================================================
@@ -65,10 +66,46 @@ void CG_Gorira::Uninit()
 void CG_Gorira::Update()
 {
 	m_OldPos = CCharacter::GetPos();
+	if (m_nAttackcnt >= 720)
+	{
+		CCharacter::SetNextMotion(2);
+		m_nAttackcnt = 0;
+	}
+	else
+	{
+		++m_nAttackcnt;
+	}
+	if (CCharacter::GetNextMotion() != 2)
+	{
+		if (m_moveFlag)
+		{
+			m_move.z -= 1.0f;
+			CCharacter::SetNextMotion(1);
+			CCharacter::SetRot({ 0.0f,0.0f,0.0f });
+		}
+		else
+		{
+			m_move.z += 1.0f;
+			CCharacter::SetNextMotion(1);
+			CCharacter::SetRot({ 0.0f,D3DX_PI,0.0f });
+		}
+	}
+
 	CCharacter::AddPos({ 0.0f,-_GRAVITY,0.0f });
 	FloorCollision();	//プレイヤー移動制限の当たり判定
-	CCharacter::SetPos(CPlayerObserver::GetInstance()->GetPlayerPos());
-	CCharacter::SetRot({ 0.0f,0.0f,0.0f });
+
+	//CCharacter::SetRot({ 0.0f,0.0f,0.0f });
+
+	CCharacter::AddPos(m_move);
+	if (m_OldPos.z + m_move.z > 800.0f || m_OldPos.z + m_move.z < -800.0f)
+	{
+		CCharacter::AddPos({ 0.0f,0.0f,-m_move.z});
+		m_moveFlag = (!m_moveFlag);
+	}
+	//移動量を更新
+	m_move.x += (0.0f - m_move.x) * 0.14f;
+	m_move.y += (0.0f - m_move.y) * 0.14f;
+	m_move.z += (0.0f - m_move.z) * 0.17f;
 	CCharacter::Update();
 }
 
@@ -77,7 +114,6 @@ void CG_Gorira::Update()
 //==========================================================================================
 void CG_Gorira::Draw()
 {
-	int odss = CCharacter::GetNowMotion();
 	CCharacter::Draw();
 }
 

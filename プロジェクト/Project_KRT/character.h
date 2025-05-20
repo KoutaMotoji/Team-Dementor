@@ -32,6 +32,8 @@ public:
 	inline D3DXVECTOR3 GetRot() { return m_rot; }				//Šp“xŽæ“¾
 	inline void AddRot(D3DXVECTOR3 rot) { m_rot += rot; }		//Šp“xˆÚ“®	
 	inline void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
+	inline void AddSize(D3DXVECTOR3 size) { m_size += size; };
+	inline void SetSize(D3DXVECTOR3 size) { m_size = size; };
 
 	inline D3DXVECTOR3 GetMove() { return m_move; };
 	inline int GetNowMotion() { return m_CurMotion; }

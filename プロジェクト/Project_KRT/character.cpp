@@ -137,7 +137,6 @@ CCharacter* CCharacter::Create(D3DXVECTOR3 pos)
 	CCharacter* charactor = new CCharacter;
 
 	charactor->m_pos = pos;
-
 	charactor->Init();
 
 	return charactor;

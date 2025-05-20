@@ -43,6 +43,8 @@ private:
 
 	void FloorCollision();					//°‚Æ‚Ì“–‚½‚è”»’è
 	bool m_bAttackCt;
+	int m_nAttackcnt;
+	bool m_moveFlag;
 };
 
 #endif
