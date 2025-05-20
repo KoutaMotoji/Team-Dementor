@@ -41,7 +41,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0), m_pModel(nullptr)
+CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -61,8 +61,8 @@ CPlayerX::~CPlayerX()
 void CPlayerX::Init()
 {
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
-	m_pModel = CCharacter::Create({0.0f,0.0f,0.0f});
-	m_pModel->MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
+	CCharacter::Init();
+	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 }
 
 //==========================================================================================
@@ -70,7 +70,7 @@ void CPlayerX::Init()
 //==========================================================================================
 void CPlayerX::Uninit()
 {
-	m_pModel->Uninit();
+	CCharacter::Uninit();
 }
 
 //==========================================================================================
@@ -79,39 +79,43 @@ void CPlayerX::Uninit()
 void CPlayerX::Update()
 {
 	D3DXVECTOR3 CameraPos;		//カメラの座標移動用ローカル変数
-	m_OldPos = CObjectX::GetPos();
+	m_OldPos = CCharacter::GetPos();
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
 	{
-		m_pModel->SetNextMotion(MOTION_ATTACK);
+		CCharacter::SetNextMotion(MOTION_ATTACK);
 	}
-	if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER))
+	if (CCharacter::GetNextMotion() != MOTION_ATTACK)
 	{
-		m_pModel->SetNextMotion(MOTION_NUTORAL);
-	}
-	if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER))
-	{
-		m_pModel->SetNextMotion(MOTION_PARRY);
+		if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER))
+		{
+			CCharacter::SetNextMotion(MOTION_NUTORAL);
+		}
+		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER))
+		{
+			CCharacter::SetNextMotion(MOTION_PARRY);
+		}
+		if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER))
+		{
+			CCharacter::SetNextMotion(MOTION_PARRY_STAY);
+		}
 	}
 
-	if (m_pModel->GetNextMotion() != MOTION_ATTACK && m_pModel->GetNextMotion() != MOTION_PARRY)
+	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY)
 	{
 		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
 	}
 	PAttackInfo();
 
-	CObjectX::AddPos(m_move);
+	CCharacter::AddPos(m_move);
 	
 	//移動量を更新
 	m_move.x += (0.0f - m_move.x) * 0.14f;
 	m_move.y += (0.0f - m_move.y) * 0.14f;
 	m_move.z += (0.0f - m_move.z) * 0.17f;
-	CManager::GetInstance()->GetCamera()->SetPlayerPos(CObjectX::GetPos());
-	D3DXVECTOR3 MODELPOS = CObjectX::GetPos();
-	MODELPOS.y += 10.0f;
-	m_pModel->SetPos(MODELPOS);
-	m_pModel->SetRot(CObjectX::GetRot());
+	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());
+	CCharacter::Update();
 }
 
 //==========================================================================================
@@ -119,62 +123,7 @@ void CPlayerX::Update()
 //==========================================================================================
 void CPlayerX::Draw()
 {
-	LPDIRECT3DDEVICE9 pDevice;
-	//デバイスの取得
-	pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-	//計算用マトリックス
-	D3DXMATRIX mtxRot, mtxTrans, mtxSize;
-
-	//クオータニオンを作成
-	D3DXQuaternionRotationAxis(
-		&m_quat,
-		&m_vecAxis,
-		m_fValueRot);
-
-	//クオータニオンから回転マトリックスを作成
-	D3DXMatrixRotationQuaternion(
-		&mtxRot,
-		&m_quat);
-	m_mtxRot = mtxRot;		//回転マトリックスを保存
-
-	//ワールドマトリックスの初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
-
-	//大きさを反映
-	D3DXMatrixScaling(&mtxSize,
-		m_size.y,
-		m_size.x,
-		m_size.z);
-	D3DXMatrixMultiply(&m_mtxWorld,
-		&m_mtxWorld,
-		&mtxSize);
-
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot,
-		m_rot.y,
-		m_rot.x,
-		m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld,
-		&m_mtxWorld,
-		&m_mtxRot);
-	D3DXMatrixMultiply(&m_mtxWorld,
-		&m_mtxWorld,
-		&mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,
-		m_pos.x,
-		m_pos.y,
-		m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld,
-		&m_mtxWorld,
-		&mtxTrans);
-
-	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD,
-		&m_mtxWorld);
-	//CObjectX::Draw();
-	m_pModel->Draw();
+	CCharacter::Draw();
 }
 
 //==========================================================================================
@@ -184,10 +133,7 @@ CPlayerX* CPlayerX::Create(D3DXVECTOR3 pos)
 {
 	CPlayerX* player = new CPlayerX;
 	player->Init();
-	player->BindModel("data\\MODEL\\P_Model.x");
-	player->SetModelParam(pos);
 	player->m_move = { 0.0f,0.0f,0.0f };
-	player->m_size = { 1.0f,1.0f,1.0f };
 	player->m_OldPos = pos;
 	return player;
 }
@@ -244,17 +190,17 @@ bool CPlayerX::PMove(float fCamRotZ)
 	if (moveDir.x == 0.0f && moveDir.z == 0.0f)
 	{
 		m_move.y -= _GRAVITY;
-		m_pModel->SetNextMotion(MOTION_NUTORAL);
+		CCharacter::SetNextMotion(MOTION_NUTORAL);
 		return true;
 	}
 
-	CObjectX::SetRot({ 0.0f,moveYrot + D3DX_PI,0.0f });
+	CCharacter::SetRot({ 0.0f,moveYrot + D3DX_PI,0.0f });
 	m_move.x += sinf(moveYrot) * _MOVE_SPEED;
 	m_move.z += cosf(moveYrot) * _MOVE_SPEED;
 
 	m_move.y -= _GRAVITY;
 
-	m_pModel->SetNextMotion(MOTION_WALK);
+	CCharacter::SetNextMotion(MOTION_WALK);
 	
 
 	return true;
@@ -265,21 +211,21 @@ bool CPlayerX::PMove(float fCamRotZ)
 //==========================================================================================
 void CPlayerX::FloorCollision()
 {
-	if (CObjectX::GetPos().z < -_WORLD_WALL)
+	if (CCharacter::GetPos().z < -_WORLD_WALL)
 	{
-		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, -_WORLD_WALL });
+		CCharacter::SetPos({ CCharacter::GetPos().x, CCharacter::GetPos().y, -_WORLD_WALL });
 	}
-	else if (CObjectX::GetPos().z > _WORLD_WALL)
+	else if (CCharacter::GetPos().z > _WORLD_WALL)
 	{
-		CObjectX::SetPos({ CObjectX::GetPos().x, CObjectX::GetPos().y, _WORLD_WALL });
+		CCharacter::SetPos({ CCharacter::GetPos().x, CCharacter::GetPos().y, _WORLD_WALL });
 	}
-	if (CObjectX::GetPos().x < -_WORLD_WALL)
+	if (CCharacter::GetPos().x < -_WORLD_WALL)
 	{
-		CObjectX::SetPos({ -_WORLD_WALL, CObjectX::GetPos().y, CObjectX::GetPos().z });
+		CCharacter::SetPos({ -_WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
 	}
-	else if (CObjectX::GetPos().x > _WORLD_WALL)
+	else if (CCharacter::GetPos().x > _WORLD_WALL)
 	{
-		CObjectX::SetPos({ _WORLD_WALL, CObjectX::GetPos().y, CObjectX::GetPos().z });
+		CCharacter::SetPos({ _WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
 	}
 
 	// 地形判定
@@ -302,13 +248,13 @@ void CPlayerX::FloorCollision()
 							// 地形判定
 							pMesh = pTest->GetMesh();
 							D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-							D3DXVECTOR3 objpos = CObjectX::GetPos() - pTest->GetPos();
+							D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
 							D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
 
 							// ----- 接地時処理 -----
 							if (bIsHit)
 							{
-								CObjectX::AddPos({ 0.0f, fLandDistance - m_move.y - _GRAVITY,0.0f });
+								CCharacter::AddPos({ 0.0f, fLandDistance - m_move.y - _GRAVITY,0.0f });
 								return;
 							}
 						}
@@ -322,7 +268,7 @@ void CPlayerX::FloorCollision()
 //==========================================================================================
 // プレイヤーの地形の起伏移動
 //==========================================================================================
-bool FloorbumpyMesh(LPD3DXMESH pMesh)
+bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 {
 	struct RayInfo
 	{
@@ -334,7 +280,7 @@ bool FloorbumpyMesh(LPD3DXMESH pMesh)
 		float fHitV;
 	};
 
-	std::vector<RayInfo>RI();
+	std::vector<RayInfo>RI(2);
 	return true;
 }
 

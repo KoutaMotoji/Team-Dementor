@@ -37,22 +37,14 @@ public:
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }
 
-
 	void MotionDataLoad(std::string filename);
 	void SetNextMotion(int nNextMotionNum);
-
+	inline std::vector<CModelParts*> GetVecModelParts() {
+		return m_apModelParts;
+	}
 private:
-
-	//モーション用定数
-	static constexpr int MAX_MODELPARTS = 32;
-	static constexpr int MAX_PARTS = 32;
-	static constexpr int MAX_KEYSET = 32;
-	static constexpr int MAX_MOTION = 16;
-
-
 	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
 	D3DXVECTOR3 m_move;						//移動量
-	D3DXVECTOR3 m_OldPos;					//過去の位置
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
 
 	void FloorCollision();					//床との当たり判定

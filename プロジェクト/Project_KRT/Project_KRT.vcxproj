@@ -168,10 +168,12 @@
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="Obj_manager.cpp" />
     <ClCompile Include="player_keyUI.cpp" />
+    <ClCompile Include="player_observer.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="sound.cpp" />
+    <ClCompile Include="stage1_boss.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="xxx_player.cpp" />
@@ -201,10 +203,12 @@
     <ClInclude Include="objectX.h" />
     <ClInclude Include="Obj_manager.h" />
     <ClInclude Include="player_keyUI.h" />
+    <ClInclude Include="player_observer.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="sound.h" />
+    <ClInclude Include="stage1_boss.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="xxx_player.h" />

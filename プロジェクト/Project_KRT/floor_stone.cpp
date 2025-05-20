@@ -53,13 +53,7 @@ void CMeshGround::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();;
 
-
-
-
 	CObjectX::Draw();
-
-
-
 }
 
 //==========================================================================================

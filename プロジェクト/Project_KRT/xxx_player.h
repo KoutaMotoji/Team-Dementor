@@ -8,7 +8,7 @@
 #define _PLAYERX_H_
 
 #include "main.h"
-#include "objectX.h"
+#include "character.h"
 #include "modelparts.h"
 
 
@@ -19,7 +19,7 @@ class CCTBarUI;
 class CButtonUI;
 class CCharacter;
 
-class CPlayerX :public CObjectX
+class CPlayerX :public CCharacter
 {
 public:
 	CPlayerX();					//コンストラクタ
@@ -33,7 +33,7 @@ public:
 	bool PAttackInfo();
 	static CPlayerX* Create(D3DXVECTOR3 pos);
 
-	inline D3DXVECTOR3 GetPos() { return m_pos; };
+	inline D3DXVECTOR3 GetPos() { return CCharacter::GetPos(); };
 	inline D3DXVECTOR3 GetMove() { return m_move; };
 	enum
 	{
@@ -42,7 +42,8 @@ public:
 		MOTION_ATTACK,
 		MOTION_JUMP,
 		MOTION_LANDING,
-		MOTION_PARRY
+		MOTION_PARRY,
+		MOTION_PARRY_STAY
 	};
 private:
 
@@ -50,8 +51,6 @@ private:
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
-	CCharacter* m_pModel;
-	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
 	D3DXVECTOR3 m_move;						//移動量
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス

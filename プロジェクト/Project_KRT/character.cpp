@@ -18,7 +18,10 @@ namespace
 //==========================================================================================
 CCharacter::CCharacter() :m_nLife(1000),
 						m_bMotion(false),
-						m_bBlend(false)
+						m_bBlend(false),
+						m_move( { 0.0f,0.0f,0.0f }),
+						m_rot ( { 0.0f,0.0f,0.0f }),
+						m_size ( { 1.0f,1.0f,1.0f })
 {
 
 }
@@ -37,7 +40,6 @@ CCharacter::~CCharacter()
 void CCharacter::Init()
 {
 	MotionInit();		//モーションの初期設定
-	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
 }
 
 //==========================================================================================
@@ -60,7 +62,6 @@ void CCharacter::Update()
 	{//モーションブレンド中でなければ通常のモーション再生
 		SetNextKey();
 	}
-
 }
 
 //==========================================================================================
@@ -134,13 +135,11 @@ void CCharacter::Draw()
 CCharacter* CCharacter::Create(D3DXVECTOR3 pos)
 {
 	CCharacter* charactor = new CCharacter;
-	charactor->Init();
 
 	charactor->m_pos = pos;
-	charactor->m_move = { 0.0f,0.0f,0.0f };
-	charactor->m_rot = { 0.0f,D3DX_PI,0.0f };
-	charactor->m_size = { 1.0f,1.0f,1.0f };
-	charactor->m_OldPos = pos;
+
+	charactor->Init();
+
 	return charactor;
 }
 

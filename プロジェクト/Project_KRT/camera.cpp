@@ -15,7 +15,7 @@ namespace
 
 	float _CAM_MAX_HEIGHT = 600.0f;
 	float _CAM_MIN_HEIGHT = 100.0f;
-	float _CAM_MAX_ZOOM = 1500.0f;
+	float _CAM_MAX_ZOOM = 600.0f;
 	float _CAM_MIN_ZOOM = 100.0f;
 }
 

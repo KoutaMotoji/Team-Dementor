@@ -42,7 +42,6 @@ public:
 	D3DXVECTOR3 GetModelMax() { return m_vtxMaxModel; }		//最小値取得
 
 	D3DXVECTOR3* GetRadius() { return &m_radius; };			//半径取得
-
 private:
 	//Xファイル管理に必要なデータ
 	LPDIRECT3DTEXTURE9 m_pTextureObjectX[MAX_MODEL_TEX];	//モデルに貼り付けるテクスチャ管理

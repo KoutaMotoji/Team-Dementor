@@ -11,6 +11,7 @@
 #include "xxx_player.h"
 #include "floor_stone.h"
 #include "mesh_cylinder.h"
+#include "stage1_boss.h"
 
 #include "game.h"
 
@@ -35,10 +36,12 @@ HRESULT CGame::Init()
 	CManager::GetInstance()->GetCamera()->SetCameraHeigjt(400.0f);
 	CManager::GetInstance()->GetCamera()->SetCameraDistance(1200.0f);
 
-	//CFloor::Create({ 0.0f,0.0f,0.0f });
 	CMeshGround::Create({ 0.0f,0.0f,0.0f });
 	CPlayerX::Create({ 200.0f,1000.0f,0.0f });
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
+
+	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+
 	return S_OK;
 }
 
