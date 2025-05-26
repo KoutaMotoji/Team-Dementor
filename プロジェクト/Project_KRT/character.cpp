@@ -19,6 +19,7 @@ namespace
 CCharacter::CCharacter() :m_nLife(1000),
 						m_bMotion(false),
 						m_bBlend(false),
+						m_NowAllFrame(0),
 						m_move( { 0.0f,0.0f,0.0f }),
 						m_rot ( { 0.0f,0.0f,0.0f }),
 						m_size ( { 1.0f,1.0f,1.0f })
@@ -159,6 +160,7 @@ void CCharacter::MotionInit()
 	m_CurMotion = 0;
 	m_CurKey = 0;
 	m_NowFrame = 0;
+	m_NowAllFrame = 0;
 }
 
 //==========================================================================================
@@ -172,6 +174,7 @@ void CCharacter::SetNextMotion(int nNextMotionNum)
 	}
 	m_NextMotion = nNextMotionNum;
 	m_NowFrame = 0;
+	m_NowAllFrame = 0;
 	m_bBlend = true;
 }
 
@@ -201,6 +204,20 @@ void CCharacter::SetNextKey()
 	int nNextKey = (m_CurKey + 1) % m_aMotion[nNowMotion].nKeyNum;
 	float fRatioFrame = (float)m_NowFrame / (float)m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame;
 	int nCntParts = 0;
+	++m_NowAllFrame;
+	for (auto& e : m_pHitCircle)
+	{
+		if (e->GetMotionNum() == nNowMotion) {
+			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd())
+			{
+				e->SetEnable();
+			}
+			else
+			{
+				e->SetDisable();
+			}
+		}
+	}
 	for (auto& e : m_apModelParts)
 	{
 		//現在の向きと位置の情報
@@ -263,6 +280,7 @@ void CCharacter::SetNextKey()
 				--m_CurKey;
 				m_CurKey = 0;
 				m_NowFrame = 0;
+				m_NowAllFrame = 0;
 				m_CurMotion = m_NextMotion = 0;
 			}
 			else
@@ -534,7 +552,23 @@ void CCharacter::MotionDataLoad(std::string filename)
 						fscanf(pFile, "%d", &nNum);
 						GetMotionData.nKeyNum = nNum;
 					}
-
+					//当たり判定の有無
+					else  if (!strcmp(LoadData, "COLLISION"))
+					{
+						D3DXVECTOR3 POS, RADIUS;
+						int PARENT,START_F,END_F;
+						float FLOAT_RADIUS;
+						fscanf(pFile, "%s", LoadData);
+						fscanf(pFile, "%d", &PARENT);
+						fscanf(pFile, "%f", &POS.x);
+						fscanf(pFile, "%f", &POS.y);
+						fscanf(pFile, "%f", &POS.z);
+						fscanf(pFile, "%f", &FLOAT_RADIUS);
+						fscanf(pFile, "%d", &START_F);
+						fscanf(pFile, "%d", &END_F);
+						RADIUS = { FLOAT_RADIUS ,FLOAT_RADIUS ,FLOAT_RADIUS };
+						m_pHitCircle.push_back(CHitCircle::Create(RADIUS, POS, PARENT, START_F, END_F,nMotionCnt));
+					}
 					//各キーを読み込み
 					if (!strcmp(LoadData, "KEYSET"))
 					{
@@ -604,6 +638,7 @@ void CCharacter::MotionDataLoad(std::string filename)
 
 					}
 				}
+				++nMotionCnt;
 			}
 		}
 	}

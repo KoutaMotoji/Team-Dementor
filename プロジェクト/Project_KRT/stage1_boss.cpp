@@ -46,7 +46,7 @@ CG_Gorira::CG_Gorira() : m_bAttackCt(false), m_nAttackcnt(0), m_moveFlag(true)
 //==========================================================================================
 void CG_Gorira::Init()
 {
-	CObject::SetType(TYPE_3D_ENEMY);						//オブジェクト一括管理用のタイプを設定
+	CObject::SetType(TYPE_3D_BOSS_1);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 	CCharacter::SetSize({ 3.0f,3.0f,3.0f });
@@ -102,6 +102,8 @@ void CG_Gorira::Update()
 		CCharacter::AddPos({ 0.0f,0.0f,-m_move.z});
 		m_moveFlag = (!m_moveFlag);
 	}
+	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
+
 	//移動量を更新
 	m_move.x += (0.0f - m_move.x) * 0.14f;
 	m_move.y += (0.0f - m_move.y) * 0.14f;

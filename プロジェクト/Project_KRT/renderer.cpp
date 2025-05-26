@@ -56,7 +56,7 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	d3dpp.BackBufferCount = 1;
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;
 	d3dpp.EnableAutoDepthStencil = TRUE;
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;;
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;;
 	d3dpp.Windowed = bWindow;
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
@@ -116,6 +116,9 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	m_D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
 	m_D3DDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_CURRENT);
 
+	m_D3DDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	m_D3DDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+
 	return S_OK;
 }
 
@@ -153,7 +156,7 @@ void CRenderer::Draw(CScene* pScene)
 {
 	//画面クリア(バックバッファ＆Zバッファのクリア)
 	m_D3DDevice->Clear(0, NULL,
-		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+		(D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
 		D3DCOLOR_RGBA(50, 50, 50, 0), 1.0f, 0);
 	//描画開始
 	if (SUCCEEDED(m_D3DDevice->BeginScene()))

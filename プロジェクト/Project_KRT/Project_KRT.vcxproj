@@ -148,6 +148,7 @@
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="character.cpp" />
+    <ClCompile Include="collision.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="floor.cpp" />
     <ClCompile Include="floor_stone.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="character.h" />
+    <ClInclude Include="collision.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="floor.h" />
     <ClInclude Include="floor_stone.h" />

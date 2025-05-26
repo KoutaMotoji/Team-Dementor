@@ -8,6 +8,7 @@
 #include "character.h"
 #include "player_keyUI.h"
 #include "floor_stone.h"
+#include "stage1_boss.h"
 
 #include "inimanager.h"
 #include "game.h"
@@ -36,12 +37,16 @@ namespace
 		 "ModelData",
 		 "PlayerMotion"
 	};
+	std::vector<D3DXVECTOR3> RayPos = {
+		{0.0f,10.0f,0.0f},
+		{0.0f,50.0f,0.0f}
+	};
 };
 
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0)
+CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -63,6 +68,7 @@ void CPlayerX::Init()
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
+	m_playerMask2D = CPlayerMask::Create();
 }
 
 //==========================================================================================
@@ -71,6 +77,7 @@ void CPlayerX::Init()
 void CPlayerX::Uninit()
 {
 	CCharacter::Uninit();
+	m_playerMask2D->Uninit();
 }
 
 //==========================================================================================
@@ -81,22 +88,23 @@ void CPlayerX::Update()
 	D3DXVECTOR3 CameraPos;		//カメラの座標移動用ローカル変数
 	m_OldPos = CCharacter::GetPos();
 
-	FloorCollision();	//プレイヤー移動制限の当たり判定
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
 	{
 		CCharacter::SetNextMotion(MOTION_ATTACK);
 	}
-	if (CCharacter::GetNextMotion() != MOTION_ATTACK)
+	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
 	{
 		if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER))
 		{
 			CCharacter::SetNextMotion(MOTION_NUTORAL);
+			m_bParryWait = false;
 		}
 		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER))
 		{
 			CCharacter::SetNextMotion(MOTION_PARRY);
+			m_bParryWait = true;
 		}
-		if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER))
+		if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER)&& CCharacter::GetNextMotion() != MOTION_PARRY)
 		{
 			CCharacter::SetNextMotion(MOTION_PARRY_STAY);
 		}
@@ -105,6 +113,12 @@ void CPlayerX::Update()
 	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY)
 	{
 		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
+	}
+	FloorCollision();	//プレイヤー移動制限の当たり判定
+
+	if (m_bParryWait)
+	{
+		SetParry();
 	}
 	PAttackInfo();
 
@@ -123,7 +137,36 @@ void CPlayerX::Update()
 //==========================================================================================
 void CPlayerX::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+
+	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_NEVER);
+
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	//ステンシル参照値
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x05);
+	//ステンシルマスク
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xffffffff);
+	pDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0xffffffff);
+
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+
+
+
+	// ステンシルテストのテスト設定
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILCAPS_REPLACE);
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
+
+
+	m_playerMask2D->Draw();
+
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, FALSE);
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
 	CCharacter::Draw();
+
+
 }
 
 //==========================================================================================
@@ -255,6 +298,7 @@ void CPlayerX::FloorCollision()
 							if (bIsHit)
 							{
 								CCharacter::AddPos({ 0.0f, fLandDistance - m_move.y - _GRAVITY,0.0f });
+								FloorbumpyMesh(pMesh);
 								return;
 							}
 						}
@@ -274,14 +318,36 @@ bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 	{
 		// 地形判定
 		BOOL  bIsHit = false;
-		float fLandDistance = {};
+		float fLandDistance{};
 		DWORD dwHitIndex = 0U;
-		float fHitU;
-		float fHitV;
+		float fHitU{};
+		float fHitV{};
 	};
+	D3DXVECTOR3 pos[2]{}, rot{};
+	rot.x = m_move.x;
+	rot.z = m_move.z;
+	rot.y = 0.0f;
 
+	D3DXVec3Normalize(&rot, &rot);
+	for (int i = 0; i < 2; ++i)
+	{
+		pos[i] = CCharacter::GetPos();
+		pos[i] += RayPos[i];
+	}
 	std::vector<RayInfo>RI(2);
-	return true;
+	for (int i = 0; i < 2; ++i)
+	{
+		D3DXIntersect(pMesh, &pos[i], &rot, &RI[i].bIsHit, &RI[i].dwHitIndex, &RI[i].fHitU, &RI[i].fHitV, &RI[i].fLandDistance, nullptr, nullptr);
+	}
+	if (RI[0].bIsHit && RI[1].bIsHit)
+	{
+		if ((RI[1].fLandDistance - RI[0].fLandDistance) < 100.0f && RI[0].fLandDistance < 20.0f)
+		{
+			CCharacter::SetPos({ CCharacter::GetPos().x - m_move.x,CCharacter::GetPos().y,CCharacter::GetPos().z - m_move.z});
+			return true;
+		}
+	}
+	return false;
 }
 
 
@@ -337,7 +403,93 @@ bool CPlayerX::PAttackInfo()
 				e = nullptr;
 			}
 		}
-		
 	}
 	return true;
+}
+
+//==========================================================================================
+// プレイヤーの攻撃入力
+//==========================================================================================
+void CPlayerX::SetParry()
+{
+	std::unique_ptr<CCollision>pCollision = std::make_unique<CCollision>();
+	std::vector < std::shared_ptr<CHitCircle>> apVecHitCircle = CCharacter::GetVecHitCircle();
+	std::shared_ptr<CHitCircle> pParryCircle;
+	std::shared_ptr<CHitCircle> pBossAttackCircle;
+
+	for (auto& p : apVecHitCircle)
+	{
+		if (p->GetEnable())	{
+			pParryCircle = p;
+			break;
+		}
+	}
+	if (pParryCircle == nullptr)
+	{
+		return;
+	}
+	apVecHitCircle.clear();
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj != nullptr) {
+				CObject::TYPE type = pObj->GetType();
+				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
+					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+					if (pTest != nullptr) {
+						if (pTest != nullptr) {
+							apVecHitCircle = pTest->CCharacter::GetVecHitCircle();
+							for (auto& p : apVecHitCircle)
+							{
+								if (p->GetEnable() && p->GetMotionNum() == 2)
+								{
+									pBossAttackCircle = p;
+								}
+							}
+							if (pBossAttackCircle == nullptr)
+							{
+								return;
+							}
+							D3DXVECTOR3 MainPos, SubPos;
+							D3DXMATRIX MainMtx, SubMtx;
+							int cnt = 0;
+							for (auto& p : CCharacter::GetModelPartsVec())
+							{
+								if (pParryCircle != nullptr)
+								{
+									if (cnt == pParryCircle->GetParentNum())
+									{
+										MainMtx = p->GetWorldMatrix();
+									}
+								}
+								++cnt;
+							}
+							cnt = 0;
+							for (auto& p : pTest->CCharacter::GetModelPartsVec())
+							{
+								if (pBossAttackCircle != nullptr)
+								{
+									if (cnt == pBossAttackCircle->GetParentNum())
+									{
+										SubMtx = p->GetWorldMatrix();
+									}
+								}
+								++cnt;
+							}
+							MainPos = pParryCircle->CalcMtxPos(MainMtx);
+							SubPos = pParryCircle->CalcMtxPos(SubMtx);
+
+							if(pCollision->CircleCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+							{
+								CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
+								m_bParryWait = false;
+								pTest->SetSize({ 1.0f,1.0f,1.0f });
+								return;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }

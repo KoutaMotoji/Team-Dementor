@@ -10,13 +10,14 @@
 #include "main.h"
 #include "object.h"
 #include "modelparts.h"
+#include "collision.h"
 
 #include "manager.h"
 
 class CCharacter :public CObject
 {
 public:
-	CCharacter();					//コンストラクタ
+	CCharacter();				//コンストラクタ
 	~CCharacter()override;		//デストラクタ
 	void Init()override;		//初期化
 	void Uninit()override;		//終了
@@ -38,12 +39,11 @@ public:
 	inline D3DXVECTOR3 GetMove() { return m_move; };
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }
+	inline std::vector<CModelParts*> GetModelPartsVec() { return m_apModelParts; }
 
 	void MotionDataLoad(std::string filename);
 	void SetNextMotion(int nNextMotionNum);
-	inline std::vector<CModelParts*> GetVecModelParts() {
-		return m_apModelParts;
-	}
+	inline std::vector<std::shared_ptr<CHitCircle>> GetVecHitCircle() { return m_pHitCircle; }
 private:
 	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
 	D3DXVECTOR3 m_move;						//移動量
@@ -51,19 +51,19 @@ private:
 
 	void FloorCollision();					//床との当たり判定
 
-
 	int m_nLife;			//体力
 
-	std::vector<CModelParts*> m_apModelParts;
+	std::vector<CModelParts*> m_apModelParts;	//モデルパーツのポインタの配列
 
 	std::vector<char*> m_pModelFileName;
 	int m_ModelParts;	//モデルパーツ数
 	int m_CurKey;		//現在のキー番号
 	int m_CurMotion;	//現在のモーション番号
-	int m_NextMotion;	//現在のモーション番号
+	int m_NextMotion;	//次のモーション番号
 	int m_KeySetNum;	//キーセット数
 	int m_MotionNum;	//モーション最大数
 	int m_NowFrame;		//現在のフレーム
+	int m_NowAllFrame;
 
 	struct Key
 	{
@@ -91,6 +91,8 @@ private:
 
 	bool m_bBlend;
 	bool m_bMotion;
+
+	std::vector<std::shared_ptr<CHitCircle>> m_pHitCircle;	//円の当たり判定配列
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
