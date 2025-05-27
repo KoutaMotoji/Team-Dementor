@@ -75,7 +75,7 @@ void CG_Gorira::Update()
 	{
 		++m_nAttackcnt;
 	}
-	if (CCharacter::GetNextMotion() != 2)
+	if (CCharacter::GetNextMotion() != 2 && CCharacter::GetNextMotion() != 3)
 	{
 		if (m_moveFlag)
 		{

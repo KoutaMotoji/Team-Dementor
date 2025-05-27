@@ -212,10 +212,11 @@ void CCharacter::SetNextKey()
 			{
 				e->SetEnable();
 			}
-			else
-			{
-				e->SetDisable();
-			}
+
+		}
+		else
+		{
+			e->SetDisable();
 		}
 	}
 	for (auto& e : m_apModelParts)

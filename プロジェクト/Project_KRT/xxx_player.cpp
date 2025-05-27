@@ -68,7 +68,6 @@ void CPlayerX::Init()
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
-	m_playerMask2D = CPlayerMask::Create();
 }
 
 //==========================================================================================
@@ -77,7 +76,7 @@ void CPlayerX::Init()
 void CPlayerX::Uninit()
 {
 	CCharacter::Uninit();
-	m_playerMask2D->Uninit();
+
 }
 
 //==========================================================================================
@@ -110,7 +109,7 @@ void CPlayerX::Update()
 		}
 	}
 
-	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY)
+	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
 	{
 		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
 	}
@@ -140,32 +139,31 @@ void CPlayerX::Draw()
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 
 	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_NEVER);
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
-	//ステンシル参照値
-	pDevice->SetRenderState(D3DRS_STENCILREF, 0x05);
-	//ステンシルマスク
-	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xffffffff);
-	pDevice->SetRenderState(D3DRS_STENCILWRITEMASK, 0xffffffff);
 
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	//ステンシルバッファに書き込む条件（比較関数）の設定********
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);	//絶対に書き込む。
 
+	// ステンシルマスク
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 0x000000ff);
+	// ステンシル参照値
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x02);
 
-
-	// ステンシルテストのテスト設定
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILCAPS_REPLACE);
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
-
-
-	m_playerMask2D->Draw();
-
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, FALSE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	//書き込む値の設定******************************************
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	//何もしない
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_REPLACE);	//ステンシル参照値を書き込む。
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);	//何もしない
 
 	CCharacter::Draw();
 
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NEVER);	//絶対に書き込む。
+
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 
 }
 
@@ -483,7 +481,7 @@ void CPlayerX::SetParry()
 							{
 								CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
 								m_bParryWait = false;
-								pTest->SetSize({ 1.0f,1.0f,1.0f });
+								pTest->SetNextMotion(3);
 								return;
 							}
 						}
