@@ -12,6 +12,7 @@
 #include "floor_stone.h"
 #include "mesh_cylinder.h"
 #include "stage1_boss.h"
+#include "stencile_mask.h"
 
 #include "game.h"
 
@@ -41,6 +42,7 @@ HRESULT CGame::Init()
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
 
 	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+	CPlayerMask::Create();
 
 	return S_OK;
 }

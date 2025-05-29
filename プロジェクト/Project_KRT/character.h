@@ -17,7 +17,7 @@
 class CCharacter :public CObject
 {
 public:
-	CCharacter();				//コンストラクタ
+	CCharacter(int nPriority = 1);				//コンストラクタ
 	~CCharacter()override;		//デストラクタ
 	void Init()override;		//初期化
 	void Uninit()override;		//終了

@@ -16,7 +16,8 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CCharacter::CCharacter() :m_nLife(1000),
+CCharacter::CCharacter(int nPriority) :CObject(nPriority),
+						m_nLife(1000),
 						m_bMotion(false),
 						m_bBlend(false),
 						m_NowAllFrame(0),

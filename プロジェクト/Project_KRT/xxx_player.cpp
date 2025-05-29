@@ -15,12 +15,12 @@
 
 namespace
 {
-	float _WORLD_WALL = 1300.0f;
-	float Damage_Ratio = 0.2f;
-	float _GRAVITY = 4.0f;
-	float _MOVE_SPEED = 1.2f;
-	float _JUMP_HEIGHT = 120.0f;
-	int _GAUGE_CTVALUE = 60;
+	const float _WORLD_WALL = 1300.0f;
+	const float Damage_Ratio = 0.2f;
+	const float _GRAVITY = 4.0f;
+	const float _MOVE_SPEED = 1.2f;
+	const float _JUMP_HEIGHT = 120.0f;
+	const int _GAUGE_CTVALUE = 60;
 	std::vector<D3DXVECTOR3>SetButtonUIpos = {
 		{220.0f - 220.0f / 3,250.0f,0.0f},
 		{220.0f,250.0f,0.0f},
@@ -46,7 +46,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX() : m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false)
+CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -76,7 +76,6 @@ void CPlayerX::Init()
 void CPlayerX::Uninit()
 {
 	CCharacter::Uninit();
-
 }
 
 //==========================================================================================
@@ -138,30 +137,19 @@ void CPlayerX::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 
-	pDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x01);
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff);
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
 
-	//ステンシルバッファに書き込む条件（比較関数）の設定********
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);	//絶対に書き込む。
-
-	// ステンシルマスク
-	pDevice->SetRenderState(D3DRS_STENCILMASK, 0x000000ff);
-	// ステンシル参照値
-	pDevice->SetRenderState(D3DRS_STENCILREF, 0x02);
-
-	//書き込む値の設定******************************************
-	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	//何もしない
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_REPLACE);	//ステンシル参照値を書き込む。
-	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);	//何もしない
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_REPLACE);
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 
 	CCharacter::Draw();
 
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NEVER);	//絶対に書き込む。
-
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
 
 	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 

@@ -211,6 +211,7 @@
     <ClInclude Include="scene.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="stage1_boss.h" />
+    <ClInclude Include="stencile_mask.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="xxx_player.h" />

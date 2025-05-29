@@ -19,7 +19,7 @@ namespace
 	float _GRAVITY = 4.0f;
 	float _MOVE_SPEED = 1.5f;
 	int _GAUGE_CTVALUE = 60;
-
+	float _SETSIZE = 1.0f;
 	struct _FILENAME
 	{
 		std::string config;
@@ -49,7 +49,7 @@ void CG_Gorira::Init()
 	CObject::SetType(TYPE_3D_BOSS_1);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
-	CCharacter::SetSize({ 3.0f,3.0f,3.0f });
+	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
 }
 
 //==========================================================================================

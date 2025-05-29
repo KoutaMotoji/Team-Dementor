@@ -53,7 +53,22 @@ void CMeshGround::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();;
 
+
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x01);
+
+	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff);
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCRSAT);
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+
 	CObjectX::Draw();
+
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+	CObjectX::Draw();
+
 }
 
 //==========================================================================================

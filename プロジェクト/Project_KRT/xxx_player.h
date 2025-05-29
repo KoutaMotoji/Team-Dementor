@@ -24,7 +24,7 @@ class CPlayerMask;
 class CPlayerX :public CCharacter
 {
 public:
-	CPlayerX();					//コンストラクタ
+	CPlayerX(int nPriority = 1);					//コンストラクタ
 	~CPlayerX()override;		//デストラクタ
 	void Init()override;		//初期化
 	void Uninit()override;		//終了
@@ -65,7 +65,6 @@ private:
 	int m_nPushedKey;
 	bool m_bParryWait;
 	std::vector<CButtonUI*>m_vButtonUI;
-	CPlayerMask* m_playerMask2D;
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
 	D3DXQUATERNION m_quat;		//クオータニオン
@@ -73,22 +72,6 @@ private:
 	float m_fValueRot;			//回転量
 };
 
-class CPlayerMask : public CObject2D
-{
-public:
-	_forceinline void Init()override {
-		CObject::SetType(TYPE_2D_UI);
-		CObject2D::Init();
-	}
-	_forceinline static CPlayerMask* Create()
-	{
-		CPlayerMask* instance = new CPlayerMask;
 
-		instance->SetPolygonParam({ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f }, SCREEN_HEIGHT, SCREEN_WIDTH, {1.0f,0.4,0.4f,0.0f});
-		instance->Init();
-
-		return instance;
-	}
-};
 
 #endif
