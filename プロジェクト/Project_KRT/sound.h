@@ -17,9 +17,8 @@ public:
 	typedef enum
 	{
 		SOUND_LABEL_BGM_TITLE = 0,
-		SOUND_LABEL_BGM_TUTORIAL,
-		SOUND_LABEL_BGM_GAME,
 		SOUND_LABEL_BGM_RESULT,
+		SOUND_LABEL_SE_PARRY,
 		SOUND_LABEL_MAX
 
 	} SOUND_LABEL;
@@ -38,6 +37,7 @@ private:
 	{
 		const char* pFilename;	// ファイル名
 		int nCntLoop;			// ループカウント
+		float fVolume;
 	} SOUNDINFO;
 	IXAudio2* m_pXAudio2 = NULL;								// XAudio2オブジェクトへのインターフェイス
 	IXAudio2MasteringVoice* m_pMasteringVoice = NULL;			// マスターボイス
@@ -48,10 +48,9 @@ private:
 	// サウンドの情報
 	SOUNDINFO m_aSoundInfo[SOUND_LABEL_MAX] =
 	{
-		{"data/SOUND/BGM_title.wav", -1},	//タイトル画面BGM
-		{"data/SOUND/BGM_tutorial.wav", -1},	//チュートリアル画面BGM
-		{"data/SOUND/BGM_game.wav", -1},		//ゲーム画面BGM
-		{"data/SOUND/BGM_result.wav", -1},	//リザルト画面BGM
+		{"data/SOUND/BGM/title.wav", -1,0.4f},	//タイトル画面BGM
+		{"data/SOUND/BGM/result.wav", -1,0.4f},	//チュートリアル画面BGM
+		{"data/SOUND/SE/super_parry.wav", 0,0.1f},		//ゲーム画面BGM
 	};
 };
 

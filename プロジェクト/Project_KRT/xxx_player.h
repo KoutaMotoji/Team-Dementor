@@ -36,7 +36,7 @@ public:
 	static CPlayerX* Create(D3DXVECTOR3 pos);
 
 	inline D3DXVECTOR3 GetPos() { return CCharacter::GetPos(); };
-	inline D3DXVECTOR3 GetMove() { return m_move; };
+	inline D3DXVECTOR3 GetMove() { return CCharacter::GetMove(); };
 	void SetParry();
 	enum
 	{
@@ -54,17 +54,19 @@ private:
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
-	D3DXVECTOR3 m_move;						//移動量
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
 
 	void FloorCollision();					//床との当たり判定
+	void EnemyCollision();
+	void CamFloorCollision(LPD3DXMESH pMesh);
 	bool FloorbumpyMesh(LPD3DXMESH pMesh);
 	CCTBarUI* m_pCctBarUI;
 	bool m_bAttackCt;
 	int m_nPushedKey;
 	bool m_bParryWait;
 	std::vector<CButtonUI*>m_vButtonUI;
+	float m_LastCamDis;
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
 	D3DXQUATERNION m_quat;		//クオータニオン

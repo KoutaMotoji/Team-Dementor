@@ -40,6 +40,7 @@ HRESULT CTitle::Init()
 {
 	CScene::Init();
 	CTitleBG::Create();
+	CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_BGM_TITLE);
 
 	return S_OK;
 }

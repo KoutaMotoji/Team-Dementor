@@ -147,12 +147,13 @@ HRESULT CSound::Init(HWND hWnd)
 		buffer.pAudioData = m_apDataAudio[nCntSound];
 		buffer.Flags      = XAUDIO2_END_OF_STREAM;
 		buffer.LoopCount  = m_aSoundInfo[nCntSound].nCntLoop;
-
+		
 		// オーディオバッファの登録
 		m_apSourceVoice[nCntSound]->SubmitSourceBuffer(&buffer);
 
 		// ファイルをクローズ
 		CloseHandle(hFile);
+		m_apSourceVoice[nCntSound]->SetVolume(m_aSoundInfo[nCntSound].fVolume);
 	}
 
 	return S_OK;

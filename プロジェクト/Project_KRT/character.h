@@ -35,8 +35,14 @@ public:
 	inline void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }
 	inline void AddSize(D3DXVECTOR3 size) { m_size += size; };
 	inline void SetSize(D3DXVECTOR3 size) { m_size = size; };
+	inline D3DXVECTOR3 GetRadius() { return m_Radius; }
+	inline void SetRadius(float RadiusValue) { m_Radius = { RadiusValue ,RadiusValue ,RadiusValue }; }
 
-	inline D3DXVECTOR3 GetMove() { return m_move; };
+	inline D3DXVECTOR3 GetMove() { return m_move; }
+	inline void SetMove(D3DXVECTOR3 move) { m_move = move; }
+	inline void AddMove(D3DXVECTOR3 move) { m_move += move; }
+
+
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }
 	inline std::vector<CModelParts*> GetModelPartsVec() { return m_apModelParts; }
@@ -48,6 +54,7 @@ private:
 	D3DXVECTOR3 m_pos, m_rot, m_size;			//座標・回転・大きさ
 	D3DXVECTOR3 m_move;						//移動量
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
+	D3DXVECTOR3 m_Radius;
 
 	void FloorCollision();					//床との当たり判定
 

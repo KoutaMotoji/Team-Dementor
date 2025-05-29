@@ -57,6 +57,28 @@ bool CCollision::SphireCollosion(D3DXVECTOR3 MainPos, D3DXVECTOR3 SubPos, D3DXVE
 }
 
 //==========================================================================================
+//‰~’Œ“–‚½‚è”»’è
+//==========================================================================================
+bool CCollision::CylinderCollosion(D3DXVECTOR3 MainPos, D3DXVECTOR3 SubPos, D3DXVECTOR3 MainRadius, D3DXVECTOR3 SubRadious)
+{
+	float fLengthX = MainPos.x - SubPos.x;
+	float fLengthY = MainPos.y - SubPos.y;
+	float fLengthZ = MainPos.z - SubPos.z;
+	float fRadiusM, fRadiusS;
+	fRadiusM = MainRadius.x;
+	fRadiusS = SubRadious.x;
+
+
+	if ((fLengthX * fLengthX) + (fLengthZ * fLengthZ) <= ((fRadiusM + fRadiusS) * (fRadiusM + fRadiusS)))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+//==========================================================================================
 //”ò‚Î‚µ‚½ƒŒƒC‚ÆƒƒbƒVƒ…‚Ì”»’è
 //==========================================================================================
 bool CCollision::MeshToIntersectCollision(LPD3DXMESH pMesh, D3DXVECTOR3 pos, D3DXVECTOR3 dir, float CheckDistance)

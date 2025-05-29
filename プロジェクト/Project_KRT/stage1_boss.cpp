@@ -50,6 +50,7 @@ void CG_Gorira::Init()
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
+	CCharacter::SetRadius(200.0f);
 }
 
 //==========================================================================================
@@ -79,13 +80,13 @@ void CG_Gorira::Update()
 	{
 		if (m_moveFlag)
 		{
-			m_move.z -= 1.0f;
+			CCharacter::AddMove({ 0.0f,0.0f,-1.0f });
 			CCharacter::SetNextMotion(1);
 			CCharacter::SetRot({ 0.0f,0.0f,0.0f });
 		}
 		else
 		{
-			m_move.z += 1.0f;
+			CCharacter::AddMove({ 0.0f,0.0f,1.0f });
 			CCharacter::SetNextMotion(1);
 			CCharacter::SetRot({ 0.0f,D3DX_PI,0.0f });
 		}
@@ -96,18 +97,14 @@ void CG_Gorira::Update()
 
 	//CCharacter::SetRot({ 0.0f,0.0f,0.0f });
 
-	CCharacter::AddPos(m_move);
-	if (m_OldPos.z + m_move.z > 800.0f || m_OldPos.z + m_move.z < -800.0f)
+	if (m_OldPos.z + CCharacter::GetMove().z > 800.0f || m_OldPos.z + CCharacter::GetMove().z < -800.0f)
 	{
-		CCharacter::AddPos({ 0.0f,0.0f,-m_move.z});
+		CCharacter::AddPos({ 0.0f,0.0f,-CCharacter::GetMove().z});
 		m_moveFlag = (!m_moveFlag);
 	}
 	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
 
-	//à⁄ìÆó ÇçXêV
-	m_move.x += (0.0f - m_move.x) * 0.14f;
-	m_move.y += (0.0f - m_move.y) * 0.14f;
-	m_move.z += (0.0f - m_move.z) * 0.17f;
+	
 	CCharacter::Update();
 }
 
@@ -125,7 +122,7 @@ void CG_Gorira::Draw()
 CG_Gorira* CG_Gorira::Create(D3DXVECTOR3 pos)
 {
 	CG_Gorira* gorira = new CG_Gorira;
-	gorira->m_move = { 0.0f,0.0f,0.0f };
+	gorira->SetMove({ 0.0f,0.0f,0.0f });
 	gorira->m_OldPos = pos;
 	gorira->Init();
 	gorira->SetPos(pos);
@@ -181,7 +178,7 @@ void CG_Gorira::FloorCollision()
 							// ----- ê⁄ínéûèàóù -----
 							if (bIsHit)
 							{
-								CCharacter::AddPos({ 0.0f, fLandDistance - m_move.y - _GRAVITY,0.0f });
+								CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f});
 								return;
 							}
 						}

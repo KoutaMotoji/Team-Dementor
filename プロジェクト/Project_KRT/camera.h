@@ -23,6 +23,7 @@ public:
 	inline void AddCameraDistance(float dis) { m_camDistance = dis; };
 
 	inline float GetCameraDistance() { return m_camDistance; };
+	inline D3DXVECTOR3 GetPosV() { return m_posV; }
 	D3DXVECTOR3& GetPlayerPos();
 	void SetPlayerPos(D3DXVECTOR3 pos);
 	float GetRotZ();

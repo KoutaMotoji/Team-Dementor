@@ -34,6 +34,8 @@ HRESULT CResult::Init()
 {
 	CScene::Init();
 	CResultBG::Create();
+	CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_BGM_RESULT);
+
 	return S_OK;
 }
 

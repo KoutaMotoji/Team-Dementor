@@ -38,7 +38,6 @@ private:
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
-	D3DXVECTOR3 m_move;						//移動量
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 
 	void FloorCollision();					//床との当たり判定

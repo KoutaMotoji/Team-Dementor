@@ -46,7 +46,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false)
+CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false), m_LastCamDis(0.0f)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -68,6 +68,8 @@ void CPlayerX::Init()
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
+	CCharacter::SetRadius(50.0f);
+	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();
 }
 
 //==========================================================================================
@@ -111,6 +113,7 @@ void CPlayerX::Update()
 	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
 	{
 		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
+		EnemyCollision();
 	}
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
@@ -120,12 +123,6 @@ void CPlayerX::Update()
 	}
 	PAttackInfo();
 
-	CCharacter::AddPos(m_move);
-	
-	//移動量を更新
-	m_move.x += (0.0f - m_move.x) * 0.14f;
-	m_move.y += (0.0f - m_move.y) * 0.14f;
-	m_move.z += (0.0f - m_move.z) * 0.17f;
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());
 	CCharacter::Update();
 }
@@ -162,7 +159,7 @@ CPlayerX* CPlayerX::Create(D3DXVECTOR3 pos)
 {
 	CPlayerX* player = new CPlayerX;
 	player->Init();
-	player->m_move = { 0.0f,0.0f,0.0f };
+	player->SetMove( { 0.0f,0.0f,0.0f });
 	player->m_OldPos = pos;
 	return player;
 }
@@ -201,10 +198,7 @@ bool CPlayerX::PMove(float fCamRotZ)
 		moveDir.x = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x;
 		moveDir.z = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y;
 	}
-	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_SPACE) || CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_A))
-	{
-		m_move.y += _JUMP_HEIGHT;
-	}
+
 	if (CManager::GetInstance()->GetKeyboard()->GetRepeat(DIK_LSHIFT) || CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_B))
 	{
 		dashValue = 2.0f;
@@ -218,16 +212,14 @@ bool CPlayerX::PMove(float fCamRotZ)
 	
 	if (moveDir.x == 0.0f && moveDir.z == 0.0f)
 	{
-		m_move.y -= _GRAVITY;
+		CCharacter::AddMove({ 0.0f,-_GRAVITY,0.0f });
 		CCharacter::SetNextMotion(MOTION_NUTORAL);
 		return true;
 	}
 
 	CCharacter::SetRot({ 0.0f,moveYrot + D3DX_PI,0.0f });
-	m_move.x += sinf(moveYrot) * _MOVE_SPEED;
-	m_move.z += cosf(moveYrot) * _MOVE_SPEED;
 
-	m_move.y -= _GRAVITY;
+	CCharacter::AddMove({ sinf(moveYrot) * _MOVE_SPEED,-_GRAVITY,cosf(moveYrot) * _MOVE_SPEED });
 
 	CCharacter::SetNextMotion(MOTION_WALK);
 	
@@ -283,7 +275,8 @@ void CPlayerX::FloorCollision()
 							// ----- 接地時処理 -----
 							if (bIsHit)
 							{
-								CCharacter::AddPos({ 0.0f, fLandDistance - m_move.y - _GRAVITY,0.0f });
+								CamFloorCollision(pMesh);
+								CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
 								FloorbumpyMesh(pMesh);
 								return;
 							}
@@ -310,8 +303,8 @@ bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 		float fHitV{};
 	};
 	D3DXVECTOR3 pos[2]{}, rot{};
-	rot.x = m_move.x;
-	rot.z = m_move.z;
+	rot.x = CCharacter::GetMove().x;
+	rot.z = CCharacter::GetMove().z;
 	rot.y = 0.0f;
 
 	D3DXVec3Normalize(&rot, &rot);
@@ -329,7 +322,7 @@ bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 	{
 		if ((RI[1].fLandDistance - RI[0].fLandDistance) < 100.0f && RI[0].fLandDistance < 20.0f)
 		{
-			CCharacter::SetPos({ CCharacter::GetPos().x - m_move.x,CCharacter::GetPos().y,CCharacter::GetPos().z - m_move.z});
+			CCharacter::SetPos({ CCharacter::GetPos().x - CCharacter::GetMove().x,CCharacter::GetPos().y,CCharacter::GetPos().z - CCharacter::GetMove().z});
 			return true;
 		}
 	}
@@ -394,7 +387,7 @@ bool CPlayerX::PAttackInfo()
 }
 
 //==========================================================================================
-// プレイヤーの攻撃入力
+// プレイヤーのパリィ
 //==========================================================================================
 void CPlayerX::SetParry()
 {
@@ -465,11 +458,12 @@ void CPlayerX::SetParry()
 							MainPos = pParryCircle->CalcMtxPos(MainMtx);
 							SubPos = pParryCircle->CalcMtxPos(SubMtx);
 
-							if(pCollision->CircleCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+							if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
 							{
 								CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
 								m_bParryWait = false;
 								pTest->SetNextMotion(3);
+								CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
 								return;
 							}
 						}
@@ -478,4 +472,72 @@ void CPlayerX::SetParry()
 			}
 		}
 	}
+}
+void CPlayerX::EnemyCollision()
+{
+	std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj != nullptr) {
+				CObject::TYPE type = pObj->GetType();
+				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
+					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+					if (pTest != nullptr) {
+						if (pTest != nullptr) {
+							if (pCollision->CylinderCollosion(CCharacter::GetPos(), pTest->GetPos(), CCharacter::GetRadius(), pTest->GetRadius()))
+							{
+								//CCharacter::AddPos((-CCharacter::GetMove()));
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+//==========================================================================================
+// 地形とカメラの当たり判定
+//==========================================================================================
+void CPlayerX::CamFloorCollision(LPD3DXMESH pMesh)
+{
+	D3DXVECTOR3 HeadPos;
+	CModelParts* HeadModel = nullptr;
+	for (auto& e : CCharacter::GetModelPartsVec())
+	{
+		if (e != nullptr)
+		{
+			if (e->GetIndex() == 2)
+			{
+				HeadModel = e;
+			}
+		}
+	}
+	HeadPos = {
+		HeadModel->GetWorldMatrix()._41,
+		HeadModel->GetWorldMatrix()._42,
+		HeadModel->GetWorldMatrix()._43
+	};
+
+	// 地形判定
+	BOOL  bIsHit = false;
+	float fLandDistance{};
+	DWORD dwHitIndex = 0U;
+	float fHitU{};
+	float fHitV{};
+	
+	D3DXVECTOR3 dir{};
+	dir = CManager::GetInstance()->GetCamera()->GetPosV() - HeadPos;
+
+	D3DXVec3Normalize(&dir, &dir);
+
+	D3DXIntersect(pMesh, &HeadPos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
+	
+	if (bIsHit)
+	{
+		CManager::GetInstance()->GetCamera()->SetCameraDistance(fLandDistance);
+		return;
+	}
+	CManager::GetInstance()->GetCamera()->SetCameraDistance(m_LastCamDis);
 }

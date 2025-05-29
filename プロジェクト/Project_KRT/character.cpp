@@ -11,6 +11,7 @@
 namespace
 {
 	float Damage_Ratio = 0.2f;
+	float _RADIUS = 200.0f;
 };
 
 //==========================================================================================
@@ -23,7 +24,8 @@ CCharacter::CCharacter(int nPriority) :CObject(nPriority),
 						m_NowAllFrame(0),
 						m_move( { 0.0f,0.0f,0.0f }),
 						m_rot ( { 0.0f,0.0f,0.0f }),
-						m_size ( { 1.0f,1.0f,1.0f })
+						m_size ( { 1.0f,1.0f,1.0f }),
+						m_Radius({ _RADIUS ,_RADIUS ,_RADIUS })
 {
 
 }
@@ -64,6 +66,12 @@ void CCharacter::Update()
 	{//モーションブレンド中でなければ通常のモーション再生
 		SetNextKey();
 	}
+	AddPos(m_move);
+
+	//移動量を更新
+	m_move.x += (0.0f - m_move.x) * 0.14f;
+	m_move.y += (0.0f - m_move.y) * 0.14f;
+	m_move.z += (0.0f - m_move.z) * 0.17f;
 }
 
 //==========================================================================================
