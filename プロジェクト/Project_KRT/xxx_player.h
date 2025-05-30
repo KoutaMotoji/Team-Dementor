@@ -11,6 +11,7 @@
 #include "character.h"
 #include "object2D.h"
 #include "modelparts.h"
+#include "debug_line.h"
 
 
 #include "manager.h"
@@ -67,6 +68,7 @@ private:
 	bool m_bParryWait;
 	std::vector<CButtonUI*>m_vButtonUI;
 	float m_LastCamDis;
+	std::shared_ptr<CDebugLine>m_pDebugLine;
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
 	D3DXQUATERNION m_quat;		//クオータニオン

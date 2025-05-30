@@ -19,7 +19,7 @@ namespace
 	float _GRAVITY = 4.0f;
 	float _MOVE_SPEED = 1.5f;
 	int _GAUGE_CTVALUE = 60;
-	float _SETSIZE = 1.0f;
+	float _SETSIZE = 3.0f;
 	struct _FILENAME
 	{
 		std::string config;
@@ -51,6 +51,8 @@ void CG_Gorira::Init()
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
 	CCharacter::SetRadius(200.0f);
+	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
+
 }
 
 //==========================================================================================
@@ -113,7 +115,17 @@ void CG_Gorira::Update()
 //==========================================================================================
 void CG_Gorira::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+	// –@ü‚ÌŽ©“®³‹K‰»‚ð—LŒø‚É
+	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
+
 	CCharacter::Draw();
+
+	// –@ü‚ÌŽ©“®³‹K‰»‚ð–³Œø‚É
+	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
+
+	m_pDebugLine->Draw(CCharacter::GetPos());
+
 }
 
 //==========================================================================================

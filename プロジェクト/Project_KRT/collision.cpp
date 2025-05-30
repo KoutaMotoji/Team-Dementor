@@ -47,7 +47,6 @@ bool CCollision::SphireCollosion(D3DXVECTOR3 MainPos, D3DXVECTOR3 SubPos, D3DXVE
 	fRadiusM = MainRadius.x;
 	fRadiusS = SubRadious.x;
 
-
 	if ((fLengthX * fLengthX) + (fLengthY * fLengthY) + (fLengthZ * fLengthZ) <= ((fRadiusM + fRadiusS) * (fRadiusM + fRadiusS)))
 	{
 		return true;
@@ -67,7 +66,6 @@ bool CCollision::CylinderCollosion(D3DXVECTOR3 MainPos, D3DXVECTOR3 SubPos, D3DX
 	float fRadiusM, fRadiusS;
 	fRadiusM = MainRadius.x;
 	fRadiusS = SubRadious.x;
-
 
 	if ((fLengthX * fLengthX) + (fLengthZ * fLengthZ) <= ((fRadiusM + fRadiusS) * (fRadiusM + fRadiusS)))
 	{

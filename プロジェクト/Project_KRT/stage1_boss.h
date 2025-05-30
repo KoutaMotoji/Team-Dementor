@@ -9,6 +9,7 @@
 
 #include "main.h"
 #include "character.h"
+#include "debug_line.h"
 
 #include "manager.h"
 
@@ -35,6 +36,8 @@ public:
 		MOTION_LANDING,
 	};
 private:
+	std::shared_ptr<CDebugLineCylinder>m_pDebugLine;
+
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 

@@ -70,6 +70,7 @@ void CPlayerX::Init()
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 	CCharacter::SetRadius(50.0f);
 	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();
+	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
 }
 
 //==========================================================================================
@@ -146,6 +147,7 @@ void CPlayerX::Draw()
 	CCharacter::Draw();
 
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+	m_pDebugLine->Draw(CCharacter::GetPos());
 
 
 	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
