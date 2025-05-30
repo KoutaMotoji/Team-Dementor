@@ -36,7 +36,7 @@ public:
 		MOTION_LANDING,
 	};
 private:
-	std::shared_ptr<CDebugLineCylinder>m_pDebugLine;
+	std::shared_ptr<CDebugLine>m_pDebugLine;
 
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力

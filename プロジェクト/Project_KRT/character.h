@@ -11,6 +11,8 @@
 #include "object.h"
 #include "modelparts.h"
 #include "collision.h"
+#include "debug_line.h"
+
 
 #include "manager.h"
 
@@ -100,6 +102,8 @@ private:
 	bool m_bMotion;
 
 	std::vector<std::shared_ptr<CHitCircle>> m_pHitCircle;	//円の当たり判定配列
+	std::vector<std::shared_ptr<CDebugLine>> m_pDebugCircle;
+	
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)

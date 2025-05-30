@@ -30,7 +30,9 @@ namespace
 	float _CYLINDER_HEIGHT = 300.0f;
 	int _DRAW_POINTCNT = 2;
 	float _DRAW_LINEWIDTH = 2.0f;
-	D3DXCOLOR _DRAW_COLOR = { 1.0f,0.1f,1.0f,1.0f };
+	D3DXCOLOR _DRAW_COLOR_CYLINDER = { 1.0f,0.1f,1.0f,1.0f };
+	D3DXCOLOR _DRAW_COLOR_SPHIRE = { 0.1f,1.0f,1.0f,1.0f };
+
 }
 CDebugLine::~CDebugLine()
 {
@@ -95,18 +97,23 @@ void CDebugLineSphire::Init()
 	}
 
 	// 線を結ぶインデックスの設定（横方向：緯線）
-	for (int j = 0; j < _MAX_SPHIRE_SLICE - 1; ++j)
+
+	for (int i = 0; i < _MAX_SPHIRE_STACK; ++i)
+	{
+		m_IdxPair.push_back({0,_MAX_SPHIRE_SLICE + i });
+	}
+	
+	for (int j = 1; j < _MAX_SPHIRE_STACK - 1; ++j)
 	{
 		for (int i = 0; i < _MAX_SPHIRE_STACK; ++i)
 		{
-			m_IdxPair.push_back({ j* (_MAX_SPHIRE_SLICE + i), (j + 1) * (_MAX_SPHIRE_SLICE + 1) });
+			m_IdxPair.push_back({ (j * _MAX_SPHIRE_SLICE) + i, (j + 1) * _MAX_SPHIRE_SLICE + i });
 		}
 	}
-
 	// 線を結ぶインデックスの設定（縦方向：経線）
 	for (int i = 0; i <= _MAX_SPHIRE_STACK; ++i)
 	{
-		m_IdxPair.push_back({ (_MAX_SPHIRE_SLICE -1) * (_MAX_SPHIRE_SLICE + i), (_MAX_SPHIRE_SLICE) * (_MAX_SPHIRE_SLICE) });
+		m_IdxPair.push_back({ _MAX_SPHIRE_SLICE* (_MAX_SPHIRE_SLICE -1)  + i, (_MAX_SPHIRE_SLICE) * (_MAX_SPHIRE_SLICE) -2});
 	}
 
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
@@ -148,7 +155,7 @@ void CDebugLineSphire::Draw(D3DXVECTOR3 pos)
 			BeginPos,
 			EedPos
 		};
-		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR);
+		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR_SPHIRE);
 	}
 	m_pLine->End();
 	// ライトの有効化
@@ -247,7 +254,7 @@ void CDebugLineCylinder::Draw(D3DXVECTOR3 pos)
 			BeginPos,
 			EedPos
 		};
-		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR);
+		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR_CYLINDER);
 	}
 	m_pLine->End();
 	// ライトの有効化

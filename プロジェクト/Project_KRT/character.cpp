@@ -137,6 +137,15 @@ void CCharacter::Draw()
 	{
 		e->Draw();
 	}
+	int nCnt{};
+	for (auto& e : m_pHitCircle)
+	{
+		if (e->GetEnable()) {
+			D3DXVECTOR3 pos = e->CalcMtxPos(m_apModelParts[e->GetParentNum()]->GetWorldMatrix());
+			m_pDebugCircle[nCnt]->Draw(pos);
+		}
+		++nCnt;
+	}
 }
 
 //==========================================================================================
@@ -214,6 +223,7 @@ void CCharacter::SetNextKey()
 	float fRatioFrame = (float)m_NowFrame / (float)m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame;
 	int nCntParts = 0;
 	++m_NowAllFrame;
+	int nCnt{};
 	for (auto& e : m_pHitCircle)
 	{
 		if (e->GetMotionNum() == nNowMotion) {
@@ -221,12 +231,12 @@ void CCharacter::SetNextKey()
 			{
 				e->SetEnable();
 			}
-
 		}
 		else
 		{
 			e->SetDisable();
 		}
+		++nCnt;
 	}
 	for (auto& e : m_apModelParts)
 	{
@@ -578,6 +588,7 @@ void CCharacter::MotionDataLoad(std::string filename)
 						fscanf(pFile, "%d", &END_F);
 						RADIUS = { FLOAT_RADIUS ,FLOAT_RADIUS ,FLOAT_RADIUS };
 						m_pHitCircle.push_back(CHitCircle::Create(RADIUS, POS, PARENT, START_F, END_F,nMotionCnt));
+						m_pDebugCircle.push_back(CDebugLineSphire::Create(FLOAT_RADIUS));
 					}
 					//äeÉLÅ[Çì«Ç›çûÇ›
 					if (!strcmp(LoadData, "KEYSET"))
