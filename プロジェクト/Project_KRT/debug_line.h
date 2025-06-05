@@ -38,9 +38,12 @@ public:
 
 	void Init()override;
 	void Draw(D3DXVECTOR3 pos)override;
-	static std::shared_ptr<CDebugLineSphire> Create(float Radius);
+	void SetColor(D3DXCOLOR col) { m_col = col; }
+	static std::shared_ptr<CDebugLineSphire> Create(float Radius);				//生成処理
+	static std::shared_ptr<CDebugLineSphire> Create(float Radius,D3DXCOLOR col);//色変更オーバーロード
 private:
 	float m_fRadius;
+	D3DXCOLOR m_col;
 };
 
 class CDebugLineCylinder : public CDebugLine
@@ -51,9 +54,11 @@ public:
 
 	void Init()override;
 	void Draw(D3DXVECTOR3 pos)override;
-	static std::shared_ptr<CDebugLineCylinder> Create(float Radius);
+	static std::shared_ptr<CDebugLineCylinder> Create(float Radius);				//生成処理
+	static std::shared_ptr<CDebugLineCylinder> Create(float Radius, D3DXCOLOR col); //色変更オーバーロード
 private:
 	float m_fRadius;
+	D3DXCOLOR m_col;
 };
 
 #endif 

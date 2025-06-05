@@ -28,7 +28,7 @@ namespace
 	int _MAX_CORNER = 6;
 	int _MAX_STEP = 2;
 	float _CYLINDER_HEIGHT = 300.0f;
-	int _DRAW_POINTCNT = 2;
+	int _DRAW_POINTCNT = 2;				//連続して描画する頂点数
 	float _DRAW_LINEWIDTH = 2.0f;
 	D3DXCOLOR _DRAW_COLOR_CYLINDER = { 1.0f,0.1f,1.0f,1.0f };
 	D3DXCOLOR _DRAW_COLOR_SPHIRE = { 0.1f,1.0f,1.0f,1.0f };
@@ -155,7 +155,7 @@ void CDebugLineSphire::Draw(D3DXVECTOR3 pos)
 			BeginPos,
 			EedPos
 		};
-		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR_SPHIRE);
+		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, m_col);
 	}
 	m_pLine->End();
 	// ライトの有効化
@@ -168,6 +168,17 @@ std::shared_ptr<CDebugLineSphire> CDebugLineSphire::Create(float Radius)
 {
 	std::shared_ptr<CDebugLineSphire> instance = std::make_shared<CDebugLineSphire>();
 	instance->m_fRadius = Radius;
+	instance->m_col = _DRAW_COLOR_SPHIRE;
+	instance->Init();
+	return instance;
+}
+
+std::shared_ptr<CDebugLineSphire> CDebugLineSphire::Create(float Radius,D3DXCOLOR col)
+{
+	std::shared_ptr<CDebugLineSphire> instance = std::make_shared<CDebugLineSphire>();
+	instance->m_fRadius = Radius;
+	instance->m_col = col;
+
 	instance->Init();
 	return instance;
 }
@@ -254,7 +265,7 @@ void CDebugLineCylinder::Draw(D3DXVECTOR3 pos)
 			BeginPos,
 			EedPos
 		};
-		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, _DRAW_COLOR_CYLINDER);
+		m_pLine->DrawTransform(DrawPos, _DRAW_POINTCNT, &matTransform, m_col);
 	}
 	m_pLine->End();
 	// ライトの有効化
@@ -267,6 +278,16 @@ std::shared_ptr<CDebugLineCylinder> CDebugLineCylinder::Create(float Radius)
 {
 	std::shared_ptr<CDebugLineCylinder> instance = std::make_shared<CDebugLineCylinder>();
 	instance->m_fRadius = Radius;
+	instance->m_col = _DRAW_COLOR_CYLINDER;
+	instance->Init();
+	return instance;
+}
+
+std::shared_ptr<CDebugLineCylinder> CDebugLineCylinder::Create(float Radius, D3DXCOLOR col)
+{
+	std::shared_ptr<CDebugLineCylinder> instance = std::make_shared<CDebugLineCylinder>();
+	instance->m_fRadius = Radius;
+	instance->m_col = col;
 	instance->Init();
 	return instance;
 }

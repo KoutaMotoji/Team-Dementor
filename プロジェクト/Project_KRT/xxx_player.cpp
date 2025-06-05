@@ -111,11 +111,15 @@ void CPlayerX::Update()
 		}
 	}
 
-	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY && CCharacter::GetNextMotion() != MOTION_PARRY_STAY && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
+	if (CCharacter::GetNextMotion() != MOTION_ATTACK && 
+		CCharacter::GetNextMotion() != MOTION_PARRY &&
+		CCharacter::GetNextMotion() != MOTION_PARRY_STAY && 
+		CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
 	{
 		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
 		EnemyCollision();
 	}
+
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
 	if (m_bParryWait)
@@ -125,6 +129,7 @@ void CPlayerX::Update()
 	PAttackInfo();
 
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());
+
 	CCharacter::Update();
 }
 
@@ -148,9 +153,6 @@ void CPlayerX::Draw()
 
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	m_pDebugLine->Draw(CCharacter::GetPos());
-
-
-	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
 
 }
 
@@ -267,22 +269,21 @@ void CPlayerX::FloorCollision()
 					CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
 					if (pTest != nullptr) {
 						pMesh = pTest->GetMesh();
-						if (pTest != nullptr) {
-							// 地形判定
-							pMesh = pTest->GetMesh();
-							D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-							D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
-							D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
+						// 地形判定
+						pMesh = pTest->GetMesh();
+						D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+						D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
+						D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
 
-							// ----- 接地時処理 -----
-							if (bIsHit)
-							{
-								CamFloorCollision(pMesh);
-								CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
-								FloorbumpyMesh(pMesh);
-								return;
-							}
+						// ----- 接地時処理 -----
+						if (bIsHit)
+						{
+							CamFloorCollision(pMesh);
+							CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
+							FloorbumpyMesh(pMesh);
+							return;
 						}
+						
 					}
 				}
 			}
@@ -418,57 +419,56 @@ void CPlayerX::SetParry()
 				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
 					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 					if (pTest != nullptr) {
-						if (pTest != nullptr) {
-							apVecHitCircle = pTest->CCharacter::GetVecHitCircle();
-							for (auto& p : apVecHitCircle)
+						apVecHitCircle = pTest->CCharacter::GetVecHitCircle();
+						for (auto& p : apVecHitCircle)
+						{
+							if (p->GetEnable() && p->GetMotionNum() == 2)
 							{
-								if (p->GetEnable() && p->GetMotionNum() == 2)
-								{
-									pBossAttackCircle = p;
-								}
-							}
-							if (pBossAttackCircle == nullptr)
-							{
-								return;
-							}
-							D3DXVECTOR3 MainPos, SubPos;
-							D3DXMATRIX MainMtx, SubMtx;
-							int cnt = 0;
-							for (auto& p : CCharacter::GetModelPartsVec())
-							{
-								if (pParryCircle != nullptr)
-								{
-									if (cnt == pParryCircle->GetParentNum())
-									{
-										MainMtx = p->GetWorldMatrix();
-									}
-								}
-								++cnt;
-							}
-							cnt = 0;
-							for (auto& p : pTest->CCharacter::GetModelPartsVec())
-							{
-								if (pBossAttackCircle != nullptr)
-								{
-									if (cnt == pBossAttackCircle->GetParentNum())
-									{
-										SubMtx = p->GetWorldMatrix();
-									}
-								}
-								++cnt;
-							}
-							MainPos = pParryCircle->CalcMtxPos(MainMtx);
-							SubPos = pParryCircle->CalcMtxPos(SubMtx);
-
-							if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
-							{
-								CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
-								m_bParryWait = false;
-								pTest->SetNextMotion(3);
-								CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
-								return;
+								pBossAttackCircle = p;
 							}
 						}
+						if (pBossAttackCircle == nullptr)
+						{
+							return;
+						}
+						D3DXVECTOR3 MainPos, SubPos;
+						D3DXMATRIX MainMtx, SubMtx;
+						int cnt = 0;
+						for (auto& p : CCharacter::GetModelPartsVec())
+						{
+							if (pParryCircle != nullptr)
+							{
+								if (cnt == pParryCircle->GetParentNum())
+								{
+									MainMtx = p->GetWorldMatrix();
+								}
+							}
+							++cnt;
+						}
+						cnt = 0;
+						for (auto& p : pTest->CCharacter::GetModelPartsVec())
+						{
+							if (pBossAttackCircle != nullptr)
+							{
+								if (cnt == pBossAttackCircle->GetParentNum())
+								{
+									SubMtx = p->GetWorldMatrix();
+								}
+							}
+							++cnt;
+						}
+						MainPos = pParryCircle->CalcMtxPos(MainMtx);
+						SubPos = pParryCircle->CalcMtxPos(SubMtx);
+
+						if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+						{
+							CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
+							m_bParryWait = false;
+							pTest->SetNextMotion(3);
+							CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
+							return;
+						}
+						
 					}
 				}
 			}
@@ -486,11 +486,12 @@ void CPlayerX::EnemyCollision()
 				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
 					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 					if (pTest != nullptr) {
-						if (pTest != nullptr) {
-							if (pCollision->CylinderCollosion(CCharacter::GetPos(), pTest->GetPos(), CCharacter::GetRadius(), pTest->GetRadius()))
-							{
-								//CCharacter::AddPos((-CCharacter::GetMove()));
-							}
+						if (pCollision->CylinderCollosion(CCharacter::GetPos(), pTest->GetPos(), CCharacter::GetRadius(), pTest->GetRadius()))
+						{
+							D3DXVECTOR3 a = CCharacter::GetPos()-pTest->GetPos();
+							D3DXVECTOR3 AditionPos = -(CCharacter::GetMove() + pTest->GetMove()) + a;
+							AditionPos.y = 0;
+							CCharacter::AddPos(a);
 						}
 					}
 				}

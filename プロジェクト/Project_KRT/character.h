@@ -102,6 +102,7 @@ private:
 	bool m_bMotion;
 
 	std::vector<std::shared_ptr<CHitCircle>> m_pHitCircle;	//‰~‚Ì“–‚½‚è”»’è”z—ñ
+
 	std::vector<std::shared_ptr<CDebugLine>> m_pDebugCircle;
 	
 

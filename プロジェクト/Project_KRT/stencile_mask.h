@@ -39,7 +39,7 @@ public:
 	{
 		CPlayerMask* instance = new CPlayerMask;
 
-		instance->SetPolygonParam({ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f }, SCREEN_HEIGHT, SCREEN_WIDTH, { 1.0f,1.0,1.0f,1.0f });
+		instance->SetPolygonParam({ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f }, SCREEN_HEIGHT, SCREEN_WIDTH, { 1.0f,0.0f,0.0f,1.0f });
 		instance->Init();
 
 		return instance;

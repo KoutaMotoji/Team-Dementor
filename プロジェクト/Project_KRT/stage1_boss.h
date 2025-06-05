@@ -37,6 +37,9 @@ public:
 	};
 private:
 	std::shared_ptr<CDebugLine>m_pDebugLine;
+	std::vector < std::shared_ptr<CDebugLine>>m_pDL_BodyCollision;
+
+	std::vector<std::shared_ptr<CHitCircle>> m_pHC_BodyCollision;	//円の当たり判定配列
 
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
