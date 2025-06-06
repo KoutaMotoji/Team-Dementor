@@ -24,6 +24,7 @@ void State_Nutoral::Move(CPlayerX* pPlayer)
 //攻撃時のステート
 void State_Attack::Attack(CPlayerX* pPlayer)
 {
+	pPlayer->ToEnemyAttack();
 	pPlayer->PAttackInfo();
 }
 void State_Attack::Parry(CPlayerX* pPlayer)

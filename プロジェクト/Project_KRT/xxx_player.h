@@ -58,7 +58,7 @@ public:
 
 	};
 	void EnemyCollision();
-
+	void ToEnemyAttack();
 private:
 
 	//ステータス用定数
@@ -73,10 +73,10 @@ private:
 	CCTBarUI* m_pCctBarUI;
 	bool m_bAttackCt;
 	int m_nPushedKey;
-	bool m_bParryWait;
 	std::vector<CButtonUI*>m_vButtonUI;
 	float m_LastCamDis;
 	std::shared_ptr<CDebugLine>m_pDebugLine;
+
 	std::shared_ptr<PlayerState>m_PlayerState;
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)

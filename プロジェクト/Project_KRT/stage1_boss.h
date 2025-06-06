@@ -32,9 +32,10 @@ public:
 		MOTION_NUTORAL = 0,
 		MOTION_WALK,
 		MOTION_ATTACK,
-		MOTION_JUMP,
-		MOTION_LANDING,
+		MOTION_DAMAGE_BIG,
+		MOTION_DAMAGE_SMALL,
 	};
+	std::vector<std::shared_ptr<CHitCircle>> GetBodyHitCircle() { return m_pHC_BodyCollision; }
 private:
 	std::shared_ptr<CDebugLine>m_pDebugLine;
 	std::vector < std::shared_ptr<CDebugLine>>m_pDL_BodyCollision;

@@ -46,7 +46,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_bParryWait(false), m_LastCamDis(0.0f)
+CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_LastCamDis(0.0f)
 {
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = { nullptr,nullptr,nullptr };
@@ -449,7 +449,6 @@ void CPlayerX::SetParry()
 						if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
 						{
 							CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
-							m_bParryWait = false;
 							pTest->SetNextMotion(3);
 							CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
 							return;
@@ -478,6 +477,79 @@ void CPlayerX::EnemyCollision()
 							D3DXVECTOR3 AditionPos = -(CCharacter::GetMove() + pTest->GetMove()) + a;
 							AditionPos.y = 0;
 							CCharacter::AddPos(a);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+void CPlayerX::ToEnemyAttack()
+{
+	//当たり判定クラスを生成
+	std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();
+	std::vector < std::shared_ptr<CHitCircle>> apVecHitCircle = CCharacter::GetVecHitCircle();
+	std::shared_ptr<CHitCircle> pAttackCircle;
+	for (auto& p : apVecHitCircle)
+	{
+		if (p->GetEnable()) {
+			pAttackCircle = p;
+			break;
+		}
+	}
+	if (pAttackCircle == nullptr)
+	{
+		return;
+	}
+
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj != nullptr) {
+				CObject::TYPE type = pObj->GetType();
+				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
+					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+					if (pTest != nullptr) {
+						std::vector<std::shared_ptr<CHitCircle>> BHC = pTest->GetBodyHitCircle();
+						for (auto& e : BHC)
+						{
+							if (!e->GetEnable())continue;
+						
+							D3DXVECTOR3 MainPos, SubPos;
+							D3DXMATRIX MainMtx, SubMtx;
+							int cnt = 0;
+							for (auto& p : CCharacter::GetModelPartsVec())
+							{
+								if (pAttackCircle != nullptr)
+								{
+									if (cnt == pAttackCircle->GetParentNum())
+									{
+										MainMtx = p->GetWorldMatrix();
+									}
+								}
+								++cnt;
+							}
+							cnt = 0;
+							for (auto& p : pTest->CCharacter::GetModelPartsVec())
+							{
+								if (e != nullptr)
+								{
+									if (cnt == e->GetParentNum())
+									{
+										SubMtx = p->GetWorldMatrix();
+									}
+								}
+								++cnt;
+							}
+							MainPos = pAttackCircle->CalcMtxPos(MainMtx);
+							SubPos = pAttackCircle->CalcMtxPos(SubMtx);
+
+							if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
+							{
+								pTest->SetNextMotion(4);
+								return;
+							}
+
 						}
 					}
 				}
