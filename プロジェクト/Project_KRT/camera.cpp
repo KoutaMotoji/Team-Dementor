@@ -62,7 +62,8 @@ void CCamera::Uninit(void)
 //XV
 void CCamera::Update(void)
 {
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DLEFT) == true)
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DLEFT) == true||
+		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LEFTARROW) == true)
 	{
 		m_fRotZ += _CAM_ROTSPEED;
 		if (m_fRotZ > D3DX_PI)
@@ -71,7 +72,8 @@ void CCamera::Update(void)
 		}
 	}
 
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DRIGHT) == true)
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DRIGHT) == true||
+		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_RIGHTARROW) == true)
 	{
 		m_fRotZ -= _CAM_ROTSPEED;
 		if (m_fRotZ < -1 * D3DX_PI)
@@ -80,7 +82,8 @@ void CCamera::Update(void)
 		}
 	}
 
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DUP) == true)
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DUP) == true||
+		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_UPARROW) == true)
 	{
 		m_camHeight += _CAM_UPSPEED;
 		if (m_camHeight > _CAM_MAX_HEIGHT)
@@ -88,7 +91,8 @@ void CCamera::Update(void)
 			m_camHeight = _CAM_MAX_HEIGHT;
 		}
 	}
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DDOWN) == true)
+	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DDOWN) == true||
+		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_DOWNARROW) == true)
 	{
 		m_camHeight -= _CAM_UPSPEED;
 		if (m_camHeight < _CAM_MIN_HEIGHT)
@@ -112,25 +116,7 @@ void CCamera::Update(void)
 			m_camDistance = _CAM_MIN_ZOOM;
 		}
 	}
-#if _DEBUG
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LEFTARROW) == true)
-	{
-		m_fRotZ += 0.02f;
-		if (m_fRotZ > D3DX_PI)
-		{
-			m_fRotZ = -D3DX_PI;
-		}
-	}
 
-	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_RIGHTARROW) == true)
-	{
-		m_fRotZ -= 0.02f;
-		if (m_fRotZ < -1 * D3DX_PI)
-		{
-			m_fRotZ = D3DX_PI;
-		}
-	}
-#endif // _DEBUG
 	if (!m_bFreeCam)
 	{
 		UpdateNormalCam();

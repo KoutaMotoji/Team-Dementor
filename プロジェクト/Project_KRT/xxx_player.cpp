@@ -26,11 +26,11 @@ namespace
 		{220.0f,250.0f,0.0f},
 		{220.0f + 220.0f / 3,250.0f,0.0f}
 	};
-	struct _FILENAME
+	struct _FILENAME	//ファイルのパス管理構造体
 	{
-		std::string config;
-		std::string section;
-		std::string keyword;
+		std::string config;		//ファイルのパス
+		std::string section;	//セクション名
+		std::string keyword;	//キーワード名
 	};
 	_FILENAME st_filename = {
 		"data\\TEXT\\Config.ini",
@@ -71,6 +71,8 @@ void CPlayerX::Init()
 	CCharacter::SetRadius(50.0f);
 	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
+	SetState(std::make_shared<State_Nutoral>());	//ステートをニュートラルに設定
+
 }
 
 //==========================================================================================
@@ -89,44 +91,34 @@ void CPlayerX::Update()
 	D3DXVECTOR3 CameraPos;		//カメラの座標移動用ローカル変数
 	m_OldPos = CCharacter::GetPos();
 
-	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
+	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
+		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 	{
 		CCharacter::SetNextMotion(MOTION_ATTACK);
+
+		SetState(std::make_shared<State_Attack>());
+
 	}
 	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
 	{
-		if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER))
-		{
-			CCharacter::SetNextMotion(MOTION_NUTORAL);
-			m_bParryWait = false;
-		}
-		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER))
+
+
+		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
+			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
 		{
 			CCharacter::SetNextMotion(MOTION_PARRY);
-			m_bParryWait = true;
-		}
-		if (CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_RIGHT_SHOULDER)&& CCharacter::GetNextMotion() != MOTION_PARRY)
-		{
-			CCharacter::SetNextMotion(MOTION_PARRY_STAY);
-		}
-	}
 
-	if (CCharacter::GetNextMotion() != MOTION_ATTACK && 
-		CCharacter::GetNextMotion() != MOTION_PARRY &&
-		CCharacter::GetNextMotion() != MOTION_PARRY_STAY && 
-		CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
-	{
-		PMove(CManager::GetInstance()->GetCamera()->GetRotZ());	//プレイヤー移動関連の処理
-		EnemyCollision();
+			SetState(std::make_shared<State_Parry>());
+
+		}
 	}
+	m_PlayerState->Move(this);
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	if (m_bParryWait)
-	{
-		SetParry();
-	}
-	PAttackInfo();
+	m_PlayerState->Parry(this);
+
+	m_PlayerState->Attack(this);
 
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());
 
@@ -173,43 +165,34 @@ CPlayerX* CPlayerX::Create(D3DXVECTOR3 pos)
 //==========================================================================================
 bool CPlayerX::PMove(float fCamRotZ)
 {
-	D3DXVECTOR3 moveDir{};
+	D3DXVECTOR3 moveDir= {0.0f,0.0f,0.0f};
 	float moveYrot{},dashValue{};
 	bool bKeyFrag = false;
 
 	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_W))
 	{
-		moveDir.z += _MOVE_SPEED;
+		moveDir.z = 1;
 		bKeyFrag = true;
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_S))
 	{
-		moveDir.z -= _MOVE_SPEED;
+		moveDir.z = -1;
 		bKeyFrag = true;
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_A))
 	{
-		moveDir.x -= _MOVE_SPEED;
+		moveDir.x = -1;
 		bKeyFrag = true;
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_D))
 	{
-		moveDir.x += _MOVE_SPEED;
+		moveDir.x = 1;
 		bKeyFrag = true;
 	}
 	if (!bKeyFrag)
 	{
 		moveDir.x = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x;
 		moveDir.z = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y;
-	}
-
-	if (CManager::GetInstance()->GetKeyboard()->GetRepeat(DIK_LSHIFT) || CManager::GetInstance()->GetJoypad()->GetRepeat(CJoypad::JOYPAD_B))
-	{
-		dashValue = 2.0f;
-	}
-	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_LSHIFT) || CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_B))
-	{
-		dashValue = 15.0f;
 	}
 
 	moveYrot = atan2f(moveDir.x, moveDir.z) + fCamRotZ;
@@ -340,13 +323,15 @@ bool CPlayerX::PAttackInfo()
 {
 	bool pushed = false;
 	if(m_nPushedKey <= 2){
-		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X))
+		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
+			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 		{
 			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9);
 			++m_nPushedKey;
 			pushed = true;
 		}
-		else if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_Y))
+		else if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_Y) ||
+				CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_K))
 		{
 			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey]);
 			++m_nPushedKey;
@@ -385,6 +370,7 @@ bool CPlayerX::PAttackInfo()
 				e = nullptr;
 			}
 		}
+		SetState(std::make_shared<State_Nutoral>());
 	}
 	return true;
 }

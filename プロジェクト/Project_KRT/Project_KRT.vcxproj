@@ -150,6 +150,7 @@
     <ClCompile Include="character.cpp" />
     <ClCompile Include="collision.cpp" />
     <ClCompile Include="debug_line.cpp" />
+    <ClCompile Include="enemy_manager.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="floor.cpp" />
     <ClCompile Include="floor_stone.cpp" />
@@ -171,6 +172,7 @@
     <ClCompile Include="Obj_manager.cpp" />
     <ClCompile Include="player_keyUI.cpp" />
     <ClCompile Include="player_observer.cpp" />
+    <ClCompile Include="player_state.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -186,6 +188,7 @@
     <ClInclude Include="character.h" />
     <ClInclude Include="collision.h" />
     <ClInclude Include="debug_line.h" />
+    <ClInclude Include="enemy_manager.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="floor.h" />
     <ClInclude Include="floor_stone.h" />
