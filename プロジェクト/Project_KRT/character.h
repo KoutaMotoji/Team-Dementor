@@ -24,9 +24,9 @@ public:
 	void Init()override;		//初期化
 	void Uninit()override;		//終了
 	void Update()override;		//更新
-
 	void Draw()override;		//描画
 
+	virtual void EndMotion() {};
 	static CCharacter* Create(D3DXVECTOR3 pos);
 
 	inline D3DXVECTOR3 GetPos() { return m_pos; }				//座標取得

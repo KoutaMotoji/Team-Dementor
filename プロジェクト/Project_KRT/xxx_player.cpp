@@ -24,7 +24,12 @@ namespace
 	std::vector<D3DXVECTOR3>SetButtonUIpos = {
 		{220.0f - 220.0f / 3,250.0f,0.0f},
 		{220.0f,250.0f,0.0f},
-		{220.0f + 220.0f / 3,250.0f,0.0f}
+		{220.0f + 220.0f / 3,250.0f,0.0f},
+		{220.0f + (220.0f / 3)*2,250.0f,0.0f},
+		{220.0f + (220.0f / 3)*3,250.0f,0.0f},
+		{220.0f + (220.0f / 3)*4,250.0f,0.0f},
+		{220.0f + (220.0f / 3)*5,250.0f,0.0f},
+
 	};
 	struct _FILENAME	//ファイルのパス管理構造体
 	{
@@ -49,7 +54,7 @@ namespace
 CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_LastCamDis(0.0f)
 {
 	m_pCctBarUI = nullptr;
-	m_vButtonUI = { nullptr,nullptr,nullptr };
+	m_vButtonUI = {};
 }
 
 //==========================================================================================
@@ -277,6 +282,17 @@ void CPlayerX::FloorCollision()
 //==========================================================================================
 // プレイヤーの地形の起伏移動
 //==========================================================================================
+void  CPlayerX::EndMotion()
+{
+	if (CCharacter::GetNowMotion() == MOTION_PARRY_ATTACK)
+	{
+		SetState(std::make_shared<State_Nutoral>());
+	}
+}
+
+//==========================================================================================
+// プレイヤーの地形の起伏移動
+//==========================================================================================
 bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 {
 	struct RayInfo
@@ -322,18 +338,18 @@ bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 bool CPlayerX::PAttackInfo()
 {
 	bool pushed = false;
-	if(m_nPushedKey <= 2){
+	if(m_nPushedKey < 7){
 		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
 			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 		{
-			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9);
+			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9));
 			++m_nPushedKey;
 			pushed = true;
 		}
 		else if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_Y) ||
 				CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_K))
 		{
-			m_vButtonUI[m_nPushedKey] = CButtonUI::Create(SetButtonUIpos[m_nPushedKey]);
+			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey]));
 			++m_nPushedKey;
 			pushed = true;
 		}
@@ -451,6 +467,7 @@ void CPlayerX::SetParry()
 							CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
 							pTest->SetNextMotion(3);
 							CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
+							SetState(std::make_shared<State_ParryAttack>());
 							return;
 						}
 						
@@ -460,6 +477,7 @@ void CPlayerX::SetParry()
 		}
 	}
 }
+
 void CPlayerX::EnemyCollision()
 {
 	std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();

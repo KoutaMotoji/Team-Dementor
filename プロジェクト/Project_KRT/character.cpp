@@ -295,6 +295,8 @@ void CCharacter::SetNextKey()
 		m_NowFrame = 0;
 		if (m_CurKey >= m_aMotion[nNowMotion].nKeyNum)
 		{
+			EndMotion();
+
 			if (!m_aMotion[nNowMotion].bLoop)
 			{
 				--m_CurKey;

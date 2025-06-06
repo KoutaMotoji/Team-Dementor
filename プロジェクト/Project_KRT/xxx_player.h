@@ -33,6 +33,7 @@ public:
 	void Update()override;		//更新
 	void Draw()override;		//描画
 
+	void EndMotion()override;
 	bool PMove(float fCamRotZ);
 	bool PAttackInfo();
 	static CPlayerX* Create(D3DXVECTOR3 pos);
@@ -130,7 +131,15 @@ public:
 private:
 
 };
+class State_ParryAttack : public PlayerState
+{	//パリィステート(パリィ構え→パリィ待機→パリィ解除まで)
+public:
+	void Move(CPlayerX* pPlayer)override {};
+	void Attack(CPlayerX* pPlayer)override {};
+	void Parry(CPlayerX* pPlayer)override {};
+private:
 
+};
 class State_Damage : public PlayerState
 {	//被ダメージステート
 public:
