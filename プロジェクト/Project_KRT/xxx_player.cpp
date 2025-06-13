@@ -231,29 +231,27 @@ void CPlayerX::FloorCollision()
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_MESHOBJECT) {
-					CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
-					if (pTest != nullptr) {
-						pMesh = pTest->GetMesh();
-						// 地形判定
-						pMesh = pTest->GetMesh();
-						D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-						D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
-						D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
+			if (pObj == nullptr) continue; 
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_MESHOBJECT) continue; 
+			CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
+			if (pTest == nullptr) continue; 
+			pMesh = pTest->GetMesh();
+			// 地形判定
+			pMesh = pTest->GetMesh();
+			D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+			D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
+			D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
 
-						// ----- 接地時処理 -----
-						if (bIsHit)
-						{
-							CamFloorCollision(pMesh);
-							CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
-							FloorbumpyMesh(pMesh);
-							return;
-						}
-					}
-				}
+			// ----- 接地時処理 -----
+			if (bIsHit)
+			{
+				CamFloorCollision(pMesh);
+				CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
+				FloorbumpyMesh(pMesh);
+				return;
 			}
+			
 		}
 	}
 }
@@ -267,14 +265,6 @@ bool  CPlayerX::EndMotion()
 	{
 		SetState(std::make_shared<State_Nutoral>());
 	}
-	//for (int i = MOTION_ATTACK_N1; i < MOTION_ATTACK_N7; ++i)
-	//{
-	//	if (CCharacter::GetNowMotion() == i)
-	//	{	
-	//		CCharacter::SetNextMotion(i + 1);
-	//		return false;		//モーションを設定するのでfalse
-	//	}
-	//}
 	return true;
 }
 
@@ -332,7 +322,7 @@ bool CPlayerX::PAttackInfo()
 		{
 			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9));
 			m_AttackInput.push_back(ATTACK_NORMAL);
-			CCharacter::SetNextMotion(MOTION_ATTACK_N1 + m_AttackInput.size());
+			CCharacter::SetNextMotion(MOTION_ATTACK_N1 + m_AttackInput.size()-1);
 			++m_nPushedKey;
 			pushed = true;
 		}
@@ -393,78 +383,72 @@ void CPlayerX::SetParry()
 	std::shared_ptr<CHitCircle> pParryCircle;
 	std::shared_ptr<CHitCircle> pBossAttackCircle;
 
-	for (auto& p : apVecHitCircle)
+	for (auto& e : apVecHitCircle)
 	{
-		if (p->GetEnable())	{
-			pParryCircle = p;
+		if (e->GetEnable())	{
+			pParryCircle = e;
 			break;
 		}
 	}
-	if (pParryCircle == nullptr)
-	{
-		return;
-	}
+	if (pParryCircle == nullptr)return;
 	apVecHitCircle.clear();
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
-					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
-					if (pTest != nullptr) {
-						apVecHitCircle = pTest->CCharacter::GetVecHitCircle();
-						for (auto& p : apVecHitCircle)
-						{
-							if (p->GetEnable() && p->GetMotionNum() == 2)
-							{
-								pBossAttackCircle = p;
-							}
-						}
-						if (pBossAttackCircle == nullptr)
-						{
-							return;
-						}
-						D3DXVECTOR3 MainPos, SubPos;
-						D3DXMATRIX MainMtx, SubMtx;
-						int cnt = 0;
-						for (auto& p : CCharacter::GetModelPartsVec())
-						{
-							if (pParryCircle != nullptr)
-							{
-								if (cnt == pParryCircle->GetParentNum())
-								{
-									MainMtx = p->GetWorldMatrix();
-								}
-							}
-							++cnt;
-						}
-						cnt = 0;
-						for (auto& p : pTest->CCharacter::GetModelPartsVec())
-						{
-							if (pBossAttackCircle != nullptr)
-							{
-								if (cnt == pBossAttackCircle->GetParentNum())
-								{
-									SubMtx = p->GetWorldMatrix();
-								}
-							}
-							++cnt;
-						}
-						MainPos = pParryCircle->CalcMtxPos(MainMtx);
-						SubPos = pParryCircle->CalcMtxPos(SubMtx);
+			if (pObj == nullptr) continue; 
 
-						if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
-						{
-							CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
-							pTest->SetNextMotion(3);
-							CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
-							SetState(std::make_shared<State_ParryAttack>());
-							return;
-						}
-						
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			if (pTest == nullptr) continue;
+			
+			apVecHitCircle = pTest->CCharacter::GetVecHitCircle();
+			for (auto& e1 : apVecHitCircle)
+			{
+				if (e1->GetEnable() && e1->GetMotionNum() == 2)
+				{
+					pBossAttackCircle = e1;
+				}
+			}
+			if (pBossAttackCircle == nullptr) continue;
+			
+			D3DXVECTOR3 MainPos, SubPos;
+			D3DXMATRIX MainMtx, SubMtx;
+			int cnt = 0;
+			for (auto& e2 : CCharacter::GetModelPartsVec())
+			{
+				if (pParryCircle != nullptr)
+				{
+					if (cnt == pParryCircle->GetParentNum())
+					{
+						MainMtx = e2->GetWorldMatrix();
 					}
 				}
+				++cnt;
+			}
+			cnt = 0;
+			for (auto& e3 : pTest->CCharacter::GetModelPartsVec())
+			{
+				if (pBossAttackCircle != nullptr)
+				{
+					if (cnt == pBossAttackCircle->GetParentNum())
+					{
+						SubMtx = e3->GetWorldMatrix();
+					}
+				}
+				++cnt;
+			}
+			MainPos = pParryCircle->CalcMtxPos(MainMtx);
+			SubPos = pParryCircle->CalcMtxPos(SubMtx);
+
+			if(pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+			{
+				CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
+				pTest->SetNextMotion(3);
+				CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
+				SetState(std::make_shared<State_ParryAttack>());
+				return;
 			}
 		}
 	}
@@ -476,20 +460,19 @@ void CPlayerX::EnemyCollision()
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
-					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
-					if (pTest != nullptr) {
-						if (pCollision->CylinderCollosion(CCharacter::GetPos(), pTest->GetPos(), CCharacter::GetRadius(), pTest->GetRadius()))
-						{
-							D3DXVECTOR3 a = CCharacter::GetPos()-pTest->GetPos();
-							D3DXVECTOR3 AditionPos = -(CCharacter::GetMove() + pTest->GetMove()) + a;
-							AditionPos.y = 0;
-							CCharacter::AddPos(a);
-						}
-					}
-				}
+			if (pObj == nullptr) continue;
+			
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			if (pTest == nullptr) continue;
+
+			if (pCollision->CylinderCollosion(CCharacter::GetPos(), pTest->GetPos(), CCharacter::GetRadius(), pTest->GetRadius()))
+			{
+				D3DXVECTOR3 a = CCharacter::GetPos()-pTest->GetPos();
+				D3DXVECTOR3 AditionPos = -(CCharacter::GetMove() + pTest->GetMove()) + a;
+				AditionPos.y = 0;
+				CCharacter::AddPos(a);
 			}
 		}
 	}
@@ -501,70 +484,66 @@ void CPlayerX::ToEnemyAttack()
 	std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();
 	std::vector < std::shared_ptr<CHitCircle>> apVecHitCircle = CCharacter::GetVecHitCircle();
 	std::shared_ptr<CHitCircle> pAttackCircle;
-	for (auto& p : apVecHitCircle)
+	for (auto& e : apVecHitCircle)
 	{
-		if (p->GetEnable()) {
-			pAttackCircle = p;
+		if (e->GetEnable()) {
+			pAttackCircle = e;
 			break;
 		}
 	}
-	if (pAttackCircle == nullptr)
-	{
-		return;
-	}
+	if (pAttackCircle == nullptr)return;
 
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_BOSS_1) {
-					CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
-					if (pTest != nullptr) {
-						std::vector<std::shared_ptr<CHitCircle>> BHC = pTest->GetBodyHitCircle();
-						for (auto& e : BHC)
-						{
-							if (!e->GetEnable())continue;
+			if (pObj == nullptr) continue;
+			
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+		
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			if (pTest == nullptr) continue;
+			
+			std::vector<std::shared_ptr<CHitCircle>> BHC = pTest->GetBodyHitCircle();
+			for (auto& e : BHC)
+			{
+				if (!e->GetEnable())continue;
 						
-							D3DXVECTOR3 MainPos, SubPos;
-							D3DXMATRIX MainMtx, SubMtx;
-							int cnt = 0;
-							for (auto& p : CCharacter::GetModelPartsVec())
-							{
-								if (pAttackCircle != nullptr)
-								{
-									if (cnt == pAttackCircle->GetParentNum())
-									{
-										MainMtx = p->GetWorldMatrix();
-									}
-								}
-								++cnt;
-							}
-							cnt = 0;
-							for (auto& p : pTest->CCharacter::GetModelPartsVec())
-							{
-								if (e != nullptr)
-								{
-									if (cnt == e->GetParentNum())
-									{
-										SubMtx = p->GetWorldMatrix();
-									}
-								}
-								++cnt;
-							}
-							MainPos = pAttackCircle->CalcMtxPos(MainMtx);
-							SubPos = pAttackCircle->CalcMtxPos(SubMtx);
-
-							if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
-							{
-								pTest->SetNextMotion(4);
-								return;
-							}
-
+				D3DXVECTOR3 MainPos, SubPos;
+				D3DXMATRIX MainMtx, SubMtx;
+				int cnt = 0;
+				for (auto& e1 : CCharacter::GetModelPartsVec())
+				{
+					if (pAttackCircle != nullptr)
+					{
+						if (cnt == pAttackCircle->GetParentNum())
+						{
+							MainMtx = e1->GetWorldMatrix();
 						}
 					}
+					++cnt;
 				}
-			}
+				cnt = 0;
+				for (auto& e2 : pTest->CCharacter::GetModelPartsVec())
+				{
+					if (e2 != nullptr)
+					{
+						if (cnt == e->GetParentNum())
+						{
+							SubMtx = e2->GetWorldMatrix();
+						}
+					}
+					++cnt;
+				}
+				MainPos = pAttackCircle->CalcMtxPos(MainMtx);
+				SubPos = pAttackCircle->CalcMtxPos(SubMtx);
+
+				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
+				{
+					pTest->SetNextMotion(4);
+					return;
+				}
+			}	
 		}
 	}
 }

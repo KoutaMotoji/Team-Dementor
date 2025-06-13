@@ -13,22 +13,25 @@ std::shared_ptr<CPlayerObserver> CPlayerObserver::_instance = nullptr;
 //======================================================================
 void CPlayerObserver::PlayerSearch()
 {
-	if (pPlayer == nullptr)
-	{
-		for (int j = 0; j < SET_PRIORITY; ++j) {
-			for (int i = 0; i < MAX_OBJECT; ++i) {
-				CObject* pObj = CObject::GetObjects(j, i);
-				if (pObj != nullptr) {
-					CObject::TYPE type = pObj->GetType();
-					if (type == CObject::TYPE::TYPE_3D_PLAYER) {
-						CPlayerX* pP = dynamic_cast<CPlayerX*>(pObj);
-						if (pP != nullptr)
-						{
-							pPlayer = pP;
-						}
-					}
-				}
-			}
+	//既に中身があるかを確認
+	if (pPlayer != nullptr) return;
+	
+	//プレイヤーの検索
+	for (int j = 0; j < SET_PRIORITY; ++j) {//プライオリティ
+		for (int i = 0; i < MAX_OBJECT; ++i) {//オブジェクト番号
+			//オブジェクトポインタのnullチェック
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj == nullptr) continue;
+
+			//オブジェクトのタイプを確認
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_PLAYER) continue;
+
+			//プレイヤーをダウンキャストし、nullチェック
+			CPlayerX* pP = dynamic_cast<CPlayerX*>(pObj);
+			if (pP == nullptr) continue;
+
+			pPlayer = pP;	//代入
 		}
 	}
 }
