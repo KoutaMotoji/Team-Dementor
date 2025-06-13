@@ -14,6 +14,8 @@
 #include "stage1_boss.h"
 #include "stencile_mask.h"
 
+#include "field_manager.h"
+
 #include "game.h"
 
 #include "floor.h"
@@ -44,6 +46,7 @@ HRESULT CGame::Init()
 	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
 	CPlayerMask::Create();
 
+	CField_Manager::GetInstance()->Init();
 	return S_OK;
 }
 
@@ -68,10 +71,10 @@ void CGame::Update()
 	}
 	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_F3))
 	{
-		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_MAPEDIT);
-		return;
+		CField_Manager::GetInstance()->SetField();
 	}
 #endif // _DEBUG
+	CField_Manager::GetInstance()->Update();
 	CScene::Update();
 }
 

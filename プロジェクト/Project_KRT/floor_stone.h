@@ -20,6 +20,7 @@ public:
 	void Update()override;		//XV
 	void Draw()override;		//•`‰æ
 	static CMeshGround* Create(D3DXVECTOR3 pos);
+	static CMeshGround* Create(D3DXVECTOR3 pos,int i);
 
 protected:
 

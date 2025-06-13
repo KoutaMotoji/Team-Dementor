@@ -26,7 +26,7 @@ public:
 	void Update()override;		//çXêV
 	void Draw()override;		//ï`âÊ
 
-	virtual void EndMotion() {};
+	virtual bool EndMotion() { return true; };
 	static CCharacter* Create(D3DXVECTOR3 pos);
 
 	inline D3DXVECTOR3 GetPos() { return m_pos; }				//ç¿ïWéÊìæ
@@ -48,7 +48,7 @@ public:
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }
 	inline std::vector<CModelParts*> GetModelPartsVec() { return m_apModelParts; }
-
+	inline void BlendDisable() { m_bBlend = false; }
 	void MotionDataLoad(std::string filename);
 	void SetNextMotion(int nNextMotionNum);
 	inline std::vector<std::shared_ptr<CHitCircle>> GetVecHitCircle() { return m_pHitCircle; }

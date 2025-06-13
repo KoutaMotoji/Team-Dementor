@@ -33,7 +33,7 @@ public:
 	void Update()override;		//更新
 	void Draw()override;		//描画
 
-	void EndMotion()override;
+	bool EndMotion()override;
 	bool PMove(float fCamRotZ);
 	bool PAttackInfo();
 	static CPlayerX* Create(D3DXVECTOR3 pos);
@@ -55,13 +55,24 @@ public:
 		MOTION_PARRY,
 		MOTION_PARRY_STAY,
 		MOTION_PARRY_ATTACK,
-		MOTION_ATTACK,
+		MOTION_ATTACK_N1,
+		MOTION_ATTACK_N2,
+		MOTION_ATTACK_N3,
+		MOTION_ATTACK_N4,
+		MOTION_ATTACK_N5,
+		MOTION_ATTACK_N6,
+		MOTION_ATTACK_N7,
+
 
 	};
 	void EnemyCollision();
 	void ToEnemyAttack();
 private:
-
+	enum
+	{
+		ATTACK_NORMAL = 0,
+		ATTACK_GREAT
+	};
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
@@ -75,6 +86,7 @@ private:
 	bool m_bAttackCt;
 	int m_nPushedKey;
 	std::vector<CButtonUI*>m_vButtonUI;
+	std::vector<int>m_AttackInput;
 	float m_LastCamDis;
 	std::shared_ptr<CDebugLine>m_pDebugLine;
 
@@ -97,7 +109,9 @@ public:
 	virtual void Move(CPlayerX* pPlayer) = 0;
 	virtual void Attack(CPlayerX* pPlayer) = 0;
 	virtual void Parry(CPlayerX* pPlayer) = 0;
-	
+	virtual void ToAttack(CPlayerX* pPlayer) = 0;
+	virtual void ToParry(CPlayerX* pPlayer) = 0;
+
 private:
 
 };
@@ -108,6 +122,8 @@ public:
 	void Move(CPlayerX* pPlayer)override;
 	void Attack(CPlayerX* pPlayer)override;
 	void Parry(CPlayerX* pPlayer)override;
+	void ToAttack(CPlayerX* pPlayer)override;
+	void ToParry(CPlayerX* pPlayer)override;
 private:
 
 };
@@ -118,6 +134,8 @@ public:
 	void Move(CPlayerX* pPlayer)override;
 	void Attack(CPlayerX* pPlayer)override;
 	void Parry(CPlayerX* pPlayer)override;
+	void ToAttack(CPlayerX* pPlayer)override;
+	void ToParry(CPlayerX* pPlayer)override;
 private:
 
 };
@@ -128,6 +146,8 @@ public:
 	void Move(CPlayerX* pPlayer)override;
 	void Attack(CPlayerX* pPlayer)override;
 	void Parry(CPlayerX* pPlayer)override;
+	void ToAttack(CPlayerX* pPlayer)override;
+	void ToParry(CPlayerX* pPlayer)override;
 private:
 
 };
@@ -137,6 +157,9 @@ public:
 	void Move(CPlayerX* pPlayer)override {};
 	void Attack(CPlayerX* pPlayer)override {};
 	void Parry(CPlayerX* pPlayer)override {};
+	void ToAttack(CPlayerX* pPlayer)override {};
+	void ToParry(CPlayerX* pPlayer)override {};
+
 private:
 
 };
@@ -146,6 +169,8 @@ public:
 	void Move(CPlayerX* pPlayer)override;
 	void Attack(CPlayerX* pPlayer)override;
 	void Parry(CPlayerX* pPlayer)override;
+	void ToAttack(CPlayerX* pPlayer)override;
+	void ToParry(CPlayerX* pPlayer)override;
 private:
 
 };

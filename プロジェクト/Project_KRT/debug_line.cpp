@@ -120,12 +120,9 @@ void CDebugLineSphire::Init()
 	D3DXCreateLine(pDevice, &m_pLine);
 }
 
-
-
 void CDebugLineSphire::Draw(D3DXVECTOR3 pos)
 {
 #ifdef _DEBUG
-
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	// ƒ‰ƒCƒg‚Ì–³Œø‰»
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);

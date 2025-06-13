@@ -5,6 +5,7 @@
 // 
 //===============================================================================
 #include "floor_stone.h"
+#include "field_manager.h"
 
 #include "manager.h"
 #include "game.h"
@@ -27,6 +28,7 @@ void CMeshGround::Init()
 {
 	CObject::SetType(TYPE_3D_MESHOBJECT);
 	CObjectX::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 //==========================================================================================
@@ -78,6 +80,18 @@ CMeshGround* CMeshGround::Create(D3DXVECTOR3 pos)
 {
 	CMeshGround* enemy = new CMeshGround;
 	enemy->BindModel("data\\MODEL\\Floor_box.x");
+	enemy->SetModelParam(pos);
+	enemy->Init();
+	return enemy;
+}
+
+//==========================================================================================
+//¶¬ˆ—
+//==========================================================================================
+CMeshGround* CMeshGround::Create(D3DXVECTOR3 pos,int i)
+{
+	CMeshGround* enemy = new CMeshGround;
+	enemy->BindModel("data\\MODEL\\FieldKari2.x");
 	enemy->SetModelParam(pos);
 	enemy->Init();
 	return enemy;

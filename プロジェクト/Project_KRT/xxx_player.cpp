@@ -95,28 +95,9 @@ void CPlayerX::Update()
 {
 	D3DXVECTOR3 CameraPos;		//カメラの座標移動用ローカル変数
 	m_OldPos = CCharacter::GetPos();
+	m_PlayerState->ToAttack(this);
+	m_PlayerState->ToParry(this);
 
-	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
-		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
-	{
-		CCharacter::SetNextMotion(MOTION_ATTACK);
-
-		SetState(std::make_shared<State_Attack>());
-
-	}
-	if (CCharacter::GetNextMotion() != MOTION_ATTACK && CCharacter::GetNextMotion() != MOTION_PARRY_ATTACK)
-	{
-
-
-		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
-			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
-		{
-			CCharacter::SetNextMotion(MOTION_PARRY);
-
-			SetState(std::make_shared<State_Parry>());
-
-		}
-	}
 	m_PlayerState->Move(this);
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
@@ -215,7 +196,6 @@ bool CPlayerX::PMove(float fCamRotZ)
 
 	CCharacter::SetNextMotion(MOTION_WALK);
 	
-
 	return true;
 }
 
@@ -271,7 +251,6 @@ void CPlayerX::FloorCollision()
 							FloorbumpyMesh(pMesh);
 							return;
 						}
-						
 					}
 				}
 			}
@@ -280,14 +259,23 @@ void CPlayerX::FloorCollision()
 }
 
 //==========================================================================================
-// プレイヤーの地形の起伏移動
+// モーション終了時に呼ばれる関数
 //==========================================================================================
-void  CPlayerX::EndMotion()
+bool  CPlayerX::EndMotion()
 {
 	if (CCharacter::GetNowMotion() == MOTION_PARRY_ATTACK)
 	{
 		SetState(std::make_shared<State_Nutoral>());
 	}
+	//for (int i = MOTION_ATTACK_N1; i < MOTION_ATTACK_N7; ++i)
+	//{
+	//	if (CCharacter::GetNowMotion() == i)
+	//	{	
+	//		CCharacter::SetNextMotion(i + 1);
+	//		return false;		//モーションを設定するのでfalse
+	//	}
+	//}
+	return true;
 }
 
 //==========================================================================================
@@ -331,18 +319,20 @@ bool CPlayerX::FloorbumpyMesh(LPD3DXMESH pMesh)
 	return false;
 }
 
-
 //==========================================================================================
 // プレイヤーの攻撃入力
 //==========================================================================================
 bool CPlayerX::PAttackInfo()
 {
 	bool pushed = false;
+
 	if(m_nPushedKey < 7){
 		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
 			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 		{
 			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9));
+			m_AttackInput.push_back(ATTACK_NORMAL);
+			CCharacter::SetNextMotion(MOTION_ATTACK_N1 + m_AttackInput.size());
 			++m_nPushedKey;
 			pushed = true;
 		}
@@ -350,6 +340,7 @@ bool CPlayerX::PAttackInfo()
 				CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_K))
 		{
 			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey]));
+			m_AttackInput.push_back(ATTACK_GREAT);
 			++m_nPushedKey;
 			pushed = true;
 		}
@@ -385,8 +376,9 @@ bool CPlayerX::PAttackInfo()
 				e->Release();
 				e = nullptr;
 			}
+			SetState(std::make_shared<State_Nutoral>());
 		}
-		SetState(std::make_shared<State_Nutoral>());
+		m_AttackInput.clear();
 	}
 	return true;
 }
@@ -502,6 +494,7 @@ void CPlayerX::EnemyCollision()
 		}
 	}
 }
+
 void CPlayerX::ToEnemyAttack()
 {
 	//当たり判定クラスを生成

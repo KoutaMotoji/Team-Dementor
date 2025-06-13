@@ -227,13 +227,11 @@ void CCharacter::SetNextKey()
 	for (auto& e : m_pHitCircle)
 	{
 		if (e->GetMotionNum() == nNowMotion) {
-			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd())
-			{
+			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd()) {
 				e->SetEnable();
 			}
 		}
-		else
-		{
+		else {
 			e->SetDisable();
 		}
 		++nCnt;
@@ -295,19 +293,29 @@ void CCharacter::SetNextKey()
 		m_NowFrame = 0;
 		if (m_CurKey >= m_aMotion[nNowMotion].nKeyNum)
 		{
-			EndMotion();
-
-			if (!m_aMotion[nNowMotion].bLoop)
+			if (EndMotion())
 			{
-				--m_CurKey;
-				m_CurKey = 0;
-				m_NowFrame = 0;
-				m_NowAllFrame = 0;
-				m_CurMotion = m_NextMotion = 0;
+				if (!m_aMotion[nNowMotion].bLoop)
+				{
+					--m_CurKey;
+					m_CurKey = 0;
+					m_NowFrame = 0;
+					m_NowAllFrame = 0;
+					m_CurMotion = m_NextMotion = 0;
+				}
+				else
+				{
+					m_CurKey = 0;
+					m_NowAllFrame = 0;
+				}
 			}
 			else
 			{
 				m_CurKey = 0;
+				m_NowAllFrame = 0;
+				m_NowFrame = 0;
+				m_CurMotion = m_NextMotion;
+				m_bBlend = false;
 			}
 		}
 	}
