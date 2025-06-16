@@ -34,22 +34,22 @@ void CField_Manager::Uninit() {
 };
 void CField_Manager::Update()
 {
-	if (m_bActibateManager)
+	if (!m_bActibateManager)return;
+
+	//ディゾルブが半分に到達しているか確認
+	if (!m_FieldDissolve->GetReach())return;
+
+
+	for (auto& e : m_vecFieldObj)
 	{
-		if (m_FieldDissolve->GetReach())	//ディゾルブが半分に到達しているか確認
-		{
-			for (auto& e : m_vecFieldObj)
-			{
-				e->Release();
-			}
-			m_vecFieldObj.clear();
-			//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
-			CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
-			m_FieldDissolve->RestartDissolve();
-			m_bActibateManager = false;
-		
-		}
+		e->Release();
 	}
+
+	m_vecFieldObj.clear();
+	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
+	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
+	m_FieldDissolve->RestartDissolve();
+	m_bActibateManager = false;
 }
 
 //外部からオブジェクト再配置スタート用の関数
@@ -88,25 +88,26 @@ void FieldDissolve::Draw()
 
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 
-	//アルファテスト設定
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+	////アルファテスト設定
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	//pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
-	//減算合成の設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+	////減算合成の設定
+	//pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
+	//pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	if (m_bDraw)
 	{
 		CObject2D::Draw();
 	}
-	//通常の合成に戻す設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	////通常の合成に戻す設定
+	//pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	//pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	//pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 }
 
 FieldDissolve* FieldDissolve::Create()
