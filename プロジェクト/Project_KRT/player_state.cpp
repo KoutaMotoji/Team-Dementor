@@ -20,7 +20,8 @@ void State_Nutoral::Move(CPlayerX* pPlayer)
 	pPlayer->PMove(CManager::GetInstance()->GetCamera()->GetRotZ());
 	pPlayer->EnemyCollision();
 }
-void State_Nutoral::ToAttack(CPlayerX* pPlayer) {
+void State_Nutoral::ToAttack(CPlayerX* pPlayer)
+{
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 	{
@@ -44,16 +45,14 @@ void State_Attack::Attack(CPlayerX* pPlayer)
 	pPlayer->ToEnemyAttack();
 	pPlayer->PAttackInfo();
 }
-void State_Attack::Parry(CPlayerX* pPlayer)
-{
+void State_Attack::Parry(CPlayerX* pPlayer){
 
 }
-void State_Attack::Move(CPlayerX* pPlayer)
-{
+void State_Attack::Move(CPlayerX* pPlayer){
 	//攻撃時は移動不可のため移動の機能を実装しない
 }
-void State_Attack::ToAttack(CPlayerX* pPlayer)
-{
+void State_Attack::ToAttack(CPlayerX* pPlayer){
+
 }
 void State_Attack::ToParry(CPlayerX* pPlayer)
 {
@@ -66,8 +65,7 @@ void State_Attack::ToParry(CPlayerX* pPlayer)
 }
 
 //パリィ時のステート
-void State_Parry::Attack(CPlayerX* pPlayer)
-{
+void State_Parry::Attack(CPlayerX* pPlayer){
 
 }
 void State_Parry::Parry(CPlayerX* pPlayer)
@@ -85,8 +83,7 @@ void State_Parry::Parry(CPlayerX* pPlayer)
 		pPlayer->SetState( std::make_shared<State_Nutoral>());
 	}
 }
-void State_Parry::Move(CPlayerX* pPlayer)
-{
+void State_Parry::Move(CPlayerX* pPlayer){
 
 }
 void State_Parry::ToAttack(CPlayerX* pPlayer)
@@ -98,29 +95,23 @@ void State_Parry::ToAttack(CPlayerX* pPlayer)
 		pPlayer->SetState(std::make_shared<State_Attack>());
 	}
 }
-void State_Parry::ToParry(CPlayerX* pPlayer)
-{
+void State_Parry::ToParry(CPlayerX* pPlayer){
 
 }
 
 //被ダメージ時のステート
-void State_Damage::Attack(CPlayerX* pPlayer)
-{
+void State_Damage::Attack(CPlayerX* pPlayer){
 
 }
-void State_Damage::Parry(CPlayerX* pPlayer)
-{
+void State_Damage::Parry(CPlayerX* pPlayer){
 	
 }
-void State_Damage::Move(CPlayerX* pPlayer)
-{
+void State_Damage::Move(CPlayerX* pPlayer){
 
 }
-void State_Damage::ToAttack(CPlayerX* pPlayer)
-{
+void State_Damage::ToAttack(CPlayerX* pPlayer){
 
 }
-void State_Damage::ToParry(CPlayerX* pPlayer)
-{
+void State_Damage::ToParry(CPlayerX* pPlayer){
 
 }
