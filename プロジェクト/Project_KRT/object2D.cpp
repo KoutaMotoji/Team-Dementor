@@ -7,9 +7,12 @@
 #include "object2D.h"
 #include "manager.h"
 
-const int CObject2D::MAX_VERTEX = 4;
-const int CObject2D::MAX_POLYGON = 2;
+namespace
+{
+	const int MAX_VERTEX = 4;
+	const int MAX_POLYGON = 2;
 
+};
 
 CObject2D::CObject2D(int nPriority):CObject(nPriority), m_fWidth(0), m_fHeight(0),m_AnimU(0),m_AnimV(0),m_fZoom(1),m_GaugeAnim(0.0f,0.0f)
 {

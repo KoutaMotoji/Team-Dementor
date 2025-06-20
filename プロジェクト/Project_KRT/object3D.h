@@ -21,7 +21,6 @@ public:
 	void Draw()override;		//•`‰æ
 	void Draw(D3DXMATRIX SetmtxRot);		//•`‰æ
 
-
 	D3DXVECTOR3 GetPos();
 	void SetPos(D3DXVECTOR3 pos) { m_pos = pos; };
 	void AddSize(float value);
@@ -40,15 +39,11 @@ private:
 	D3DXVECTOR3 m_size;
 	D3DXCOLOR m_col;
 	D3DXMATRIX m_mtxWorld;
-	static const int MAX_VERTEX;
-	static const int MAX_POLYGON;
 	float m_fAngle;
 	float m_fLength;
 	float m_fHeight;
 	float m_fWidth;
 	float m_fZoom;
-	static const float MAX_OBJ3DHEIGHT;
-	static const float MAX_OBJ3DWIDTH;
 };
 
 #endif

@@ -57,8 +57,6 @@ private:
 	D3DXVECTOR3 m_pos;
 	D3DXVECTOR3 m_rot;
 	D3DXCOLOR m_col;
-	static const int MAX_VERTEX;
-	static const int MAX_POLYGON;
 	float m_fAngle;
 	float m_fLength;
 	float m_fHeight;

@@ -7,14 +7,14 @@
 #include "object3D.h"
 #include "manager.h"
 
-
-//静的メンバ初期化
-const float CObject3D::MAX_OBJ3DHEIGHT = 500.0f;
-const float CObject3D::MAX_OBJ3DWIDTH = 500.0f;
-
-const int CObject3D::MAX_VERTEX = 4;
-const int CObject3D::MAX_POLYGON = 2;
-
+namespace
+{
+	const float MAX_OBJ3DHEIGHT = 500.0f;
+	const float MAX_OBJ3DWIDTH = 500.0f;
+	const int MAX_VERTEX = 4;
+	const int MAX_VERTEX_FAN = 3;
+	const int MAX_POLYGON = 2;
+};
 
 CObject3D::CObject3D(int nPriority) : CObject(nPriority) ,m_fWidth(0), m_fHeight(0)
 {
@@ -132,8 +132,7 @@ void CObject3D::Draw()
 		&mtxTrans);
 
 	//ワールドマトリックスの設定
-	pDevice->SetTransform(D3DTS_WORLD,
-		&m_mtxWorld);
+	pDevice->SetTransform(D3DTS_WORLD,&m_mtxWorld);
 	//頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuffObject3D, 0, sizeof(VERTEX_3D));
 	//頂点フォーマットの設定

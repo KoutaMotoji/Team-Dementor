@@ -8,6 +8,7 @@
 #include "character.h"
 #include "floor_stone.h"
 #include "player_observer.h"
+#include "attack_range.h"
 
 #include "inimanager.h"
 #include "game.h"
@@ -82,6 +83,7 @@ void CG_Gorira::Update()
 	m_OldPos = CCharacter::GetPos();
 	if (m_nAttackcnt >= 720)
 	{
+		CDrawFan::Create({ 0.0f,0.0f,0.0f });
 		CCharacter::SetNextMotion(2);
 		m_nAttackcnt = 0;
 	}
