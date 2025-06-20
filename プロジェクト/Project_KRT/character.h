@@ -43,7 +43,7 @@ public:
 	inline D3DXVECTOR3 GetMove() { return m_move; }
 	inline void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	inline void AddMove(D3DXVECTOR3 move) { m_move += move; }
-
+	inline D3DXMATRIX GetMatrix() { return m_mtxWorld; }
 
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }

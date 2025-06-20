@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="attack_range.cpp" />
     <ClCompile Include="billboard.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="character.cpp" />
@@ -170,7 +171,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="Obj_manager.cpp" />
-
+    <ClCompile Include="player_behavior.cpp" />
     <ClCompile Include="player_keyUI.cpp" />
     <ClCompile Include="player_observer.cpp" />
     <ClCompile Include="player_state.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="xxx_player.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="attack_range.h" />
     <ClInclude Include="billboard.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="character.h" />
