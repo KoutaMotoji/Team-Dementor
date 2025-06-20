@@ -170,6 +170,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="Obj_manager.cpp" />
+    <ClCompile Include="player_behavior.cpp" />
     <ClCompile Include="player_keyUI.cpp" />
     <ClCompile Include="player_observer.cpp" />
     <ClCompile Include="player_state.cpp" />

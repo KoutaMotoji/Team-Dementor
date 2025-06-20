@@ -51,6 +51,8 @@ public:
 	inline void BlendDisable() { m_bBlend = false; }
 	void MotionDataLoad(std::string filename);
 	void SetNextMotion(int nNextMotionNum);
+	void SetNextMotion(int nNextMotionNum,bool bBlend);
+
 	inline std::vector<std::shared_ptr<CHitCircle>> GetVecHitCircle() { return m_pHitCircle; }
 private:
 	D3DXVECTOR3 m_pos, m_rot, m_size;			//ç¿ïWÅEâÒì]ÅEëÂÇ´Ç≥

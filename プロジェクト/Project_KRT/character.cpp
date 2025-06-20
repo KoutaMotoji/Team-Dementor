@@ -195,7 +195,20 @@ void CCharacter::SetNextMotion(int nNextMotionNum)
 	m_NowAllFrame = 0;
 	m_bBlend = true;
 }
-
+//==========================================================================================
+//次のモーションに移行する処理(モーションブレンド)
+//==========================================================================================
+void CCharacter::SetNextMotion(int nNextMotionNum,bool bBlend)
+{
+	if (m_NextMotion == nNextMotionNum)
+	{
+		return;
+	}
+	m_NextMotion = nNextMotionNum;
+	m_NowFrame = 0;
+	m_NowAllFrame = 0;
+	m_bBlend = bBlend;
+}
 //==========================================================================================
 //次のキーのモーション処理
 //==========================================================================================

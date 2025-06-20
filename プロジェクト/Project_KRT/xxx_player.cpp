@@ -15,13 +15,13 @@
 
 namespace
 {
-	const float _WORLD_WALL = 1300.0f;
-	const float Damage_Ratio = 0.2f;
-	const float _GRAVITY = 4.0f;
-	const float _MOVE_SPEED = 1.2f;
-	const float _JUMP_HEIGHT = 120.0f;
-	const int _GAUGE_CTVALUE = 60;
-	std::vector<D3DXVECTOR3>SetButtonUIpos = {
+	const float _WORLD_WALL = 1300.0f;		//世界の壁
+	const float Damage_Ratio = 0.2f;		//プレイヤーのダメージCT(使ってない)
+	const float _GRAVITY = 4.0f;			//重力
+	const float _MOVE_SPEED = 1.2f;			//移動速度
+	const int _GAUGE_CTVALUE = 60;			//攻撃の入力猶予時間用のゲージ容量
+	const float _BODY_RADIUS = 50.0f;
+	std::vector<D3DXVECTOR3>SetButtonUIpos = {	//ボタンUIの座標
 		{220.0f - 220.0f / 3,250.0f,0.0f},
 		{220.0f,250.0f,0.0f},
 		{220.0f + 220.0f / 3,250.0f,0.0f},
@@ -37,12 +37,12 @@ namespace
 		std::string section;	//セクション名
 		std::string keyword;	//キーワード名
 	};
-	_FILENAME st_filename = {
+	_FILENAME st_filename = {		//プレイヤーのモデル・モーション用ファイルパス
 		"data\\TEXT\\Config.ini",
 		 "ModelData",
 		 "PlayerMotion"
 	};
-	std::vector<D3DXVECTOR3> RayPos = {
+	std::vector<D3DXVECTOR3> RayPos = {			//地形判定用レイの飛ばす座標
 		{0.0f,10.0f,0.0f},
 		{0.0f,50.0f,0.0f}
 	};
@@ -72,11 +72,12 @@ void CPlayerX::Init()
 {
 	CObject::SetType(TYPE_3D_PLAYER);						//オブジェクト一括管理用のタイプを設定
 	CCharacter::Init();
-	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
-	CCharacter::SetRadius(50.0f);
-	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();
-	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
+	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));	//iniファイルから設定されてるプレイヤーの読み込み
+	CCharacter::SetRadius(_BODY_RADIUS);										//当たり判定を設定(円柱)
+	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();	//カメラ距離設定
+	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);		//デバッグ用線の生成
 	SetState(std::make_shared<State_Nutoral>());	//ステートをニュートラルに設定
+	SetAttackBehavior(std::make_shared<Attack_None>());
 
 }
 
@@ -94,19 +95,19 @@ void CPlayerX::Uninit()
 void CPlayerX::Update()
 {
 	D3DXVECTOR3 CameraPos;		//カメラの座標移動用ローカル変数
-	m_OldPos = CCharacter::GetPos();
-	m_PlayerState->ToAttack(this);
-	m_PlayerState->ToParry(this);
+	m_OldPos = CCharacter::GetPos();	//過去の位置座標を保存
+	m_PlayerState->ToAttack(this);		//攻撃への移行を管理
+	m_PlayerState->ToParry(this);		//パリィへの移行を管理
 
-	m_PlayerState->Move(this);
+	m_PlayerState->Move(this);			//移動を制御
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	m_PlayerState->Parry(this);
+	m_PlayerState->Parry(this);			//パリィ中の制御
 
-	m_PlayerState->Attack(this);
+	m_PlayerState->Attack(this);		//攻撃中の制御
 
-	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());
+	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());	//カメラの注視点せて地
 
 	CCharacter::Update();
 }
@@ -117,7 +118,8 @@ void CPlayerX::Update()
 void CPlayerX::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-
+	
+	//ステンシルバッファを使用したシルエット描画用の設定
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
 	pDevice->SetRenderState(D3DRS_STENCILREF, 0x01);
 	pDevice->SetRenderState(D3DRS_STENCILMASK, 0xff);
@@ -129,6 +131,7 @@ void CPlayerX::Draw()
 
 	CCharacter::Draw();
 
+	//ステンシルバッファへの書き込みを無効化
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	m_pDebugLine->Draw(CCharacter::GetPos());
 
@@ -155,6 +158,8 @@ bool CPlayerX::PMove(float fCamRotZ)
 	float moveYrot{},dashValue{};
 	bool bKeyFrag = false;
 
+	//==========================
+	//キーボード入力
 	if (CManager::GetInstance()->GetKeyboard()->GetPress(DIK_W))
 	{
 		moveDir.z = 1;
@@ -175,12 +180,16 @@ bool CPlayerX::PMove(float fCamRotZ)
 		moveDir.x = 1;
 		bKeyFrag = true;
 	}
+	//==========================
+	//ジョイパッド入力
 	if (!bKeyFrag)
 	{
 		moveDir.x = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x;
 		moveDir.z = CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y;
 	}
-
+	//==========================
+	
+	//回転方向をmove値とカメラの回転値から算出
 	moveYrot = atan2f(moveDir.x, moveDir.z) + fCamRotZ;
 	
 	if (moveDir.x == 0.0f && moveDir.z == 0.0f)
@@ -190,7 +199,7 @@ bool CPlayerX::PMove(float fCamRotZ)
 		return true;
 	}
 
-	CCharacter::SetRot({ 0.0f,moveYrot + D3DX_PI,0.0f });
+	CCharacter::SetRot({ 0.0f,moveYrot + D3DX_PI,0.0f });	//	移動方向に回転を合わせる
 
 	CCharacter::AddMove({ sinf(moveYrot) * _MOVE_SPEED,-_GRAVITY,cosf(moveYrot) * _MOVE_SPEED });
 
@@ -204,6 +213,7 @@ bool CPlayerX::PMove(float fCamRotZ)
 //==========================================================================================
 void CPlayerX::FloorCollision()
 {
+	//各方向の世界の壁
 	if (CCharacter::GetPos().z < -_WORLD_WALL)
 	{
 		CCharacter::SetPos({ CCharacter::GetPos().x, CCharacter::GetPos().y, -_WORLD_WALL });
@@ -251,13 +261,12 @@ void CPlayerX::FloorCollision()
 				FloorbumpyMesh(pMesh);
 				return;
 			}
-			
 		}
 	}
 }
 
 //==========================================================================================
-// モーション終了時に呼ばれる関数
+// モーション終了時に呼ばれる関数(オーバーライド)
 //==========================================================================================
 bool  CPlayerX::EndMotion()
 {
@@ -265,6 +274,7 @@ bool  CPlayerX::EndMotion()
 	{
 		SetState(std::make_shared<State_Nutoral>());
 	}
+
 	return true;
 }
 
@@ -317,12 +327,11 @@ bool CPlayerX::PAttackInfo()
 	bool pushed = false;
 
 	if(m_nPushedKey < 7){
+		m_AttackBehavior->NextAttack(this);
 		if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X)||
 			CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
 		{
 			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey],9));
-			m_AttackInput.push_back(ATTACK_NORMAL);
-			CCharacter::SetNextMotion(MOTION_ATTACK_N1 + m_AttackInput.size()-1);
 			++m_nPushedKey;
 			pushed = true;
 		}
@@ -330,10 +339,13 @@ bool CPlayerX::PAttackInfo()
 				CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_K))
 		{
 			m_vButtonUI.push_back(CButtonUI::Create(SetButtonUIpos[m_nPushedKey]));
-			m_AttackInput.push_back(ATTACK_GREAT);
 			++m_nPushedKey;
 			pushed = true;
 		}
+	}
+	if (!m_AttackBehavior->GetUse())
+	{
+		SetState(std::make_shared<State_AttackWait>());
 	}
 	if (pushed)
 	{
@@ -367,8 +379,8 @@ bool CPlayerX::PAttackInfo()
 				e = nullptr;
 			}
 			SetState(std::make_shared<State_Nutoral>());
+			SetAttackBehavior(std::make_shared<Attack_None>());
 		}
-		m_AttackInput.clear();
 	}
 	return true;
 }

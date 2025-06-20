@@ -1,12 +1,10 @@
 //===============================================================================
 //
-//  プレイヤー処理(playerX.cpp)
+//  プレイヤーの状態管理(player_state.cpp)
 //								制作：元地弘汰
 // 
 //===============================================================================
 #include "xxx_player.h"
-
-
 
 //通常時のステート
 void State_Nutoral::Attack(CPlayerX* pPlayer)	{
@@ -44,6 +42,7 @@ void State_Attack::Attack(CPlayerX* pPlayer)
 {
 	pPlayer->ToEnemyAttack();
 	pPlayer->PAttackInfo();
+	
 }
 void State_Attack::Parry(CPlayerX* pPlayer){
 
@@ -98,6 +97,34 @@ void State_Parry::ToAttack(CPlayerX* pPlayer)
 void State_Parry::ToParry(CPlayerX* pPlayer){
 
 }
+//攻撃待機時のステート
+void State_AttackWait::Attack(CPlayerX* pPlayer)
+{
+	pPlayer->ToEnemyAttack();
+	pPlayer->PAttackInfo();
+
+}
+void State_AttackWait::Parry(CPlayerX* pPlayer) 
+{
+	pPlayer->PMove(CManager::GetInstance()->GetCamera()->GetRotZ());
+	pPlayer->EnemyCollision();
+}
+void State_AttackWait::Move(CPlayerX* pPlayer) {
+	//攻撃時は移動不可のため移動の機能を実装しない
+}
+void State_AttackWait::ToAttack(CPlayerX* pPlayer) {
+
+}
+void State_AttackWait::ToParry(CPlayerX* pPlayer)
+{
+	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
+		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
+	{
+		pPlayer->CCharacter::SetNextMotion(CPlayerX::MOTION_PARRY);
+		pPlayer->SetState(std::make_shared<State_Parry>());
+	}
+}
+
 
 //被ダメージ時のステート
 void State_Damage::Attack(CPlayerX* pPlayer){
