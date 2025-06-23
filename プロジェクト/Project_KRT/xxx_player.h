@@ -89,6 +89,14 @@ private:
 	void FloorCollision();					//床との当たり判定
 	void CamFloorCollision(LPD3DXMESH pMesh);
 	bool FloorbumpyMesh(LPD3DXMESH pMesh);
+	_forceinline bool GetMoveInput() {
+		return ((CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x != 0.0f ||
+			CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y != 0.0f) ||
+			(CManager::GetInstance()->GetKeyboard()->GetPress(DIK_W) ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_A) ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_S) ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_D)));
+	}
 	CCTBarUI* m_pCctBarUI;
 	bool m_bAttackCt;
 	int m_nPushedKey;
@@ -98,6 +106,7 @@ private:
 
 	std::shared_ptr<PlayerState>m_PlayerState;
 	std::shared_ptr<AttackBehavior>m_AttackBehavior;
+
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
 	D3DXQUATERNION m_quat;		//クオータニオン
@@ -166,16 +175,6 @@ public:
 private:
 
 };
-class State_AttackWait : public PlayerState
-{	//攻撃終了→次の段の攻撃or猶予終了まで
-public:
-	void Move(CPlayerX* pPlayer)override;
-	void Attack(CPlayerX* pPlayer)override;
-	void Parry(CPlayerX* pPlayer)override;
-	void ToAttack(CPlayerX* pPlayer)override;
-	void ToParry(CPlayerX* pPlayer)override;
-private:
-};
 class State_Damage : public PlayerState
 {	//被ダメージステート
 public:
@@ -209,7 +208,7 @@ protected:
 		int nownum = pPlayer->GetNowMotion();
 		int nextnum = pPlayer->GetNextMotion();
 
-		if (m_MyMotionNum != nownum&& nownum == nextnum)
+		if (m_MyMotionNum != nownum&& nownum == 1)
 		{
 			m_bUse = false;
 		}

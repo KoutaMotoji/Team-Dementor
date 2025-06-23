@@ -246,7 +246,6 @@ void CPlayerX::FloorCollision()
 			if (type != CObject::TYPE::TYPE_3D_MESHOBJECT) continue; 
 			CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
 			if (pTest == nullptr) continue; 
-			pMesh = pTest->GetMesh();
 			// ’nŒ`”»’è
 			pMesh = pTest->GetMesh();
 			D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
@@ -343,10 +342,6 @@ bool CPlayerX::PAttackInfo()
 			pushed = true;
 		}
 	}
-	if (!m_AttackBehavior->GetUse())
-	{
-		SetState(std::make_shared<State_AttackWait>());
-	}
 	if (pushed)
 	{
 		m_bAttackCt = true;
@@ -359,15 +354,38 @@ bool CPlayerX::PAttackInfo()
 			m_pCctBarUI->ResetGauge();
 		}
 	}
-	if (m_pCctBarUI != nullptr)
+	if (m_AttackBehavior->GetUse())
 	{
-		if (m_pCctBarUI->GetEndFrag())
+		if (m_pCctBarUI != nullptr)
+		{
+			if (m_pCctBarUI->GetEndFrag())
+			{
+				m_pCctBarUI->Release();
+				m_pCctBarUI = nullptr;
+				m_bAttackCt = false;
+				m_nPushedKey = 0;
+			}
+		}
+	}
+	if (GetMoveInput())
+	{
+		for (auto& e : m_vButtonUI)
+		{
+			if (e != nullptr)
+			{
+				e->Release();
+				e = nullptr;
+			}
+		}
+		if (m_pCctBarUI != nullptr)
 		{
 			m_pCctBarUI->Release();
 			m_pCctBarUI = nullptr;
-			m_bAttackCt = false;
-			m_nPushedKey = 0;
 		}
+		m_bAttackCt = false;
+		m_nPushedKey = 0;
+		SetState(std::make_shared<State_Nutoral>());
+		SetAttackBehavior(std::make_shared<Attack_None>());
 	}
 	if (!m_bAttackCt)
 	{
@@ -378,9 +396,9 @@ bool CPlayerX::PAttackInfo()
 				e->Release();
 				e = nullptr;
 			}
-			SetState(std::make_shared<State_Nutoral>());
-			SetAttackBehavior(std::make_shared<Attack_None>());
 		}
+		SetState(std::make_shared<State_Nutoral>());
+		SetAttackBehavior(std::make_shared<Attack_None>());
 	}
 	return true;
 }

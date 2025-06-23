@@ -37,6 +37,9 @@ HRESULT CLight::Init(void)
 		m_aLight[i].Type = D3DLIGHT_DIRECTIONAL;
 		//ライトの拡散光
 		m_aLight[i].Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		m_aLight[i].Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		m_aLight[i].Specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		m_aLight[i].Ambient = D3DXCOLOR(0.2f, 0.2f, 0.2f, 1.0f);
 		//ライトの方向を設定
 		switch (i)
 		{
@@ -57,6 +60,8 @@ HRESULT CLight::Init(void)
 		pDevice->SetLight(i, &m_aLight[i]);
 		//ライトを有効にする
 		pDevice->LightEnable(i, TRUE);
+		pDevice->SetRenderState(D3DRS_AMBIENT, 0x00202020);    // 全体的な環境光（補助的に使用）
+
 	}
 
 	return S_OK;

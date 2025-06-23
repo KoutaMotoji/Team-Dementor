@@ -360,8 +360,10 @@ bool CCharacter::MotionBlending()
 
 	int nLastKey = m_CurKey;
 	int nNowMotion = m_CurMotion;
+	const float _SET_BLENDFRAME = (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame;
+	//float fRatioFrame = ((float)m_NowFrame / (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame);
+	float fRatioFrame = ((float)m_NowFrame / _SET_BLENDFRAME);
 
-	float fRatioFrame = ((float)m_NowFrame / (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame);
 	int nCntParts = 0;
 
 	for (auto& e : m_apModelParts)
@@ -415,7 +417,7 @@ bool CCharacter::MotionBlending()
 
 	++m_NowFrame;
 
-	if (m_NowFrame > m_aMotion[m_NextMotion].aKetSet[0].nFrame)
+	if (m_NowFrame > _SET_BLENDFRAME)
 	{
 		m_CurKey = 0;
 		m_NowFrame = 0;

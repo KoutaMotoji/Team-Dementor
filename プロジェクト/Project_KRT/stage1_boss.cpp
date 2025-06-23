@@ -8,19 +8,19 @@
 #include "character.h"
 #include "floor_stone.h"
 #include "player_observer.h"
-#include "attack_range.h"
 
 #include "inimanager.h"
 #include "game.h"
 
 namespace
 {
+	int _MAX_LIFE = 1000;
 	float _WORLD_WALL = 1300.0f;
 	float Damage_Ratio = 0.2f;
 	float _GRAVITY = 4.0f;
 	float _MOVE_SPEED = 1.5f;
 	int _GAUGE_CTVALUE = 60;
-	float _SETSIZE = 3.0f;
+	float _SETSIZE = 1.0f;
 	struct _FILENAME
 	{
 		std::string config;
@@ -52,12 +52,13 @@ void CG_Gorira::Init()
 	CCharacter::MotionDataLoad(CiniManager::GetInstance()->GetINIData(st_filename.config, st_filename.section, st_filename.keyword));
 	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
 	CCharacter::SetRadius(100.0f);
-
+	CCharacter::SetLife(_MAX_LIFE);
+	m_State = std::make_shared<Stage1Boss_State>();
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
 	for (const auto& e : CCharacter::GetModelPartsVec())
 	{
 		D3DXVECTOR3 radius = *e->GetRadius();
-		radius.x = radius.y = radius.z *= 3;
+		//radius.x = radius.y = radius.z *= 3;
 		m_pHC_BodyCollision.push_back(CHitCircle::Create(radius, e->GetPos(), e->GetIndex(), 0, 2, 0));
 		m_pDL_BodyCollision.push_back(CDebugLineSphire::Create(radius.x, { 0.1f,1.0f,0.1f,1.0f }));
 	}
@@ -81,42 +82,11 @@ void CG_Gorira::Uninit()
 void CG_Gorira::Update()
 {
 	m_OldPos = CCharacter::GetPos();
-	if (m_nAttackcnt >= 720)
-	{
-		CDrawFan::Create({ 0.0f,0.0f,0.0f });
-		CCharacter::SetNextMotion(2);
-		m_nAttackcnt = 0;
-	}
-	else
-	{
-		++m_nAttackcnt;
-	}
-	if (CCharacter::GetNextMotion() != 2 && CCharacter::GetNextMotion() != 3 && CCharacter::GetNextMotion() != 4)
-	{
-		if (m_moveFlag)
-		{
-			CCharacter::AddMove({ 0.0f,0.0f,-1.0f });
-			CCharacter::SetNextMotion(1);
-			CCharacter::SetRot({ 0.0f,0.0f,0.0f });
-		}
-		else
-		{
-			CCharacter::AddMove({ 0.0f,0.0f,1.0f });
-			CCharacter::SetNextMotion(1);
-			CCharacter::SetRot({ 0.0f,D3DX_PI,0.0f });
-		}
-	}
+	m_State->Move(this);
+	m_State->Attack(this);
 
-	CCharacter::AddPos({ 0.0f,-_GRAVITY,0.0f });
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	//CCharacter::SetRot({ 0.0f,0.0f,0.0f });
-
-	if (m_OldPos.z + CCharacter::GetMove().z > 800.0f || m_OldPos.z + CCharacter::GetMove().z < -800.0f)
-	{
-		CCharacter::AddPos({ 0.0f,0.0f,-CCharacter::GetMove().z});
-		m_moveFlag = (!m_moveFlag);
-	}
 	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
 
 	CCharacter::Update();
@@ -132,7 +102,6 @@ void CG_Gorira::Draw()
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);
 
 	CCharacter::Draw();
-
 
 	// 法線の自動正規化を無効に
 	pDevice->SetRenderState(D3DRS_NORMALIZENORMALS, FALSE);
@@ -159,7 +128,6 @@ CG_Gorira* CG_Gorira::Create(D3DXVECTOR3 pos)
 	gorira->SetPos(pos);
 	return gorira;
 }
-
 
 //==========================================================================================
 // キャラクターの移動制限判定
@@ -193,31 +161,71 @@ void CG_Gorira::FloorCollision()
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj != nullptr) {
-				CObject::TYPE type = pObj->GetType();
-				if (type == CObject::TYPE::TYPE_3D_MESHOBJECT) {
-					CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
-					if (pTest != nullptr) {
-						pMesh = pTest->GetMesh();
-						if (pTest != nullptr) {
-							// 地形判定
-							pMesh = pTest->GetMesh();
-							D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-							D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
-							D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
+			if (pObj == nullptr) continue;
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_MESHOBJECT) continue;
+			CMeshGround* pTest = dynamic_cast<CMeshGround*>(pObj);
+			if (pTest == nullptr) continue;
+			// 地形判定
+			pMesh = pTest->GetMesh();
+			D3DXVECTOR3 dir = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+			D3DXVECTOR3 objpos = CCharacter::GetPos() - pTest->GetPos();
+			D3DXIntersect(pMesh, &objpos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
 
-							// ----- 接地時処理 -----
-							if (bIsHit)
-							{
-								CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f});
-								return;
-							}
-						}
-					}
-				}
+			// ----- 接地時処理 -----
+			if (bIsHit)
+			{
+				CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f});
+				return;
 			}
 		}
 	}
 }
 
+//==========================================================================================
+// キャラクターの移動
+//==========================================================================================
+void CG_Gorira::Move()
+{
+	if (CCharacter::GetNextMotion() != 2 && CCharacter::GetNextMotion() != 3 && CCharacter::GetNextMotion() != 4)
+	{
+		if (m_moveFlag)
+		{
+			CCharacter::AddMove({ 0.0f,0.0f,-1.0f });
+			CCharacter::SetNextMotion(1);
+			CCharacter::SetRot({ 0.0f,0.0f,0.0f });
+		}
+		else
+		{
+			CCharacter::AddMove({ 0.0f,0.0f,1.0f });
+			CCharacter::SetNextMotion(1);
+			CCharacter::SetRot({ 0.0f,D3DX_PI,0.0f });
+		}
+	}
 
+	CCharacter::AddPos({ 0.0f,-_GRAVITY,0.0f });
+
+						//CCharacter::SetRot({ 0.0f,0.0f,0.0f });
+
+	if (m_OldPos.z + CCharacter::GetMove().z > 800.0f || m_OldPos.z + CCharacter::GetMove().z < -800.0f)
+	{
+		CCharacter::AddPos({ 0.0f,0.0f,-CCharacter::GetMove().z });
+		m_moveFlag = (!m_moveFlag);
+	}
+}
+
+//==========================================================================================
+// キャラクターの攻撃を制御
+//==========================================================================================
+void CG_Gorira::DoAttack()
+{
+	if (m_nAttackcnt >= 720)
+	{
+		CCharacter::SetNextMotion(2);
+		m_nAttackcnt = 0;
+	}
+	else
+	{
+		++m_nAttackcnt;
+	}
+}

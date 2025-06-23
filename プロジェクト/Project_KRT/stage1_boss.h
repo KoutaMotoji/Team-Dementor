@@ -14,6 +14,7 @@
 #include "manager.h"
 
 //前方宣言
+class Stage1Boss_State;
 
 class CG_Gorira :public CCharacter
 {
@@ -24,6 +25,11 @@ public:
 	void Uninit()override;		//終了
 	void Update()override;		//更新
 	void Draw()override;		//描画
+
+	void DoAttack();
+	void Move();
+	void BeDamaged() { m_State->Damage(this); };	//外部から呼ぶ用
+	void Damaged();		//Stateの中で呼ぶ用
 
 	static CG_Gorira* Create(D3DXVECTOR3 pos);
 
@@ -42,6 +48,7 @@ private:
 
 	std::vector<std::shared_ptr<CHitCircle>> m_pHC_BodyCollision;	//円の当たり判定配列
 
+	std::shared_ptr<Stage1Boss_State> m_State;
 	//ステータス用定数
 	static constexpr int MAX_LIFE = 1000;			//体力
 
@@ -53,4 +60,43 @@ private:
 	bool m_moveFlag;
 };
 
+
+
+//========================================================================================================
+//	状態管理ステートクラス
+class Stage1Boss_State
+{
+public:
+	virtual void Move(CG_Gorira* pGorira) = 0;
+	virtual void Attack(CG_Gorira* pGorira) = 0;
+	virtual void Damage(CG_Gorira* pGorira) = 0;
+};
+
+class Stage1Boss_Nutoral : public Stage1Boss_State
+{
+	void Move(CG_Gorira* pGorira)override;
+	void Attack(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira)override;
+};
+
+class Stage1Boss_Attack : public Stage1Boss_State
+{
+	void Move(CG_Gorira* pGorira)override;
+	void Attack(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira)override;
+};
+
+class Stage1Boss_Damage: public Stage1Boss_State
+{
+	void Move(CG_Gorira* pGorira)override;
+	void Attack(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira)override;
+};
+
+class Stage1Boss_Death : public Stage1Boss_State
+{
+	void Move(CG_Gorira* pGorira)override;
+	void Attack(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira)override;
+};
 #endif
