@@ -44,6 +44,7 @@ public:
 	inline void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	inline void AddMove(D3DXVECTOR3 move) { m_move += move; }
 	inline D3DXMATRIX GetMatrix() { return m_mtxWorld; }
+	inline void SetLife(int nLife) { m_nLife = nLife; }
 
 	inline int GetNowMotion() { return m_CurMotion; }
 	inline int GetNextMotion() { return m_NextMotion; }
@@ -106,7 +107,6 @@ private:
 	std::vector<std::shared_ptr<CHitCircle>> m_pHitCircle;	//円の当たり判定配列
 
 	std::vector<std::shared_ptr<CDebugLine>> m_pDebugCircle;
-	
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
