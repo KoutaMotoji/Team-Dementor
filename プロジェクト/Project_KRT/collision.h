@@ -59,14 +59,30 @@ public:
 		instance->m_MotionNum = MotionNum;
 		return instance;
 	}
-	inline D3DXVECTOR3 CalcMtxPos(D3DXMATRIX mtx)
+	_forceinline D3DXVECTOR3 CalcMtxPos(D3DXMATRIX mtx)
 	{
+
+		D3DXMATRIX SetMtx{}, mtxTrans{};
+
+		//ワールドマトリックスの初期化
+		D3DXMatrixIdentity(&SetMtx);
+		//位置を反映
+		D3DXMatrixTranslation(&mtxTrans,
+			m_pos.x,
+			m_pos.y,
+			m_pos.z);
+		D3DXMatrixMultiply(&SetMtx,
+			&SetMtx,
+			&mtxTrans);
+		D3DXMatrixMultiply(&SetMtx,
+			&SetMtx,
+			&mtx);
 		D3DXVECTOR3 mtxPos = {
-			mtx._41,
-			mtx._42,
-			mtx._43
+			SetMtx._41,
+			SetMtx._42,
+			SetMtx._43
 		};
-		return mtxPos + m_pos;
+		return mtxPos;
 	}
 private:
 	D3DXVECTOR3 m_pos;

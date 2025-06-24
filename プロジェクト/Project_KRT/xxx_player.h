@@ -203,22 +203,14 @@ protected:
 		bool use;
 		int motion_num;
 	};
-	void UseDisable(CPlayerX* pPlayer)
-	{
-		int nownum = pPlayer->GetNowMotion();
-		int nextnum = pPlayer->GetNextMotion();
 
-		if (m_MyMotionNum != nownum&& nownum == 1)
-		{
-			m_bUse = false;
-		}
-	}
 public:
 	bool m_bUse;
 	int m_MyMotionNum;
 
 	AttackBehavior(MyInfo info = { false,1 }) :m_bUse(info.use), m_MyMotionNum(info.motion_num) {};
 	virtual void NextAttack(CPlayerX* pPlayer) = 0;
+	virtual void UseDisable() {}
 	bool GetUse() { return m_bUse; }
 	int GetMyMotionNum() { return m_MyMotionNum; }
 };
@@ -229,48 +221,59 @@ class Attack_None : public AttackBehavior
 public:
 	Attack_None(MyInfo info = { true,CPlayerX::MOTION_NUTORAL }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
+
 };
 class Attack_Normal1 : public AttackBehavior
 {
 public:
 	Attack_Normal1(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N1 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
+
 };
 class Attack_Normal2 : public AttackBehavior
 {
 public:
 	Attack_Normal2(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N2 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
+
 };
 class Attack_Normal3 : public AttackBehavior
 {
 public:
 	Attack_Normal3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N3 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override	{m_bUse = false;}
 };
 class Attack_Normal4 : public AttackBehavior
 {
 public:
 	Attack_Normal4(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N4 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal5 : public AttackBehavior
 {
 public:
 	Attack_Normal5(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N5 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal6 : public AttackBehavior
 {
 public:
 	Attack_Normal6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N6 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal7 : public AttackBehavior
 {
 public:
 	Attack_Normal7(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N7 }) :AttackBehavior(info) {}
 	void NextAttack(CPlayerX* pPlayer)override;
+	void UseDisable()override { m_bUse = false; }
 };
 
 #endif

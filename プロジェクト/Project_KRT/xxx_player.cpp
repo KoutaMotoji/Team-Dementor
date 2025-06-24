@@ -273,7 +273,7 @@ bool  CPlayerX::EndMotion()
 	{
 		SetState(std::make_shared<State_Nutoral>());
 	}
-
+	m_AttackBehavior->UseDisable();
 	return true;
 }
 
@@ -354,38 +354,38 @@ bool CPlayerX::PAttackInfo()
 			m_pCctBarUI->ResetGauge();
 		}
 	}
-	if (m_AttackBehavior->GetUse())
+	
+	if (m_pCctBarUI != nullptr)
 	{
-		if (m_pCctBarUI != nullptr)
-		{
-			if (m_pCctBarUI->GetEndFrag())
-			{
-				m_pCctBarUI->Release();
-				m_pCctBarUI = nullptr;
-				m_bAttackCt = false;
-				m_nPushedKey = 0;
-			}
-		}
-	}
-	if (GetMoveInput())
-	{
-		for (auto& e : m_vButtonUI)
-		{
-			if (e != nullptr)
-			{
-				e->Release();
-				e = nullptr;
-			}
-		}
-		if (m_pCctBarUI != nullptr)
+		if (m_pCctBarUI->GetEndFrag())
 		{
 			m_pCctBarUI->Release();
 			m_pCctBarUI = nullptr;
+			m_bAttackCt = false;
+			m_nPushedKey = 0;
 		}
-		m_bAttackCt = false;
-		m_nPushedKey = 0;
-		SetState(std::make_shared<State_Nutoral>());
-		SetAttackBehavior(std::make_shared<Attack_None>());
+	}
+	
+	if (!m_AttackBehavior->GetUse())
+	{
+		if (GetMoveInput())
+		{
+			for (auto& e : m_vButtonUI)
+			{
+				if (e == nullptr)continue;
+				e->Release();
+				e = nullptr;
+			}
+			if (m_pCctBarUI != nullptr)
+			{
+				m_pCctBarUI->Release();
+				m_pCctBarUI = nullptr;
+			}
+			m_bAttackCt = false;
+			m_nPushedKey = 0;
+			SetState(std::make_shared<State_Nutoral>());
+			SetAttackBehavior(std::make_shared<Attack_None>());
+		}
 	}
 	if (!m_bAttackCt)
 	{

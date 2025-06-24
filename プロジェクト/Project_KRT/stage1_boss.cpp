@@ -53,7 +53,7 @@ void CG_Gorira::Init()
 	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
 	CCharacter::SetRadius(100.0f);
 	CCharacter::SetLife(_MAX_LIFE);
-	m_State = std::make_shared<Stage1Boss_State>();
+	SetState(std::make_shared<Stage1Boss_Nutoral>());
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
 	for (const auto& e : CCharacter::GetModelPartsVec())
 	{
@@ -205,8 +205,6 @@ void CG_Gorira::Move()
 
 	CCharacter::AddPos({ 0.0f,-_GRAVITY,0.0f });
 
-						//CCharacter::SetRot({ 0.0f,0.0f,0.0f });
-
 	if (m_OldPos.z + CCharacter::GetMove().z > 800.0f || m_OldPos.z + CCharacter::GetMove().z < -800.0f)
 	{
 		CCharacter::AddPos({ 0.0f,0.0f,-CCharacter::GetMove().z });
@@ -229,3 +227,11 @@ void CG_Gorira::DoAttack()
 		++m_nAttackcnt;
 	}
 }
+
+//==========================================================================================
+// キャラクターの被ダメ
+//==========================================================================================
+void CG_Gorira::BeDamaged()
+{
+	m_State->Damage(this); 
+}	

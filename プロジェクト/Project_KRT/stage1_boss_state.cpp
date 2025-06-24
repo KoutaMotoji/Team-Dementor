@@ -50,15 +50,15 @@ void Stage1Boss_Damage::Damage(CG_Gorira* pGorira)
 }
 
 //死亡状態のステート
-void Stage1Boss_Damage::Move(CG_Gorira* pGorira)
+void Stage1Boss_Death::Move(CG_Gorira* pGorira)
 {
 
 }
-void Stage1Boss_Damage::Attack(CG_Gorira* pGorira)
+void Stage1Boss_Death::Attack(CG_Gorira* pGorira)
 {
 
 }
-void Stage1Boss_Damage::Damage(CG_Gorira* pGorira)
+void Stage1Boss_Death::Damage(CG_Gorira* pGorira)
 {
 
 }

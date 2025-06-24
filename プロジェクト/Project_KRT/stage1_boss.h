@@ -28,9 +28,17 @@ public:
 
 	void DoAttack();
 	void Move();
-	void BeDamaged() { m_State->Damage(this); };	//外部から呼ぶ用
-	void Damaged();		//Stateの中で呼ぶ用
 
+	_forceinline void SetState(std::shared_ptr<Stage1Boss_State>pState) {
+		if (m_State != nullptr)
+		{
+			m_State = nullptr;
+		}
+		m_State = pState;
+	}
+
+	void BeDamaged() ;			//外部から呼ぶ用
+	void Damaged() {};				//Stateの中で呼ぶ用
 	static CG_Gorira* Create(D3DXVECTOR3 pos);
 
 	enum
@@ -50,7 +58,6 @@ private:
 
 	std::shared_ptr<Stage1Boss_State> m_State;
 	//ステータス用定数
-	static constexpr int MAX_LIFE = 1000;			//体力
 
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 
@@ -59,8 +66,6 @@ private:
 	int m_nAttackcnt;
 	bool m_moveFlag;
 };
-
-
 
 //========================================================================================================
 //	状態管理ステートクラス
@@ -74,6 +79,7 @@ public:
 
 class Stage1Boss_Nutoral : public Stage1Boss_State
 {
+public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
@@ -81,6 +87,7 @@ class Stage1Boss_Nutoral : public Stage1Boss_State
 
 class Stage1Boss_Attack : public Stage1Boss_State
 {
+public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
@@ -88,6 +95,7 @@ class Stage1Boss_Attack : public Stage1Boss_State
 
 class Stage1Boss_Damage: public Stage1Boss_State
 {
+public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
@@ -95,6 +103,7 @@ class Stage1Boss_Damage: public Stage1Boss_State
 
 class Stage1Boss_Death : public Stage1Boss_State
 {
+public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
