@@ -571,6 +571,7 @@ void CPlayerX::ToEnemyAttack()
 				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
 				{
 					pTest->SetNextMotion(4);
+					pTest->BeDamaged();
 					return;
 				}
 			}	
