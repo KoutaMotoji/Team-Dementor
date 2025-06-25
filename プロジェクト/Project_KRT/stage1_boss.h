@@ -38,7 +38,7 @@ public:
 	}
 
 	void BeDamaged() ;			//外部から呼ぶ用
-	void Damaged() {};				//Stateの中で呼ぶ用
+	void Damaged();				//Stateの中で呼ぶ用
 	static CG_Gorira* Create(D3DXVECTOR3 pos);
 
 	enum
@@ -65,6 +65,7 @@ private:
 	bool m_bAttackCt;
 	int m_nAttackcnt;
 	bool m_moveFlag;
+	int m_nLife;
 };
 
 //========================================================================================================
@@ -75,6 +76,7 @@ public:
 	virtual void Move(CG_Gorira* pGorira) = 0;
 	virtual void Attack(CG_Gorira* pGorira) = 0;
 	virtual void Damage(CG_Gorira* pGorira) = 0;
+	virtual void Wait(CG_Gorira* pGorira) = 0;
 };
 
 class Stage1Boss_Nutoral : public Stage1Boss_State
@@ -83,6 +85,7 @@ public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
+	void Wait(CG_Gorira* pGorira)override;
 };
 
 class Stage1Boss_Attack : public Stage1Boss_State
@@ -91,6 +94,7 @@ public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
+	void Wait(CG_Gorira* pGorira)override;
 };
 
 class Stage1Boss_Damage: public Stage1Boss_State
@@ -99,6 +103,7 @@ public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
+	void Wait(CG_Gorira* pGorira)override;
 };
 
 class Stage1Boss_Death : public Stage1Boss_State
@@ -107,5 +112,6 @@ public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
 	void Damage(CG_Gorira* pGorira)override;
+	void Wait(CG_Gorira* pGorira)override;
 };
 #endif

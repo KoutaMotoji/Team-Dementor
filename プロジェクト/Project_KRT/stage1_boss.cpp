@@ -37,7 +37,7 @@ namespace
 //==========================================================================================
 //コンストラクタ
 //==========================================================================================
-CG_Gorira::CG_Gorira() : m_bAttackCt(false), m_nAttackcnt(0), m_moveFlag(true)
+CG_Gorira::CG_Gorira() : m_bAttackCt(false), m_nAttackcnt(0), m_moveFlag(true), m_nLife(0)
 {
 
 }
@@ -84,10 +84,16 @@ void CG_Gorira::Update()
 	m_OldPos = CCharacter::GetPos();
 	m_State->Move(this);
 	m_State->Attack(this);
+	m_State->Wait(this);
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
 	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
+
+	if (CCharacter::GetLife() <= 0)
+	{
+		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_RESULT);
+	}
 
 	CCharacter::Update();
 }
@@ -229,9 +235,18 @@ void CG_Gorira::DoAttack()
 }
 
 //==========================================================================================
-// キャラクターの被ダメ
+// キャラクターの被ダメ状態
 //==========================================================================================
 void CG_Gorira::BeDamaged()
 {
 	m_State->Damage(this); 
 }	
+
+//==========================================================================================
+// キャラクターの被ダメ処理
+//==========================================================================================
+void CG_Gorira::Damaged()
+{
+	CCharacter::SetLife(CCharacter::GetLife() - 10);
+}	
+
