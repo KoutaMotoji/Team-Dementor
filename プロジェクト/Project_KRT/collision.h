@@ -61,7 +61,6 @@ public:
 	}
 	_forceinline D3DXVECTOR3 CalcMtxPos(D3DXMATRIX mtx)
 	{
-
 		D3DXMATRIX SetMtx{}, mtxTrans{};
 
 		//ワールドマトリックスの初期化
