@@ -19,13 +19,13 @@ CObject::CObject(int nPriority)
 	m_nPriority = nPriority;
 	assert(!(m_nPriority < 0 || m_nPriority > SET_PRIORITY));
 	
-	for (int i = 0; i < MAX_OBJECT; i++)
+	for (int i = 0; i < MAX_OBJECT; ++i)
 	{
 		if (m_apObject[m_nPriority][i] == nullptr)
 		{
 			m_apObject[m_nPriority][i] = this;
 			m_nID = i;
-			m_nNumAll++;
+			++m_nNumAll;
 			break;
 		}
 	}
@@ -51,7 +51,7 @@ void CObject::Release()
 		m_apObject[nPriority][nID]->Uninit();
 		delete m_apObject[nPriority][nID];
 		m_apObject[nPriority][nID] = nullptr;
-		m_nNumAll--;
+		--m_nNumAll;
 	}
 }
 
@@ -84,9 +84,9 @@ CObject::TYPE CObject::GetType()
 //==========================================================================================
 void CObject::ReleaseAll()
 {
-	for (int j = 0; j < SET_PRIORITY; j++)
+	for (int j = 0; j < SET_PRIORITY; ++j)
 	{
-		for (int i = 0; i < MAX_OBJECT; i++)
+		for (int i = 0; i < MAX_OBJECT; ++i)
 		{
 			if (m_apObject[j][i] != nullptr)
 			{
@@ -101,9 +101,9 @@ void CObject::ReleaseAll()
 //==========================================================================================
 void CObject::UpdateAll()
 {
-	for (int j = 0; j < SET_PRIORITY; j++)
+	for (int j = 0; j < SET_PRIORITY; ++j)
 	{
-		for (int i = 0; i < MAX_OBJECT; i++)
+		for (int i = 0; i < MAX_OBJECT; ++i)
 		{
 			if (m_apObject[j][i] != nullptr)
 			{
@@ -118,9 +118,9 @@ void CObject::UpdateAll()
 //==========================================================================================
 void CObject::DrawAll()
 {
-	for (int j = 0; j < SET_PRIORITY; j++)
+	for (int j = 0; j < SET_PRIORITY; ++j)
 	{
-		for (int i = 0; i < MAX_OBJECT; i++)
+		for (int i = 0; i < MAX_OBJECT; ++i)
 		{
 			if (m_apObject[j][i] != nullptr)
 			{
