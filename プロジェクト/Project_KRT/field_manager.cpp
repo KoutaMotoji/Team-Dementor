@@ -52,7 +52,7 @@ void CField_Manager::Update()
 			e = nullptr;
 		}
 	}
-
+	m_vecFieldObj.clear();
 	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
 	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
 	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
