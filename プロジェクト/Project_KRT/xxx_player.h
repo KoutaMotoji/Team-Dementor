@@ -185,6 +185,37 @@ public:
 	void ToParry(CPlayerX* pPlayer)override;
 private:
 };
+
+//========================================================================================================
+//ロックオン状態管理クラス
+
+class LockOn_state
+{	//ロックオンステート基底クラス　
+public:
+	//この状態になることは無いので純粋仮想関数化する
+	virtual void Swicth(CPlayerX* pPlayer) = 0;
+	virtual void UpdateCam(CPlayerX* pPlayer) = 0;
+private:
+};
+
+class LockEnable : public LockOn_state
+{	//ロックオン状態クラス
+public:
+	//この状態になることは無いので純粋仮想関数化する
+	virtual void Swicth(CPlayerX* pPlayer)override;
+	virtual void UpdateCam(CPlayerX* pPlayer)override;
+private:
+};
+
+class LockDisable : public LockOn_state
+{	//非ロックオン状態クラス
+public:
+	//この状態になることは無いので純粋仮想関数化する
+	virtual void Swicth(CPlayerX* pPlayer)override;
+	virtual void UpdateCam(CPlayerX* pPlayer)override;
+private:
+};
+
 //========================================================================================================
 
 //========================================================================================================
