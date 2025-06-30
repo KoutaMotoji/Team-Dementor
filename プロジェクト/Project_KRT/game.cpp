@@ -13,6 +13,9 @@
 #include "mesh_cylinder.h"
 #include "stage1_boss.h"
 #include "stencile_mask.h"
+#include "area_move_gate.h"
+#include "player_observer.h"
+
 
 #include "field_manager.h"
 
@@ -43,10 +46,10 @@ HRESULT CGame::Init()
 	CPlayerX::Create({ 200.0f,1000.0f,0.0f });
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
 
-	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
 	CPlayerMask::Create();
-
+	CAreaGate::Create({ 0.0f,0.0f,700.0f });
 	CField_Manager::GetInstance()->Init();
+	CPlayerObserver::GetInstance()->PlayerSearch();
 	return S_OK;
 }
 
@@ -55,6 +58,8 @@ HRESULT CGame::Init()
 //==========================================================================================
 void CGame::Uninit()
 {
+	CField_Manager::GetInstance()->Uninit();
+	CPlayerObserver::GetInstance()->PlayerObsDestroy();
 	CScene::Uninit();
 }
 

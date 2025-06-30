@@ -8,7 +8,7 @@
 
 
 //ƒL[“ü—Í‚ğ‚Ü‚Æ‚ß‚é
-bool AttackBehavior::InputNormal()
+bool AttackBehavior::InputNormal()	
 {
 	return (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X) || CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J));
 }
@@ -37,6 +37,10 @@ void Attack_Normal2::NextAttack(CPlayerX* pPlayer)
 		pPlayer->SetNextMotion(CPlayerX::MOTION_ATTACK_N3);
 		pPlayer->SetAttackBehavior(std::make_shared<Attack_Normal3>());
 	}
+	if (InputExtended()) {
+		pPlayer->SetNextMotion(CPlayerX::MOTION_ATTACK_Ex3);
+		pPlayer->SetAttackBehavior(std::make_shared<Attack_Extended3>());
+	}
 }
 void Attack_Normal3::NextAttack(CPlayerX* pPlayer)
 {
@@ -50,6 +54,10 @@ void Attack_Normal4::NextAttack(CPlayerX* pPlayer)
 	if (InputNormal()) {
 		pPlayer->SetNextMotion(CPlayerX::MOTION_ATTACK_N5);
 		pPlayer->SetAttackBehavior(std::make_shared<Attack_Normal5>());
+	}
+	if (InputExtended()) {
+		pPlayer->SetNextMotion(CPlayerX::MOTION_ATTACK_Ex5);
+		pPlayer->SetAttackBehavior(std::make_shared<Attack_Extended5>());
 	}
 }
 void Attack_Normal5::NextAttack(CPlayerX* pPlayer)
@@ -69,4 +77,19 @@ void Attack_Normal6::NextAttack(CPlayerX* pPlayer)
 void Attack_Normal7::NextAttack(CPlayerX* pPlayer)
 {
 	//’ÊíUŒ‚‚ÌÅI’i‚È‚Ì‚Å‚È‚É‚à‚µ‚È‚¢
+}
+void Attack_Extended3::NextAttack(CPlayerX* pPlayer)
+{
+	//”h¶UŒ‚‚Ì‹æØ‚è’i‚È‚Ì‚Å‚È‚É‚à‚µ‚È‚¢
+}
+void Attack_Extended5::NextAttack(CPlayerX* pPlayer)
+{
+	if (InputExtended()) {
+		pPlayer->SetNextMotion(CPlayerX::MOTION_ATTACK_Ex6);
+		pPlayer->SetAttackBehavior(std::make_shared<Attack_Extended6>());
+	}
+}
+void Attack_Extended6::NextAttack(CPlayerX* pPlayer)
+{
+	//”h¶UŒ‚‚ÌÅI’i‚È‚Ì‚Å‚È‚É‚à‚µ‚È‚¢
 }

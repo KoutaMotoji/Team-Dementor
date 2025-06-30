@@ -6,6 +6,8 @@
 //===============================================================================
 #include "manager.h"
 #include "field_manager.h"
+#include "stage1_boss.h"
+
 #include "floor_stone.h"
 
 namespace
@@ -26,11 +28,13 @@ namespace
 std::shared_ptr<CField_Manager> CField_Manager::_instance = nullptr;
 
 void CField_Manager::Init() {
-
+	if (m_FieldDissolve != nullptr)return;
 	m_FieldDissolve = FieldDissolve::Create();
 }
 void CField_Manager::Uninit() {
+	if (m_FieldDissolve == nullptr)return;
 	m_FieldDissolve->Uninit();
+	m_FieldDissolve = nullptr;
 };
 void CField_Manager::Update()
 {
@@ -42,12 +46,17 @@ void CField_Manager::Update()
 
 	for (auto& e : m_vecFieldObj)
 	{
-		e->Release();
+		if (e != nullptr)
+		{
+			e->Release();
+			e = nullptr;
+		}
 	}
-
 	m_vecFieldObj.clear();
 	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
 	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
+	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+
 	m_FieldDissolve->RestartDissolve();
 	m_bActibateManager = false;
 }

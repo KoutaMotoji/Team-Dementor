@@ -25,7 +25,7 @@ private:
 	std::vector<CObjectX*> m_vecFieldObj;
 public:
 	CField_Manager() :m_bActibateManager(false), m_FieldNum(0), m_FieldDissolve(nullptr){}
-	~CField_Manager() {};
+	~CField_Manager() { }
 
 	static std::shared_ptr<CField_Manager> GetInstance()	{
 		if (_instance == nullptr)
