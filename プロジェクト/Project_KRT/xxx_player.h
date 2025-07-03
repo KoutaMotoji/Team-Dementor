@@ -22,7 +22,7 @@ class CCharacter;
 class CPlayerMask;
 class PlayerState;
 class AttackBehavior;
-
+class LockOn_State;
 
 class CPlayerX :public CCharacter
 {
@@ -55,6 +55,13 @@ public:
 			m_AttackBehavior = nullptr;
 		}
 		m_AttackBehavior = pBehavior;
+	}
+	_forceinline void SetLockOnState(std::shared_ptr<LockOn_State>pState) {
+		if (m_LockOnState != nullptr)
+		{
+			m_LockOnState = nullptr;
+		}
+		m_LockOnState = pState;
 	}
 	inline std::shared_ptr<AttackBehavior> GetAttackBehavior() { return m_AttackBehavior; }
 	enum
@@ -104,6 +111,7 @@ private:
 
 	std::shared_ptr<PlayerState>m_PlayerState;
 	std::shared_ptr<AttackBehavior>m_AttackBehavior;
+	std::shared_ptr<LockOn_State>m_LockOnState;
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)
@@ -187,7 +195,7 @@ private:
 //========================================================================================================
 //ロックオン状態管理クラス
 
-class LockOn_state
+class LockOn_State
 {	//ロックオンステート基底クラス　
 public:
 	//この状態になることは無いので純粋仮想関数化する
@@ -196,19 +204,17 @@ public:
 private:
 };
 
-class LockEnable : public LockOn_state
+class LockEnable : public LockOn_State
 {	//ロックオン状態クラス
 public:
-	//この状態になることは無いので純粋仮想関数化する
 	virtual void Swicth(CPlayerX* pPlayer)override;
 	virtual void UpdateCam(CPlayerX* pPlayer)override;
 private:
 };
 
-class LockDisable : public LockOn_state
+class LockDisable : public LockOn_State
 {	//非ロックオン状態クラス
 public:
-	//この状態になることは無いので純粋仮想関数化する
 	virtual void Swicth(CPlayerX* pPlayer)override;
 	virtual void UpdateCam(CPlayerX* pPlayer)override;
 private:

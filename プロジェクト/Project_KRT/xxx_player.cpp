@@ -78,7 +78,7 @@ void CPlayerX::Init()
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);		//デバッグ用線の生成
 	SetState(std::make_shared<State_Nutoral>());	//ステートをニュートラルに設定
 	SetAttackBehavior(std::make_shared<Attack_None>());
-
+	SetLockOnState(std::make_shared<LockDisable>());
 }
 
 //==========================================================================================
@@ -107,7 +107,12 @@ void CPlayerX::Update()
 
 	m_PlayerState->Attack(this);		//攻撃中の制御
 
-	CManager::GetInstance()->GetCamera()->SetPlayerPos(CCharacter::GetPos());	//カメラの注視点せて地
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) == true)
+	{
+		m_LockOnState->Swicth(this);
+	}
+
+	m_LockOnState->UpdateCam(this);
 
 	CCharacter::Update();
 }

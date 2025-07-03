@@ -6,6 +6,7 @@
 //===============================================================================
 
 #include "xxx_player.h"
+#include "stage1_boss.h"
 
 //通常時のステート
 void State_Nutoral::Attack(CPlayerX* pPlayer)	{
@@ -114,4 +115,41 @@ void State_Damage::ToAttack(CPlayerX* pPlayer){
 }
 void State_Damage::ToParry(CPlayerX* pPlayer){
 
+}
+
+void LockEnable::Swicth(CPlayerX* pPlayer){
+	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
+}
+
+void LockEnable::UpdateCam(CPlayerX* pPlayer)
+{
+	D3DXVECTOR3 SetPos{};
+	D3DXVECTOR3 a{};
+	D3DXVECTOR3 b{};
+
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj == nullptr) continue;
+
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			if (pTest == nullptr) continue;
+
+			a = pPlayer->CCharacter::GetPos();
+			b = pTest->CCharacter::GetPos();
+			SetPos = (a + b) * 0.5f;
+		}
+	}
+	CManager::GetInstance()->GetCamera()->SetPlayerPos(SetPos);
+}
+
+void LockDisable::Swicth(CPlayerX* pPlayer){
+	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
+}
+
+void LockDisable::UpdateCam(CPlayerX* pPlayer)
+{
+	CManager::GetInstance()->GetCamera()->SetPlayerPos(pPlayer->CCharacter::GetPos());
 }
