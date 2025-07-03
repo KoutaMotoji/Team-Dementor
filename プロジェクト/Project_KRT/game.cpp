@@ -45,9 +45,10 @@ HRESULT CGame::Init()
 	CMeshGround::Create({ 0.0f,0.0f,0.0f });
 	CPlayerX::Create({ 200.0f,1000.0f,0.0f });
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
+	CAreaGate::Create({ 0.0f,0.0f,700.0f });
+
 
 	CPlayerMask::Create();
-	CAreaGate::Create({ 0.0f,0.0f,700.0f });
 	CField_Manager::GetInstance()->Init();
 	CPlayerObserver::GetInstance()->PlayerSearch();
 	return S_OK;

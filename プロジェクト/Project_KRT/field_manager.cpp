@@ -35,9 +35,19 @@ void CField_Manager::Uninit() {
 	if (m_FieldDissolve == nullptr)return;
 	m_FieldDissolve->Uninit();
 	m_FieldDissolve = nullptr;
+	for (auto& e : m_vecFieldObj)
+	{
+		if (e != nullptr)
+		{
+			e->Release();
+			e = nullptr;
+		}
+	}
+	m_vecFieldObj.clear();
 };
 void CField_Manager::Update()
 {
+	m_vecFieldObj;
 	if (!m_bActibateManager)return;
 
 	//ディゾルブが半分に到達しているか確認

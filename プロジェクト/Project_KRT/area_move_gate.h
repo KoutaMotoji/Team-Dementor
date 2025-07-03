@@ -13,7 +13,7 @@
 class CAreaGate : public CObjectX
 {
 public:
-	CAreaGate() :m_bPass(false){};				//コンストラクタ
+	CAreaGate(int nPriority = 3) :CObjectX(nPriority),m_bPass(false){};				//コンストラクタ
 	~CAreaGate()override {};		//デストラクタ
 	void Init()override;		//初期化
 	void Update()override;		//更新
