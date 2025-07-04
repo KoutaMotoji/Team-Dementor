@@ -14,21 +14,21 @@ NUM_MODEL = 15
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/KRTplayer/00_bodyD.x	# [0]腹
-MODEL_FILENAME = data/MODEL/KRTplayer/01_bodyU.x	# [1]胸
-MODEL_FILENAME = data/MODEL/KRTplayer/02_head.x		# [2]頭
-MODEL_FILENAME = data/MODEL/KRTplayer/03_armUR.x	# [3]右上腕
-MODEL_FILENAME = data/MODEL/KRTplayer/04_armDR.x	# [4]右前腕
-MODEL_FILENAME = data/MODEL/KRTplayer/05_handR.x	# [5]右手
-MODEL_FILENAME = data/MODEL/KRTplayer/06_armUL.x	# [6]左上腕
-MODEL_FILENAME = data/MODEL/KRTplayer/07_armDL.x	# [7]左前腕
-MODEL_FILENAME = data/MODEL/KRTplayer/08_handL.x	# [8]左手
-MODEL_FILENAME = data/MODEL/KRTplayer/09_legUR.x	# [9]右腿
-MODEL_FILENAME = data/MODEL/KRTplayer/10_legDR.x	# [10]右脛
-MODEL_FILENAME = data/MODEL/KRTplayer/11_footR.x	# [11]右足
-MODEL_FILENAME = data/MODEL/KRTplayer/12_legUL.x	# [12]左腿
-MODEL_FILENAME = data/MODEL/KRTplayer/13_legDL.x	# [13]左脛
-MODEL_FILENAME = data/MODEL/KRTplayer/14_footL.x	# [14]左足
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/00_bodyD.x	# [0]腹
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/01_bodyU.x	# [1]胸
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/02_head.x		# [2]頭
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/03_armUR.x	# [3]右上腕
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/04_armDR.x	# [4]右前腕
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/05_handR.x	# [5]右手
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/06_armUL.x	# [6]左上腕
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/07_armDL.x	# [7]左前腕
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/08_handL.x	# [8]左手
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/09_legUR.x	# [9]右腿
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/10_legDR.x	# [10]右脛
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/11_footR.x	# [11]右足
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/12_legUL.x	# [12]左腿
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/13_legDL.x	# [13]左脛
+MODEL_FILENAME = data/MODEL/KRTplayer-ver2/14_footL.x	# [14]左足
 
 #------------------------------------------------------------------------------
 # キャラクター情報
@@ -48,56 +48,56 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 1					# 胸
 		PARENT = 0					# (親)NULL
-		POS = 0.0 10.0 0.0
+		POS = 0.0 8.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 2					# 頭
 		PARENT = 1					# (親)体
-		POS = 0.0 21.0 0.0
+		POS = 0.0 26.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 3					# 右上腕
 		PARENT = 1					# (親)体
-		POS = -6.5 15.5 0.0
+		POS = -6.5 22.5 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 4					# 右前腕
 		PARENT = 3					# (親)右上腕
-		POS = -12.0 0.0 0.0
+		POS = -8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 5					# 右手
 		PARENT = 4					# (親)右前腕
-		POS = -10.0 0.0 0.0
+		POS = -11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 6					# 左上腕
 		PARENT = 1					# (親)体
-		POS = 6.5 15.5 0.0
+		POS = 6.5 22.5 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 7					# 左前腕
 		PARENT = 6					# (親)左上腕
-		POS = 12.0 0.0 0.0
+		POS = 8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 8					# 左手
 		PARENT = 7					# (親)左前腕
-		POS = 10.0 0.0 0.0
+		POS = 11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
@@ -793,7 +793,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-	COLLISION = 5 -5.0 0.0 -10.0 20.0 2 50 # 当たり判定
+	COLLISION = 5 -5.0 0.0 -10.0 35.0 2 50 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 10
@@ -1114,7 +1114,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 1		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-	COLLISION = 5 -5.0 0.0 -10.0 20.0 1 160 # 当たり判定
+	COLLISION = 5 -5.0 0.0 -10.0 35.0 1 160 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 40
@@ -1911,7 +1911,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 3		# キー数
-	COLLISION = 5 -5.0 0.0 0.0 10.0 0 11 # 当たり判定
+	COLLISION = 5 -13.0 0.0 0.0 12.0 7 10 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 3 >> ---
 		FRAME = 3
@@ -2083,7 +2083,7 @@ MOTIONSET
 
 		KEY	# ----- [ 2 ] -----
 			POS = 0.00 0.00 0.00
-			ROT = 0.00 -0.57 0.00
+			ROT = 0.13 0.22 0.00
 		END_KEY
 
 		KEY	# ----- [ 3 ] -----
@@ -2154,7 +2154,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 3		# キー数
-	COLLISION = 8 6.0 0.0 0.0 10.0 4 16 # 当たり判定
+	COLLISION = 8 13.0 0.0 0.0 12.0 9 15 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 3 >> ---
 		FRAME = 9
@@ -2397,7 +2397,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 2		# キー数
-	COLLISION = 5 -5.0 0.0 0.0 10.0 0 14 # 当たり判定
+	COLLISION = 5 -13.0 0.0 0.0 12.0 9 13 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 14
@@ -2491,7 +2491,7 @@ MOTIONSET
 
 		KEY	# ----- [ 2 ] -----
 			POS = 0.00 0.00 0.00
-			ROT = 0.00 -0.57 0.00
+			ROT = -0.35 0.47 0.00
 		END_KEY
 
 		KEY	# ----- [ 3 ] -----
@@ -2562,7 +2562,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 2		# キー数
-	COLLISION = 11 0.0 0.0 0.0 10.0 0 17 # 当たり判定
+	COLLISION = 11 0.0 0.0 -4.0 10.0 11 16 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 2 >> ---
 		FRAME = 17
@@ -2727,10 +2727,10 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 3		# キー数
-	COLLISION = 11 0.0 0.0 0.0 10.0 0 9 # 当たり判定
+	COLLISION = 11 0.0 0.0 -4.0 10.0 0 12 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 3 >> ---
-		FRAME = 4
+		FRAME = 8
 		KEY	# ----- [ 0 ] -----
 			POS = 9.30 3.20 -56.10
 			ROT = -0.03 -1.32 -0.88
@@ -2808,7 +2808,7 @@ MOTIONSET
 	END_KEYSET
 
 	KEYSET			# --- << KEY : 1 / 3 >> ---
-		FRAME = 5
+		FRAME = 8
 		KEY	# ----- [ 0 ] -----
 			POS = 9.30 3.20 -56.10
 			ROT = -0.03 -1.32 -0.79
@@ -2886,7 +2886,7 @@ MOTIONSET
 	END_KEYSET
 
 	KEYSET			# --- << KEY : 2 / 3 >> ---
-		FRAME = 9
+		FRAME = 10
 		KEY	# ----- [ 0 ] -----
 			POS = 9.30 3.20 -54.80
 			ROT = -0.03 -0.82 -0.63
@@ -2970,7 +2970,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-	COLLISION = 5 -5.0 0.0 0.0 10.0 41 55 # 当たり判定
+	COLLISION = 5 -13.0 0.0 0.0 12.0 49 54 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 20
@@ -3220,7 +3220,7 @@ MOTIONSET
 
 		KEY	# ----- [ 2 ] -----
 			POS = 0.00 0.00 0.00
-			ROT = 0.00 -0.57 0.00
+			ROT = 0.09 1.35 0.00
 		END_KEY
 
 		KEY	# ----- [ 3 ] -----
@@ -3291,7 +3291,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-	COLLISION = 5 -10.0 0.0 0.0 10.0 20 55 # 当たり判定
+	COLLISION = 5 -10.0 0.0 0.0 15.0 35 45 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 22
@@ -3307,7 +3307,7 @@ MOTIONSET
 
 		KEY	# ----- [ 2 ] -----
 			POS = 0.00 0.00 0.00
-			ROT = 0.00 -0.57 0.00
+			ROT = 0.09 1.35 0.00
 		END_KEY
 
 		KEY	# ----- [ 3 ] -----
@@ -3612,7 +3612,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 4		# キー数
-	COLLISION = 10 0.0 0.0 0.0 10.0 10 43 # 当たり判定
+	COLLISION = 10 0.0 0.0 0.0 10.0 18 40 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 4 >> ---
 		FRAME = 15
@@ -3933,7 +3933,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 6		# キー数
-	COLLISION = 14 0.0 0.0 0.0 10.0 50 63 # 当たり判定
+	COLLISION = 14 0.0 0.0 -4.0 10.0 57 62 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 6 >> ---
 		FRAME = 10
@@ -4410,7 +4410,7 @@ END_MOTIONSET
 MOTIONSET
 	LOOP = 0		# ループするかどうか[0:ループしない / 1:ループする]
 	NUM_KEY = 8		# キー数
-	COLLISION = 11 0.0 0.0 0.0 10.0 72 81 # 当たり判定
+	COLLISION = 11 0.0 0.0 -4.0 10.0 75 80 # 当たり判定
 
 	KEYSET			# --- << KEY : 0 / 8 >> ---
 		FRAME = 15
@@ -4972,7 +4972,7 @@ MOTIONSET
 
 		KEY	# ----- [ 2 ] -----
 			POS = 0.00 0.00 0.00
-			ROT = 0.03 0.00 0.00
+			ROT = -0.22 1.10 0.00
 		END_KEY
 
 		KEY	# ----- [ 3 ] -----

@@ -19,7 +19,7 @@ namespace
 	const float Damage_Ratio = 0.2f;		//プレイヤーのダメージCT(使ってない)
 	const float _GRAVITY = 4.0f;			//重力
 	const float _MOVE_SPEED = 1.2f;			//移動速度
-	const int _GAUGE_CTVALUE = 60;			//攻撃の入力猶予時間用のゲージ容量
+	const int _GAUGE_CTVALUE = 120;			//攻撃の入力猶予時間用のゲージ容量
 	const float _BODY_RADIUS = 50.0f;
 	std::vector<D3DXVECTOR3>SetButtonUIpos = {	//ボタンUIの座標
 		{220.0f - 220.0f / 3,250.0f,0.0f},
@@ -360,16 +360,7 @@ bool CPlayerX::PAttackInfo()
 		}
 	}
 	
-	if (m_pCctBarUI != nullptr)
-	{
-		if (m_pCctBarUI->GetEndFrag())
-		{
-			m_pCctBarUI->Release();
-			m_pCctBarUI = nullptr;
-			m_bAttackCt = false;
-			m_nPushedKey = 0;
-		}
-	}
+
 	
 	if (!m_AttackBehavior->GetUse())
 	{
@@ -390,6 +381,16 @@ bool CPlayerX::PAttackInfo()
 			m_nPushedKey = 0;
 			SetState(std::make_shared<State_Nutoral>());
 			SetAttackBehavior(std::make_shared<Attack_None>());
+		}
+		if (m_pCctBarUI != nullptr)
+		{
+			if (m_pCctBarUI->GetEndFrag())
+			{
+				m_pCctBarUI->Release();
+				m_pCctBarUI = nullptr;
+				m_bAttackCt = false;
+				m_nPushedKey = 0;
+			}
 		}
 	}
 	if (!m_bAttackCt)

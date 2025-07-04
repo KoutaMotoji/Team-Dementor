@@ -123,6 +123,7 @@ FieldDissolve* FieldDissolve::Create()
 
 //=================================================================================================================
 //ディゾルブのスタンダード・リスタート
+
 void FieldDissolve::StartDissolve()
 {
 	m_bReachHalf = false;

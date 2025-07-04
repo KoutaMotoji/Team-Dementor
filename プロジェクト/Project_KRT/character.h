@@ -76,7 +76,8 @@ private:
 	int m_KeySetNum;	//キーセット数
 	int m_MotionNum;	//モーション最大数
 	int m_NowFrame;		//現在のフレーム
-	int m_NowAllFrame;
+	int m_NowAllFrame;  //全体のフレーム
+	float m_MagnificationFrame;
 
 	struct Key
 	{

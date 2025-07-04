@@ -12,6 +12,7 @@ namespace
 {
 	float Damage_Ratio = 0.2f;
 	float _RADIUS = 200.0f;
+	float _DEFAULT_MOTIONFRAME_MAG = 0.8f;
 };
 
 //==========================================================================================
@@ -24,7 +25,8 @@ CCharacter::CCharacter(int nPriority) :CObject(nPriority),
 						m_move( { 0.0f,0.0f,0.0f }),
 						m_rot ( { 0.0f,0.0f,0.0f }),
 						m_size ( { 1.0f,1.0f,1.0f }),
-						m_Radius({ _RADIUS ,_RADIUS ,_RADIUS })
+						m_Radius({ _RADIUS ,_RADIUS ,_RADIUS }),
+						m_MagnificationFrame(_DEFAULT_MOTIONFRAME_MAG)
 {
 
 }
@@ -232,14 +234,16 @@ void CCharacter::SetNextKey()
 	int nNowKey = m_CurKey;
 	int nNowMotion = m_CurMotion;
 	int nNextKey = (m_CurKey + 1) % m_aMotion[nNowMotion].nKeyNum;
-	float fRatioFrame = (float)m_NowFrame / (float)m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame;
+	float _MOTION_FRAME = (float)m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame;
+	_MOTION_FRAME *= m_MagnificationFrame;
+	float fRatioFrame = (float)m_NowFrame / _MOTION_FRAME;
 	int nCntParts = 0;
 	++m_NowAllFrame;
 	int nCnt{};
 	for (auto& e : m_pHitCircle)
 	{
 		if (e->GetMotionNum() == nNowMotion) {
-			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd()) {
+			if (m_NowAllFrame >= e->GetStart() * _MOTION_FRAME && m_NowAllFrame <= e->GetEnd() * _MOTION_FRAME) {
 				e->SetEnable();
 			}
 		}
@@ -299,7 +303,7 @@ void CCharacter::SetNextKey()
 
 	++m_NowFrame;
 
-	if (m_NowFrame >= m_aMotion[nNowMotion].aKetSet[nNowKey].nFrame)
+	if (m_NowFrame >= _MOTION_FRAME)
 	{
 		++m_CurKey;
 		m_NowFrame = 0;
@@ -313,7 +317,8 @@ void CCharacter::SetNextKey()
 					m_CurKey = 0;
 					m_NowFrame = 0;
 					m_NowAllFrame = 0;
-					m_CurMotion = m_NextMotion = 0;
+					SetNextMotion(0);
+
 				}
 				else
 				{
@@ -359,12 +364,20 @@ bool CCharacter::MotionBlending()
 
 	int nLastKey = m_CurKey;
 	int nNowMotion = m_CurMotion;
-	const float _SET_BLENDFRAME = (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame;
+	float _SET_BLENDFRAME = (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame;
+	_SET_BLENDFRAME *= m_MagnificationFrame;
 	//float fRatioFrame = ((float)m_NowFrame / (float)m_aMotion[m_NextMotion].aKetSet[0].nFrame);
 	float fRatioFrame = ((float)m_NowFrame / _SET_BLENDFRAME);
 
 	int nCntParts = 0;
-
+	int nCnt{};
+	for (auto& e : m_pHitCircle)
+	{
+		if (e->GetMotionNum() == nNowMotion) {
+			e->SetDisable();
+		}
+		++nCnt;
+	}
 	for (auto& e : m_apModelParts)
 	{
 		//Œ»İ‚ÌŒü‚«‚ÆˆÊ’u‚Ìî•ñ
