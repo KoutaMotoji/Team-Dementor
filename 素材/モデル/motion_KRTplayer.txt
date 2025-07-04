@@ -69,14 +69,14 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 4					# 右前腕
 		PARENT = 3					# (親)右上腕
-		POS = -9.0 0.0 0.0
+		POS = -8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 5					# 右手
 		PARENT = 4					# (親)右前腕
-		POS = -39.0 0.0 0.0
+		POS = -11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
@@ -90,14 +90,14 @@ CHARACTERSET
 	PARTSSET
 		INDEX = 7					# 左前腕
 		PARENT = 6					# (親)左上腕
-		POS = 9.0 0.0 0.0
+		POS = 8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
 		INDEX = 8					# 左手
 		PARENT = 7					# (親)左前腕
-		POS = 39.0 0.0 0.0
+		POS = 11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 

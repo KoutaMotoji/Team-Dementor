@@ -1,0 +1,73 @@
+#==============================================================================
+#
+# 『モーションビューワ』スクリプトファイル [motion_runningman.txt]
+# Author : AKIRA TANAKA
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# モデル数
+#------------------------------------------------------------------------------
+NUM_MODEL = 6
+
+#------------------------------------------------------------------------------
+# モデルファイル名
+#------------------------------------------------------------------------------
+MODEL_FILENAME = data/MODEL/KRTplayer-G/03_armUR.x	# # [0]右肩
+MODEL_FILENAME = data/MODEL/KRTplayer-G/04_armDR.x	# # [1]右腕
+MODEL_FILENAME = data/MODEL/KRTplayer-G/05_handR.x	# # [2]右手
+MODEL_FILENAME = data/MODEL/KRTplayer-G/06_armUL.x	# # [3]左肩
+MODEL_FILENAME = data/MODEL/KRTplayer-G/07_armDL.x	# # [4]左腕
+MODEL_FILENAME = data/MODEL/KRTplayer-G/08_handL.x	# # [5]左手
+
+#------------------------------------------------------------------------------
+# キャラクター情報
+#------------------------------------------------------------------------------
+
+	PARTSSET
+		INDEX = 0					# 右肩
+		PARENT = -1					# (親)体
+		POS = -6.5 22.5 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 1					# 右腕
+		PARENT = 3					# (親)右肩
+		POS = -9.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 2					# 右手
+		PARENT = 4					# (親)右腕
+		POS = -39.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 3					# 左肩
+		PARENT = -1					# (親)体
+		POS = 6.5 22.5 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 4					# 左腕
+		PARENT = 6					# (親)左肩
+		POS = 9.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 5					# 左手
+		PARENT = 7					# (親)左腕
+		POS = 39.0 0.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+END_CHARACTERSET
+
+
+END_SCRIPT		# この行は絶対消さないこと！
