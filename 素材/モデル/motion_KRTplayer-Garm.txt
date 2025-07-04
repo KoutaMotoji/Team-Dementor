@@ -14,12 +14,12 @@ NUM_MODEL = 6
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/KRTplayer-G/03_armUR.x	# # [0]右肩
-MODEL_FILENAME = data/MODEL/KRTplayer-G/04_armDR.x	# # [1]右腕
-MODEL_FILENAME = data/MODEL/KRTplayer-G/05_handR.x	# # [2]右手
-MODEL_FILENAME = data/MODEL/KRTplayer-G/06_armUL.x	# # [3]左肩
-MODEL_FILENAME = data/MODEL/KRTplayer-G/07_armDL.x	# # [4]左腕
-MODEL_FILENAME = data/MODEL/KRTplayer-G/08_handL.x	# # [5]左手
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/03_armUR.x	# # [0]右肩
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/04_armDR.x	# # [1]右腕
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/05_handR.x	# # [2]右手
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/06_armUL.x	# # [3]左肩
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/07_armDL.x	# # [4]左腕
+MODEL_FILENAME = data/MODEL/KRTplayer-Garm/08_handL.x	# # [5]左手
 
 #------------------------------------------------------------------------------
 # キャラクター情報
