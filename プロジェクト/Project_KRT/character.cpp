@@ -12,7 +12,7 @@ namespace
 {
 	float Damage_Ratio = 0.2f;
 	float _RADIUS = 200.0f;
-	float _DEFAULT_MOTIONFRAME_MAG = 0.8f;
+	float _DEFAULT_MOTIONFRAME_MAG = 1.0f;
 };
 
 //==========================================================================================
@@ -155,7 +155,6 @@ void CCharacter::Draw()
 CCharacter* CCharacter::Create(D3DXVECTOR3 pos)
 {
 	CCharacter* charactor = new CCharacter;
-
 	charactor->m_pos = pos;
 	charactor->Init();
 
@@ -243,7 +242,7 @@ void CCharacter::SetNextKey()
 	for (auto& e : m_pHitCircle)
 	{
 		if (e->GetMotionNum() == nNowMotion) {
-			if (m_NowAllFrame >= e->GetStart() * _MOTION_FRAME && m_NowAllFrame <= e->GetEnd() * _MOTION_FRAME) {
+			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd()) {
 				e->SetEnable();
 			}
 		}
@@ -569,6 +568,7 @@ void CCharacter::MotionDataLoad(std::string filename)
 
 						m_apModelParts[nModelCnt]->SetDefault();
 						m_apModelParts[nModelCnt]->SetIndex(nIndex);
+						m_apModelParts[nModelCnt]->SetParentNum(nParent);
 						if (nParent != -1)
 						{
 							m_apModelParts[nModelCnt]->SetParent(m_apModelParts[nParent]);
@@ -703,5 +703,22 @@ void CCharacter::MotionDataLoad(std::string filename)
 	else
 	{
 		assert(pFile == nullptr);
+	}
+}
+
+//==========================================================================================
+//パーツ付け替え処理
+//==========================================================================================
+void CCharacter::ChangeModelParts(CModelParts* NewParts)
+{
+	for (auto& e : m_apModelParts)
+	{
+		if (e->GetIndex() == NewParts->GetIndex())
+		{
+			e = nullptr;
+			e = NewParts;
+			e->SetParent(m_apModelParts[e->GetParentNum()]);
+			return;
+		}
 	}
 }

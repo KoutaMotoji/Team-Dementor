@@ -11,7 +11,10 @@
 #include "stage1_boss.h"
 
 #include "inimanager.h"
+#include "json.hpp"
 #include "game.h"
+
+using json = nlohmann::json;
 
 namespace
 {
@@ -46,6 +49,9 @@ namespace
 		{0.0f,10.0f,0.0f},
 		{0.0f,50.0f,0.0f}
 	};
+	std::string G_ARM_JSONNAME = "data\\JSON\\MAPDATA1.json";
+	std::string N_ARM_JSONNAME = "data\\JSON\\MAPDATA2.json";
+
 };
 
 //==========================================================================================
@@ -113,7 +119,15 @@ void CPlayerX::Update()
 	}
 
 	m_LockOnState->UpdateCam(this);
-
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F4))
+	{
+		SetArmParts(G_ARM_JSONNAME);
+	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F6))
+	{
+		SetArmParts(N_ARM_JSONNAME);
+	}
+	
 	CCharacter::Update();
 }
 
@@ -628,4 +642,38 @@ void CPlayerX::CamFloorCollision(LPD3DXMESH pMesh)
 		return;
 	}
 	CManager::GetInstance()->GetCamera()->SetCameraDistance(m_LastCamDis);
+}
+
+//==========================================================================================
+// 腕パーツの付け替え処理
+//==========================================================================================
+void CPlayerX::SetArmParts(std::string filename)
+{
+	std::string fName = filename;
+
+	std::ifstream ifs(fName);
+	if (!ifs) {
+		std::cerr << "ファイルが開けません: " << fName << std::endl;
+		return;
+	}
+	json j;
+	ifs >> j;
+
+	for (auto& [key, value] : j.items()) {
+		D3DXVECTOR3 pos = { value.at("POS").at("X").get<float>(),  value.at("POS").at("Y").get<float>(), value.at("POS").at("Z").get<float>() };
+		D3DXVECTOR3 rot = { value.at("ROT").at("X").get<float>(),  value.at("ROT").at("Y").get<float>(), value.at("ROT").at("Z").get<float>() };
+		std::string filename = value.at("FILENAME").get<std::string>();
+		int Parent = value.at("PARENT").get<int>();
+		int index = value.at("INDEX").get<int>();
+
+		CModelParts* instance = CModelParts::Create({0.0f,0.0f,0.0f},filename.c_str());
+		instance->SetPos(pos);
+		instance->SetRot(rot);
+
+		instance->SetDefault();
+		instance->SetIndex(index);
+		instance->SetParentNum(Parent);
+		CCharacter::ChangeModelParts(instance);
+	}
+	CCharacter::SetAllPartsParent();
 }

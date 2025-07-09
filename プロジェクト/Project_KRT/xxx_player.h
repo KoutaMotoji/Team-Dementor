@@ -94,6 +94,9 @@ private:
 	void FloorCollision();					//°‚Æ‚Ì“–‚½‚è”»’è
 	void CamFloorCollision(LPD3DXMESH pMesh);
 	bool FloorbumpyMesh(LPD3DXMESH pMesh);
+
+	void SetArmParts(std::string filename);
+
 	_forceinline bool GetMoveInput() {
 		return ((CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x != 0.0f ||
 			CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y != 0.0f) ||

@@ -39,6 +39,8 @@ public:
 	inline void SetSize(D3DXVECTOR3 size) { m_size = size; };
 	inline D3DXVECTOR3 GetRadius() { return m_Radius; }
 	inline void SetRadius(float RadiusValue) { m_Radius = { RadiusValue ,RadiusValue ,RadiusValue }; }
+	inline float GetMotionMag() { return m_MagnificationFrame; }
+	inline void SetMotionMag(float Magnification) { m_MagnificationFrame = Magnification; }
 
 	inline D3DXVECTOR3 GetMove() { return m_move; }
 	inline void SetMove(D3DXVECTOR3 move) { m_move = move; }
@@ -54,6 +56,18 @@ public:
 	void MotionDataLoad(std::string filename);
 	void SetNextMotion(int nNextMotionNum);
 	void SetNextMotion(int nNextMotionNum,bool bBlend);
+
+	void ChangeModelParts(CModelParts* NewParts);
+	_forceinline void SetAllPartsParent()
+	{
+		for (auto& e : m_apModelParts)
+		{
+			if (e->GetParentNum() != -1)
+			{
+				e->SetParent(m_apModelParts[e->GetParentNum()]);
+			}
+		}
+	}
 
 	inline std::vector<std::shared_ptr<CHitCircle>> GetVecHitCircle() { return m_pHitCircle; }
 private:

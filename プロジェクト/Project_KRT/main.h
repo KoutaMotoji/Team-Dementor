@@ -17,6 +17,8 @@
 #include <cmath>
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+
 #include <random>
 
 //ƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒŠƒ“ƒN	

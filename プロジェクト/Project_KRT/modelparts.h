@@ -20,7 +20,10 @@ public:
 	void Uninit();
 	void Draw();
 	static CModelParts* Create(D3DXVECTOR3 pos,const char* apFileName);
+
 	void SetParent(CModelParts* pParent);
+	void SetParentNum(int ParentNum) { m_nParentNum = ParentNum; }
+	int GetParentNum() { return m_nParentNum; }
 
 	void BindModel(const char* apFileName);	//モデル読み込み 
 	void SetModelSize();								//モデルサイズ最大値・最小値を取得
@@ -60,6 +63,7 @@ private:
 	D3DXVECTOR3 m_radius;		//半径
 
 	int m_nIdx;
+	int m_nParentNum;
 	CModelParts* m_pParent;		//親のモデルのポインタ
 };
 

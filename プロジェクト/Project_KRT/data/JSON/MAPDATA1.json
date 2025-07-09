@@ -1,0 +1,92 @@
+{
+    "Object001": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/03_armUR.x",
+        "INDEX": 3,
+        "PARENT": 1,
+        "POS": {
+            "X": -6.5,
+            "Y": 22.5,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    },
+    "Object002": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/04_armDR.x",
+        "INDEX": 4,
+        "PARENT": 3,
+        "POS": {
+            "X": -9.0,
+            "Y": 0.0,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    },
+    "Object003": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/05_handR.x",
+        "INDEX": 5,
+        "PARENT": 4,
+        "POS": {
+            "X": -39.0,
+            "Y": 0.0,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    },
+    "Object004": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/06_armUL.x",
+        "INDEX": 6,
+        "PARENT": 1,
+        "POS": {
+            "X": 6.5,
+            "Y": 22.5,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    },
+    "Object005": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/07_armDL.x",
+        "INDEX": 7,
+        "PARENT": 6,
+        "POS": {
+            "X": 9.0,
+            "Y": 0.0,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    },
+    "Object006": {
+        "FILENAME": "data/MODEL/KRTplayer-Garm/08_handL.x",
+        "INDEX": 8,
+        "PARENT": 7,
+        "POS": {
+            "X": 39.0,
+            "Y": 0.0,
+            "Z": 0.0
+        },
+        "ROT": {
+            "X": 0.0,
+            "Y": 0.0,
+            "Z": 0.0
+        }
+    }
+}

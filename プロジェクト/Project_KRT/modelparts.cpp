@@ -168,6 +168,7 @@ void CModelParts::SetParent(CModelParts* pParent)
 	{
 		m_pParent = pParent;
 	}
+	SetParentNum(pParent->GetIndex());
 }
 
 //==========================================================================================
