@@ -1,7 +1,7 @@
 #==============================================================================
 #
-# 『モーションビューワ』スクリプトファイル [motion_runningman.txt]
-# Author : AKIRA TANAKA
+# 『モーションビューワ』スクリプトファイル [motion_KRTplayer-arm.txt]
+# Author : KAITO HONDO
 #
 #==============================================================================
 SCRIPT			# この行は絶対消さないこと！
@@ -27,44 +27,44 @@ MODEL_FILENAME = data/MODEL/KRTplayer-arm/08_handL.x	# # [5]左手
 CHARACTERSET
 
 	PARTSSET
-		INDEX = 0					# 右肩
-		PARENT = -1					# (親)体
+		INDEX = 3					# 右肩
+		PARENT = 1					# (親)体
 		POS = -6.5 22.5 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
-		INDEX = 1					# 右腕
+		INDEX = 4					# 右腕
 		PARENT = 3					# (親)右肩
-		POS = -9.0 0.0 0.0
+		POS = -8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
-		INDEX = 2					# 右手
+		INDEX = 5					# 右手
 		PARENT = 4					# (親)右腕
-		POS = -39.0 0.0 0.0
+		POS = -11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
-		INDEX = 3					# 左肩
-		PARENT = -1					# (親)体
+		INDEX = 6					# 左肩
+		PARENT = 1					# (親)体
 		POS = 6.5 22.5 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
-		INDEX = 4					# 左腕
+		INDEX = 7					# 左腕
 		PARENT = 6					# (親)左肩
-		POS = 9.0 0.0 0.0
+		POS = 8.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
 	PARTSSET
-		INDEX = 5					# 左手
+		INDEX = 8					# 左手
 		PARENT = 7					# (親)左腕
-		POS = 39.0 0.0 0.0
+		POS = 11.0 0.0 0.0
 		ROT = 0.0 0.0 0.0
 	END_PARTSSET
 
