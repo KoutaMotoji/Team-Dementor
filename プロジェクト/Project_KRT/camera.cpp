@@ -6,6 +6,8 @@
 //===============================================================================
 #include "camera.h"
 #include "manager.h"
+#include "xxx_player.h"
+#include "stage1_boss.h"
 
 namespace
 {
@@ -20,7 +22,7 @@ namespace
 }
 
 CCamera::CCamera():m_nShakeFlame(0)
-					,m_fShalePower(0.0f), m_camHeight(1000.0f), m_DestFrame(0),m_NowFrame(0), m_bFreeCam(false)
+					,m_fShalePower(0.0f), m_camHeight(1000.0f), m_DestFrame(0),m_NowFrame(0), m_bFreeCam(false), m_bLockOnCam(false)
 					,m_DestPosR({0.0f,0.0f,0.0f}),m_DestPosV({ 0.0f,0.0f,0.0f }),m_LastPosR({ 0.0f,0.0f,0.0f }),m_LastPosV({ 0.0f,0.0f,0.0f })
 {
 
@@ -62,69 +64,73 @@ void CCamera::Uninit(void)
 //更新
 void CCamera::Update(void)
 {
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DLEFT) == true||
-		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LEFTARROW) == true)
+	if (!m_bLockOnCam)
 	{
-		m_fRotZ += _CAM_ROTSPEED;
-		if (m_fRotZ > D3DX_PI)
+		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DLEFT) == true ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LEFTARROW) == true)
 		{
-			m_fRotZ = -D3DX_PI;
+			m_fRotZ += _CAM_ROTSPEED;
+			if (m_fRotZ > D3DX_PI)
+			{
+				m_fRotZ = -D3DX_PI;
+			}
 		}
-	}
 
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DRIGHT) == true||
-		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_RIGHTARROW) == true)
-	{
-		m_fRotZ -= _CAM_ROTSPEED;
-		if (m_fRotZ < -1 * D3DX_PI)
+		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DRIGHT) == true ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_RIGHTARROW) == true)
 		{
-			m_fRotZ = D3DX_PI;
+			m_fRotZ -= _CAM_ROTSPEED;
+			if (m_fRotZ < -1 * D3DX_PI)
+			{
+				m_fRotZ = D3DX_PI;
+			}
 		}
-	}
 
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DUP) == true||
-		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_UPARROW) == true)
-	{
-		m_camHeight += _CAM_UPSPEED;
-		if (m_camHeight > _CAM_MAX_HEIGHT)
+		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DUP) == true ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_UPARROW) == true)
 		{
-			m_camHeight = _CAM_MAX_HEIGHT;
+			m_camHeight += _CAM_UPSPEED;
+			if (m_camHeight > _CAM_MAX_HEIGHT)
+			{
+				m_camHeight = _CAM_MAX_HEIGHT;
+			}
 		}
-	}
-	if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DDOWN) == true||
-		CManager::GetInstance()->GetKeyboard()->GetPress(DIK_DOWNARROW) == true)
-	{
-		m_camHeight -= _CAM_UPSPEED;
-		if (m_camHeight < _CAM_MIN_HEIGHT)
+		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DDOWN) == true ||
+			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_DOWNARROW) == true)
 		{
-			m_camHeight = _CAM_MIN_HEIGHT;
+			m_camHeight -= _CAM_UPSPEED;
+			if (m_camHeight < _CAM_MIN_HEIGHT)
+			{
+				m_camHeight = _CAM_MIN_HEIGHT;
+			}
 		}
-	}
-	if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_UP) == true)
-	{
-		m_camDistance += _CAM_ZOOMSPEED;
-		if (m_camDistance > _CAM_MAX_ZOOM)
+		if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_UP) == true)
 		{
-			m_camDistance = _CAM_MAX_ZOOM;
+			m_camDistance += _CAM_ZOOMSPEED;
+			if (m_camDistance > _CAM_MAX_ZOOM)
+			{
+				m_camDistance = _CAM_MAX_ZOOM;
+			}
 		}
-	}
-	if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_DOWN) == true)
-	{
-		m_camDistance -= _CAM_ZOOMSPEED;
-		if (m_camDistance < _CAM_MIN_ZOOM)
+		if (CManager::GetInstance()->GetJoypad()->GetPress(CJoypad::JOYPAD_DPAD_DOWN) == true)
 		{
-			m_camDistance = _CAM_MIN_ZOOM;
+			m_camDistance -= _CAM_ZOOMSPEED;
+			if (m_camDistance < _CAM_MIN_ZOOM)
+			{
+				m_camDistance = _CAM_MIN_ZOOM;
+			}
 		}
-	}
 
-	if (!m_bFreeCam)
-	{
-		UpdateNormalCam();
+		if (!m_bFreeCam)
+		{
+			UpdateNormalCam();
+		}
+		else
+		{
+			UpdateFreeCam();
+		}
 	}
-	else
-	{
-		UpdateFreeCam();
-	}
+	m_bLockOnCam = false;
 }
 
 //設定
@@ -170,28 +176,11 @@ void CCamera::SetCamera(void)
 	//ビューマトリックスの設定
 	pDevice->SetTransform(D3DTS_VIEW,
 							&m_mtxView);
-	
 }
 
-D3DXVECTOR3& CCamera::GetPlayerPos()
+void CCamera::SetRotz(float rot)
 {
-	return m_PlayerPos;
-}
-
-void CCamera::SetPlayerPos(D3DXVECTOR3 pos)
-{
-	m_PlayerPos = pos;
-}
-
-float CCamera::GetRotZ()
-{
-	return m_fRotZ;
-}
-
-void CCamera::SetShake(int nFlame, float fShake)
-{
-	m_nShakeFlame = nFlame;
-	m_fShalePower = fShake;
+	m_fRotZ = rot;
 }
 
 void CCamera::UpdateNormalCam()
@@ -204,6 +193,45 @@ void CCamera::UpdateNormalCam()
 	m_posR.x = m_PlayerPos.x;
 	m_posR.z = m_PlayerPos.z;
 	m_posR.y = m_PlayerPos.y + 50.0f;
+}
+
+void CCamera::UpdateLockOnCam(D3DXMATRIX mat, D3DXVECTOR3 posEnemy)
+{
+	D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
+
+	D3DXVECTOR3 pos = { 0.0f,300.0f,-500.0f };
+	D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
+
+	//マトリックスから位置を抽出
+	D3DXVECTOR3 mtxPos1 = {
+	mat._41,
+	mat._42,
+	mat._43
+	};
+	D3DXVECTOR3 PlayerPos = { mtxPos1.x,0.0f,mtxPos1.z };
+
+	D3DXVECTOR3 EnemyPos = { posEnemy.x,0.0f,posEnemy.z };
+
+	D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+	D3DXVec3Normalize(&dir, &dir);
+
+	float Yaw = atan2f(dir.x, dir.z);
+
+	D3DXMATRIX RotY;
+	D3DXVECTOR3 RotateOffset;
+
+	D3DXMatrixRotationY(&RotY, Yaw);
+	D3DXVec3TransformCoord(&RotateOffset, &pos, &RotY);
+
+	D3DXVECTOR3 CamPos = mtxPos1 + RotateOffset;
+
+	CManager::GetInstance()->GetCamera()->SetRotz(Yaw);
+
+	m_posV = CamPos;
+
+	m_posR = posEnemy;
+
+	m_bLockOnCam = true;
 }
 
 void CCamera::UpdateFreeCam()

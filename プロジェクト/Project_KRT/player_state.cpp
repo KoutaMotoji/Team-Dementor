@@ -7,6 +7,7 @@
 
 #include "xxx_player.h"
 #include "stage1_boss.h"
+#include "collision.h"
 
 //通常時のステート
 void State_Nutoral::Attack(CPlayerX* pPlayer)	{
@@ -136,13 +137,11 @@ void LockEnable::UpdateCam(CPlayerX* pPlayer)
 			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
 			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 			if (pTest == nullptr) continue;
-
-			a = pPlayer->CCharacter::GetPos();
-			b = pTest->CCharacter::GetPos();
-			SetPos = (a + b) * 0.5f;
+			
+			CManager::GetInstance()->GetCamera()->SetPlayerPos(pPlayer->CCharacter::GetPos());
+			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(pPlayer->CCharacter::GetMatrix(), pTest->CCharacter::GetPos());
 		}
 	}
-	CManager::GetInstance()->GetCamera()->SetPlayerPos(SetPos);
 }
 
 void LockDisable::Swicth(CPlayerX* pPlayer){

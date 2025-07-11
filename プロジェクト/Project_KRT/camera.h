@@ -24,20 +24,20 @@ public:
 
 	inline float GetCameraDistance() { return m_camDistance; };
 	inline D3DXVECTOR3 GetPosV() { return m_posV; }
-	D3DXVECTOR3& GetPlayerPos();
-	void SetPlayerPos(D3DXVECTOR3 pos);
-	float GetRotZ();
-
+	inline D3DXVECTOR3& GetPlayerPos() { return m_PlayerPos; }
+	inline void SetPlayerPos(D3DXVECTOR3 pos) { m_PlayerPos = pos; m_bLockOnCam = false;}
+	inline void SetLockOnPos(D3DXVECTOR3 pos) { m_LockOnPos = pos; m_bLockOnCam = true; }
+	inline float GetRotZ() { return m_fRotZ; }
 
 	void SetFreeCam(D3DXVECTOR3 destPosV, D3DXVECTOR3 destPosR, int Frame);
 	inline void DefuseFreeCam() { m_bFreeCam = false; }
-	inline void SetRotz(float rot) { m_fRotZ = rot; };
-	inline void AddRotz(float rot) { m_fRotZ += rot; };
+	void SetRotz(float rot);
+	inline void AddRotz(float rot) { m_fRotZ += rot; }
 
 	inline void SetCameraHeigjt(float Height) { m_camHeight = Height; };
 	inline void AddCameraHeigjt(float Height) { m_camHeight += Height; };
 
-	void SetShake(int nFlame, float fShake);
+	inline void SetShake(int nFlame, float fShake) { m_nShakeFlame = nFlame; m_fShalePower = fShake; }
 	inline void SetCamPos(D3DXVECTOR3 PosV, D3DXVECTOR3 PosR) { m_posV = PosV; m_posR = PosR; }	//視点 / 注視点の設定
 	void SetCamDefault() {
 		m_posV = D3DXVECTOR3(0.0f, 100.0f, -300.0f);
@@ -48,10 +48,12 @@ public:
 		m_fRotZ = 0.0f;
 	};
 
+	void UpdateLockOnCam(D3DXMATRIX mat, D3DXVECTOR3 posEnemy);
+
 private:
 	void UpdateNormalCam();
 	void UpdateFreeCam();
-	D3DXVECTOR3 m_posV, m_posR, m_posU,m_rot,m_PlayerPos;
+	D3DXVECTOR3 m_posV, m_posR, m_posU,m_rot,m_PlayerPos,m_LockOnPos;
 	D3DXMATRIX m_mtxProjection, m_mtxView;
 	float m_fRotZ;
 	float m_camDistance;
@@ -59,10 +61,9 @@ private:
 	int m_nShakeFlame;
 	float m_fShalePower;
 
-
 	D3DXVECTOR3 m_DestPosV, m_DestPosR,m_LastPosV,m_LastPosR;
 	int m_DestFrame,m_NowFrame;
-	bool m_bFreeCam;
+	bool m_bFreeCam,m_bLockOnCam;
 
 	LPD3DXFONT m_pFont;		//フォントのポインタ
 
