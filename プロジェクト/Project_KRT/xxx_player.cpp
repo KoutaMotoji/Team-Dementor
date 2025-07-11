@@ -9,6 +9,8 @@
 #include "player_keyUI.h"
 #include "floor_stone.h"
 #include "stage1_boss.h"
+#include "player_armState.h"
+#include "player_behavior.h"
 
 #include "inimanager.h"
 #include "json.hpp"
@@ -40,12 +42,12 @@ namespace
 		std::string section;	//セクション名
 		std::string keyword;	//キーワード名
 	};
-	_FILENAME st_filename = {		//プレイヤーのモデル・モーション用ファイルパス
+	_FILENAME st_filename = {				//プレイヤーのモデル・モーション用ファイルパス
 		"data\\TEXT\\Config.ini",
 		 "ModelData",
 		 "PlayerMotion"
 	};
-	std::vector<D3DXVECTOR3> RayPos = {			//地形判定用レイの飛ばす座標
+	std::vector<D3DXVECTOR3> RayPos = {		//地形判定用レイの飛ばす座標
 		{0.0f,10.0f,0.0f},
 		{0.0f,50.0f,0.0f}
 	};
@@ -82,9 +84,11 @@ void CPlayerX::Init()
 	CCharacter::SetRadius(_BODY_RADIUS);										//当たり判定を設定(円柱)
 	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();	//カメラ距離設定
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);		//デバッグ用線の生成
-	SetState(std::make_shared<State_Nutoral>());	//ステートをニュートラルに設定
+	SetState(std::make_shared<State_Nutoral>());								//ステートをニュートラルに設定
 	SetAttackBehavior(std::make_shared<Attack_None>());
 	SetLockOnState(std::make_shared<LockDisable>());
+	SetArmState(std::make_shared<Arm_Normal>());
+	m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 }
 
 //==========================================================================================
@@ -109,23 +113,28 @@ void CPlayerX::Update()
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	m_PlayerState->Parry(this);			//パリィ中の制御
-
-	m_PlayerState->Attack(this);		//攻撃中の制御
-
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) == true)
 	{
 		m_LockOnState->Swicth(this);
 	}
 
 	m_LockOnState->UpdateCam(this);
+
+	m_PlayerState->Parry(this);			//パリィ中の制御
+
+	m_PlayerState->Attack(this);		//攻撃中の制御
+
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F4))
 	{
 		SetArmParts(G_ARM_JSONNAME);
+		SetArmState(std::make_shared<Arm_Gorira>());
+		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Gorira>());
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F6))
 	{
 		SetArmParts(N_ARM_JSONNAME);
+		SetArmState(std::make_shared<Arm_Normal>());
+		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	}
 	
 	CCharacter::Update();
@@ -222,8 +231,7 @@ bool CPlayerX::PMove(float fCamRotZ)
 
 	CCharacter::AddMove({ sinf(moveYrot) * _MOVE_SPEED,-_GRAVITY,cosf(moveYrot) * _MOVE_SPEED });
 
-	CCharacter::SetNextMotion(MOTION_WALK);
-	
+	m_ArmState->WalkMotion(this);
 	return true;
 }
 
