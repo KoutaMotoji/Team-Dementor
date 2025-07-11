@@ -199,7 +199,7 @@ void CCamera::UpdateLockOnCam(D3DXMATRIX mat, D3DXVECTOR3 posEnemy)
 {
 	D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
 
-	D3DXVECTOR3 pos = { 0.0f,300.0f,-500.0f };
+	D3DXVECTOR3 pos = { 0.0f,200.0f,-700.0f };
 	D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
 
 	//マトリックスから位置を抽出
@@ -230,6 +230,8 @@ void CCamera::UpdateLockOnCam(D3DXMATRIX mat, D3DXVECTOR3 posEnemy)
 	m_posV = CamPos;
 
 	m_posR = posEnemy;
+
+	m_posR.y += 150.0f;
 
 	m_bLockOnCam = true;
 }
