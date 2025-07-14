@@ -118,6 +118,7 @@ void State_Damage::ToParry(CPlayerX* pPlayer){
 
 }
 
+//ロックオン時のステート
 void LockEnable::Swicth(CPlayerX* pPlayer){
 	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
 }
@@ -138,12 +139,12 @@ void LockEnable::UpdateCam(CPlayerX* pPlayer)
 			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 			if (pTest == nullptr) continue;
 			
-			CManager::GetInstance()->GetCamera()->SetPlayerPos(pPlayer->CCharacter::GetPos());
 			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(pPlayer->CCharacter::GetMatrix(), pTest->CCharacter::GetPos());
 		}
 	}
 }
 
+//非ロックオン時のステート
 void LockDisable::Swicth(CPlayerX* pPlayer){
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
