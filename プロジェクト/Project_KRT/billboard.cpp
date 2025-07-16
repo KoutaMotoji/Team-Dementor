@@ -174,7 +174,7 @@ void CBillboard::Draw()
 		0,
 		MAX_POLYGON);
 
-	//Zアルファ
+	//深度バッファ
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
