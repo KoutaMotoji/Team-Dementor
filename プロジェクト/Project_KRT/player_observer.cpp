@@ -78,7 +78,7 @@ int CPlayerObserver::GetPlayerLife()
 {
 	if (pPlayer != nullptr)
 	{
-		return 0;
+		return pPlayer->GetLife();
 	}
 	return 0;
 }

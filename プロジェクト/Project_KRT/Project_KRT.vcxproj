@@ -171,6 +171,7 @@
     <ClCompile Include="object.cpp" />
     <ClCompile Include="object2D.cpp" />
     <ClCompile Include="object3D.cpp" />
+    <ClCompile Include="objectCircleGauge.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="Obj_manager.cpp" />
     <ClCompile Include="player_armState.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="player_keyUI.cpp" />
     <ClCompile Include="player_observer.cpp" />
     <ClCompile Include="player_state.cpp" />
+    <ClCompile Include="player_UI.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
@@ -215,12 +217,14 @@
     <ClInclude Include="object.h" />
     <ClInclude Include="object2D.h" />
     <ClInclude Include="object3D.h" />
+    <ClInclude Include="objectCircleGauge.h" />
     <ClInclude Include="objectX.h" />
     <ClInclude Include="Obj_manager.h" />
     <ClInclude Include="player_armState.h" />
     <ClInclude Include="player_behavior.h" />
     <ClInclude Include="player_keyUI.h" />
     <ClInclude Include="player_observer.h" />
+    <ClInclude Include="player_UI.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />

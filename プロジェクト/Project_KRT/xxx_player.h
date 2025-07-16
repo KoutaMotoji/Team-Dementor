@@ -25,6 +25,8 @@ class PlayerArm_State;
 class AttackBehavior;
 class LockOn_State;
 
+class CGaugeLife;
+
 class CPlayerX :public CCharacter
 {
 public:
@@ -132,6 +134,7 @@ private:
 	std::shared_ptr<PlayerArm_State>m_ArmState;
 	std::shared_ptr<AttackBehavior>m_AttackBehavior;
 	std::shared_ptr<LockOn_State>m_LockOnState;
+	CGaugeLife* m_pLifeGauge;
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)

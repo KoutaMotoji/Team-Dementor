@@ -11,6 +11,7 @@
 #include "stage1_boss.h"
 #include "player_armState.h"
 #include "player_behavior.h"
+#include "player_UI.h"
 
 #include "inimanager.h"
 #include "json.hpp"
@@ -61,6 +62,7 @@ namespace
 //==========================================================================================
 CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_LastCamDis(0.0f)
 {
+	m_pLifeGauge = nullptr;
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = {};
 }
@@ -89,6 +91,8 @@ void CPlayerX::Init()
 	SetLockOnState(std::make_shared<LockDisable>());
 	SetArmState(std::make_shared<Arm_Normal>());
 	m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
+	m_pLifeGauge = CGaugeLife::Create(MAX_LIFE);
+	CCharacter::SetLife(MAX_LIFE);
 }
 
 //==========================================================================================
@@ -96,6 +100,11 @@ void CPlayerX::Init()
 //==========================================================================================
 void CPlayerX::Uninit()
 {
+	if (m_pLifeGauge != nullptr)
+	{
+		m_pLifeGauge->Release();
+		m_pLifeGauge = nullptr;
+	}
 	CCharacter::Uninit();
 }
 
@@ -117,6 +126,10 @@ void CPlayerX::Update()
 	{
 		m_LockOnState->Swicth(this);
 	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_9) == true)
+	{
+		CCharacter::SetLife(CCharacter::GetLife() - 100);
+	}
 
 	m_LockOnState->UpdateCam(this);
 
@@ -136,7 +149,7 @@ void CPlayerX::Update()
 		SetArmState(std::make_shared<Arm_Normal>());
 		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	}
-	
+
 	CCharacter::Update();
 }
 
@@ -161,6 +174,7 @@ void CPlayerX::Draw()
 
 	//ステンシルバッファへの書き込みを無効化
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
 	m_pDebugLine->Draw(CCharacter::GetPos());
 
 }
@@ -670,11 +684,11 @@ void CPlayerX::SetArmParts(std::string filename)
 	for (auto& [key, value] : j.items()) {
 		D3DXVECTOR3 pos = { value.at("POS").at("X").get<float>(),  value.at("POS").at("Y").get<float>(), value.at("POS").at("Z").get<float>() };
 		D3DXVECTOR3 rot = { value.at("ROT").at("X").get<float>(),  value.at("ROT").at("Y").get<float>(), value.at("ROT").at("Z").get<float>() };
-		std::string filename = value.at("FILENAME").get<std::string>();
+		std::string s_filename = value.at("FILENAME").get<std::string>();
 		int Parent = value.at("PARENT").get<int>();
 		int index = value.at("INDEX").get<int>();
 
-		CModelParts* instance = CModelParts::Create({0.0f,0.0f,0.0f},filename.c_str());
+		CModelParts* instance = CModelParts::Create({0.0f,0.0f,0.0f}, s_filename.c_str());
 		instance->SetPos(pos);
 		instance->SetRot(rot);
 

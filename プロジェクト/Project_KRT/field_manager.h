@@ -45,7 +45,7 @@ public:
 class FieldDissolve : public CObject2D
 {
 public:
-	FieldDissolve(int nPriority = 5) :CObject2D(nPriority),m_bDraw(false), m_bReachHalf(false), m_bUse(false){}
+	FieldDissolve(int nPriority = 9) :CObject2D(nPriority),m_bDraw(false), m_bReachHalf(false), m_bUse(false){}
 	~FieldDissolve() {}
 	
 	void Init()override;

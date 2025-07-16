@@ -1,6 +1,6 @@
 //===============================================================================
 //
-//  プレイヤー処理(playerX.h)
+//  ステンシルマスクの処理(stencile_mask.h)
 //								制作：元地弘汰
 // 
 //===============================================================================
@@ -34,6 +34,11 @@ public:
 		CObject2D::Draw();
 
 		pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+		//ステンシルマスクの設定時に無効化したZバッファをもとにもどす
+		pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	}
 	_forceinline static CPlayerMask* Create()
 	{
