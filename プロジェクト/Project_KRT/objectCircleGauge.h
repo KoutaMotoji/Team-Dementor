@@ -15,14 +15,15 @@
 class CObjectCircleGauge :public CObject
 {
 public:
-    CObjectCircleGauge(int nPriority = 2);
+    CObjectCircleGauge(int nPriority = 5);
     ~CObjectCircleGauge();
     struct VERTEX
     {
-        D3DXVECTOR3 position;
-        DWORD color;
-        float u, v;
+        D3DXVECTOR3 pos;
         float rhw;
+        DWORD color;
+        D3DXVECTOR2 tex;
+      
     };
 
     static CObjectCircleGauge* Create(float radius);

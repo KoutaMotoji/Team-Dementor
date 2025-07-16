@@ -7,6 +7,7 @@
 
 #include "xxx_player.h"
 #include "stage1_boss.h"
+#include "collision.h"
 
 //通常時のステート
 void State_Nutoral::Attack(CPlayerX* pPlayer) {
@@ -116,6 +117,7 @@ void State_Damage::ToAttack(CPlayerX* pPlayer) {
 void State_Damage::ToParry(CPlayerX* pPlayer) {
 
 }
+
 //ロックオン時のステート
 void LockEnable::Swicth(CPlayerX* pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
@@ -134,7 +136,7 @@ void LockEnable::UpdateCam(CPlayerX* pPlayer)
 
 			CObject::TYPE type = pObj->GetType();
 			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
-			CG_Gorira* pTest = dynamic_cast<CG_Gorira>(pObj);
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 			if (pTest == nullptr) continue;
 
 			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(pPlayer->CCharacter::GetMatrix(), pTest->CCharacter::GetPos());
@@ -143,7 +145,7 @@ void LockEnable::UpdateCam(CPlayerX* pPlayer)
 }
 
 //非ロックオン時のステート
-void LockDisable::Swicth(CPlayerX pPlayer) {
+void LockDisable::Swicth(CPlayerX* pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
 
@@ -151,3 +153,4 @@ void LockDisable::UpdateCam(CPlayerX* pPlayer)
 {
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(pPlayer->CCharacter::GetPos());
 }
+

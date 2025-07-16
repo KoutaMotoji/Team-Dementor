@@ -41,7 +41,7 @@ void CObjectCircleGauge::Init()
     float cx = m_fRadius;
     float cy = m_fRadius;
 
-    pVtx[0] = { { cx, cy, 0.0f }, m_color, 0.5f, 0.5f };
+    pVtx[0] = { { cx, cy, 0.0f },1.0f, m_color, {0.5f, 0.5f} };
 
     for (int i = 0; i <= m_nResolution; ++i)
     {
@@ -52,7 +52,7 @@ void CObjectCircleGauge::Init()
         float u = 0.5f + cosf(angle) * 0.5f;
         float v = 0.5f + sinf(angle) * 0.5f;
 
-        pVtx[i + 1] = { { x, y, 0.0f }, m_color, u, v ,1.0f};
+        pVtx[i + 1] = { { x, y, 0.0f },1.0f, m_color, {u, v}  };
     }
 
     m_pVtxBuffer->Unlock();
@@ -79,18 +79,19 @@ void CObjectCircleGauge::Update()
     float cx = m_fRadius;
     float cy = m_fRadius;
 
-    pVtx[0] = { { cx, cy, 0.0f }, m_color, 0.5f, 0.5f };
+    pVtx[0] = { { cx, cy, 0.0f },1.0f, m_color, {0.5f, 0.5f} };
 
     for (int i = 0; i <= m_nResolution; ++i)
     {
-        float angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * i / m_nResolution * m_nPercent);
-        float x = cx + cosf(angle) * m_fRadius;
-        float y = cy + sinf(angle) * m_fRadius;
+        float t = static_cast<float>(i) / m_nResolution;
+        float angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * m_nPercent * t);
+        float x = cx + sinf(angle) * m_fRadius;
+        float y = cy + cosf(angle) * m_fRadius;
 
-        float u = 0.5f + cosf(angle) * 0.5f;
-        float v = 0.5f + sinf(angle) * 0.5f;
+        float u = 0.5f + sinf(angle) * 0.5f;
+        float v = 0.5f + cosf(angle) * 0.5f;
 
-        pVtx[i + 1] = { { m_pos.x + x, m_pos.y + y, 0.0f }, m_color, u, v ,1.0f};
+        pVtx[i + 1] = { { m_pos.x + x, m_pos.y + y, 0.0f },1.0f, m_color, {u, v }  };
     }
 
     m_pVtxBuffer->Unlock();
