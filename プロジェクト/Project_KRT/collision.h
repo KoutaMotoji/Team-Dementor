@@ -34,13 +34,17 @@ public:
 						m_startF(0),
 						m_endF(0),
 						m_MotionNum(0),
-						m_bEnable(false)
+						m_bEnable(false),
+						m_bInvincible(false)
 	{}
 	~CHitCircle() = default;
 
 	inline void SetEnable() { m_bEnable = true; }
 	inline void SetDisable() { m_bEnable = false; }
 	inline bool GetEnable() { return m_bEnable; }
+
+	inline void SetInvincible(bool hit) { m_bInvincible = hit; }
+	inline bool GetInvincible() { return m_bInvincible; }
 
 	inline int GetMotionNum() { return m_MotionNum; }
 	inline int GetStart() { return m_startF; }
@@ -88,6 +92,7 @@ private:
 	D3DXVECTOR3 m_Radius;
 	int m_ParentNum,m_startF,m_endF,m_MotionNum;
 	bool m_bEnable;
+	bool m_bInvincible;
 };
 
 #endif 

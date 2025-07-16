@@ -116,7 +116,7 @@ void State_Damage::ToAttack(CPlayerX* pPlayer) {
 void State_Damage::ToParry(CPlayerX* pPlayer) {
 
 }
-
+//ロックオン時のステート
 void LockEnable::Swicth(CPlayerX* pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
 }
@@ -134,18 +134,16 @@ void LockEnable::UpdateCam(CPlayerX* pPlayer)
 
 			CObject::TYPE type = pObj->GetType();
 			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
-			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira>(pObj);
 			if (pTest == nullptr) continue;
 
-			a = pPlayer->CCharacter::GetPos();
-			b = pTest->CCharacter::GetPos();
-			SetPos = (a + b) * 0.5f;
+			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(pPlayer->CCharacter::GetMatrix(), pTest->CCharacter::GetPos());
 		}
 	}
-	CManager::GetInstance()->GetCamera()->SetPlayerPos(SetPos);
 }
 
-void LockDisable::Swicth(CPlayerX* pPlayer) {
+//非ロックオン時のステート
+void LockDisable::Swicth(CPlayerX pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
 

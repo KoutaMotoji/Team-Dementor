@@ -190,6 +190,12 @@ void CCharacter::SetNextMotion(int nNextMotionNum)
 	{
 		return;
 	}
+
+	for (auto& e : m_pHitCircle)
+	{
+		e->SetInvincible(false);
+	}
+
 	m_NextMotion = nNextMotionNum;
 	m_NowFrame = 0;
 	m_NowAllFrame = 0;
@@ -204,6 +210,12 @@ void CCharacter::SetNextMotion(int nNextMotionNum,bool bBlend)
 	{
 		return;
 	}
+
+	for (auto& e : m_pHitCircle)
+	{
+		e->SetInvincible(false);
+	}
+
 	m_NextMotion = nNextMotionNum;
 	m_NowFrame = 0;
 	m_NowAllFrame = 0;
@@ -242,6 +254,14 @@ void CCharacter::SetNextKey()
 	for (auto& e : m_pHitCircle)
 	{
 		if (e->GetMotionNum() == nNowMotion) {
+
+			if (e->GetInvincible() == true)
+			{
+				e->SetDisable();
+
+				continue;
+			}
+
 			if (m_NowAllFrame >= e->GetStart() && m_NowAllFrame <= e->GetEnd()) {
 				e->SetEnable();
 			}
