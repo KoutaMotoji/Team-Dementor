@@ -23,6 +23,8 @@ namespace
 	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = {600.0f,80.0f};
 	D3DXVECTOR3 _HP_GAUGE_POS = { (_HP_GAUGE_DECO_SIZE.x * 0.5f) - 50.0f,SCREEN_HEIGHT - (_HP_GAUGE_DECO_SIZE.y * 0.5f),0.0f };
 	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x + 50.0f,_HP_GAUGE_POS.y,0.0f };
+	D3DXVECTOR3 _HP_GAUGE_CIRCLE_POS = { 1000.0f,500.0f,0.0f };
+
 	float _GAUGE_RADIUS = 100.0f;
 
 	D3DXCOLOR _GAUGE_COLOR = { 0.0f,1.0f,0.2f,1.0f };
@@ -51,6 +53,7 @@ void CGaugeLife::Init()
 	CGaugeLiBack::Create(CObject2D::GetPos(), _HP_GAUGE_SIZE.x, _HP_GAUGE_SIZE.y);
 	CGaugeLiDeco::Create();
 	CGaugeCircle::Create();
+	CGaugeCircleDeco::Create();
 
 	CObject::SetType(TYPE_2D_UI);
 	CObject2D::Init();
@@ -180,7 +183,7 @@ void CGaugeLiBack::Init()
 void CGaugeLiBack::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-	//pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
 	//テクスチャ拡大時に色を近似値にする
 	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	//アルファテスト設定
@@ -224,7 +227,6 @@ void CGaugeLiDeco::Init()
 void CGaugeLiDeco::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-	//pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	
 	//テクスチャ拡大時に色を近似値にする
 	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
@@ -259,7 +261,7 @@ CGaugeLiDeco* CGaugeLiDeco::Create()
 void CGaugeCircle::Init()
 {
 	//テクスチャの登録・割り当て
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_HP_GAUGE.c_str());
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_HP_CIRCLEGAUGE.c_str());
 	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx));
 
 	CObject::SetType(TYPE_2D_UI);
@@ -271,7 +273,8 @@ void CGaugeCircle::Init()
 //==========================================================================================
 void CGaugeCircle::Update()
 {
-	float nNowGauge = CPlayerObserver::GetInstance()->GetPlayerLife() / 1000;
+	int life = 1000 - CPlayerObserver::GetInstance()->GetPlayerLife();
+	float nNowGauge = (float)life / 1000.0f;
 
 	CObjectCircleGauge::SetGaugePercent(nNowGauge);
 
@@ -286,20 +289,9 @@ void CGaugeCircle::Update()
 void CGaugeCircle::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-	//pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 
-	////テクスチャ拡大時に色を近似値にする
-	//pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-
-	////アルファテスト設定
-	//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	//pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-	//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 
 	CObjectCircleGauge::Draw();
-
-	//テクスチャ拡大時の色を線形補間
-	//pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 }
 
 //==========================================================================================
@@ -309,7 +301,58 @@ CGaugeCircle* CGaugeCircle::Create()
 {
 	CGaugeCircle* gauge = new CGaugeCircle;
 
-	gauge->SetPolygonParam(_HP_GAUGE_DECO_POS, _GAUGE_RADIUS);
+	gauge->SetPolygonParam(_HP_GAUGE_CIRCLE_POS, _GAUGE_RADIUS);
+	gauge->Init();
+
+	return gauge;
+}
+
+//==========================================================================================
+//HP装飾の初期化処理
+//==========================================================================================
+void CGaugeCircleDeco::Init()
+{
+	//テクスチャの登録・割り当て
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_HP_CIRCLEGAUGE.c_str());
+	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	CObject::SetType(TYPE_2D_UI);
+	CObject2D::Init();
+}
+
+//==========================================================================================
+//描画処理
+//==========================================================================================
+void CGaugeCircleDeco::Draw()
+{
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+
+	//テクスチャ拡大時に色を近似値にする
+	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+
+	//アルファテスト設定
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
+	CObject2D::Draw();
+
+	//テクスチャ拡大時の色を線形補間
+	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+}
+
+//==========================================================================================
+//HP装飾の生成処理
+//==========================================================================================
+CGaugeCircleDeco* CGaugeCircleDeco::Create()
+{
+	CGaugeCircleDeco* gauge = new CGaugeCircleDeco;
+	D3DXVECTOR3 pos = {
+		_HP_GAUGE_CIRCLE_POS.x + _GAUGE_RADIUS,
+		_HP_GAUGE_CIRCLE_POS.y + _GAUGE_RADIUS,
+		0.0f
+	};
+	gauge->SetPolygonParam(pos, _GAUGE_RADIUS * 2, _GAUGE_RADIUS * 2, { 1.0f,1.0f,1.0f,0.4f });
 	gauge->Init();
 
 	return gauge;

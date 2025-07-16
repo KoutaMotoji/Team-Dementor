@@ -50,7 +50,6 @@ public:
 
 	static CFloorNumberUI* Create(D3DXVECTOR3 pos);
 private:
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuffFloorNumberUI;
 	int  m_nTexPos;
 	int m_FloorNumber;
 };
@@ -66,7 +65,6 @@ public:
 		
 	static CFloorTypeUI* Create(D3DXVECTOR3 pos);
 private:
-	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuffFloorTypeUI;
 	int  m_nTexPos;
 };
 

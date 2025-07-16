@@ -613,6 +613,7 @@ void CPlayerX::ToEnemyAttack()
 				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
 				{
 					pTest->SetNextMotion(4);
+					pAttackCircle->SetInvincible(true);
 					pTest->BeDamaged();
 					return;
 				}

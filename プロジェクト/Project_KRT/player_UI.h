@@ -74,4 +74,16 @@ public:
 private:
 };
 
+class CGaugeCircleDeco :public CObject2D
+{
+public:
+	CGaugeCircleDeco(int nPriority = 4) : CObject2D(nPriority) {};		//コンストラクタ
+	~CGaugeCircleDeco()override = default;				//デストラクタ
+	void Init()override;		//初期化
+	void Draw()override;		//描画
+
+	static CGaugeCircleDeco* Create();
+private:
+};
+
 #endif

@@ -81,8 +81,8 @@ void CGame::Update()
 	}
 	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_F))
 	{
-		CFloorUI::Create(D3DXVECTOR3(1150.0f, 75.0f, 0.0f));
-		CFloorNumberUI::Create(D3DXVECTOR3(900.0f, 75.0f, 0.0f));
+		CFloorUI::Create({ 1150.0f, 75.0f, 0.0f });
+		CFloorNumberUI::Create({ 900.0f, 75.0f, 0.0f });
 	}
 #endif // _DEBUG
 	CField_Manager::GetInstance()->Update();
