@@ -22,7 +22,7 @@
 #include "game.h"
 
 #include "floor.h"
-
+#include "floorUI.h"
 
 CGame::CGame()
 {
@@ -78,6 +78,11 @@ void CGame::Update()
 	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_F3))
 	{
 		CField_Manager::GetInstance()->SetField();
+	}
+	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_F))
+	{
+		CFloorUI::Create(D3DXVECTOR3(1150.0f, 75.0f, 0.0f));
+		CFloorNumberUI::Create(D3DXVECTOR3(900.0f, 75.0f, 0.0f));
 	}
 #endif // _DEBUG
 	CField_Manager::GetInstance()->Update();
