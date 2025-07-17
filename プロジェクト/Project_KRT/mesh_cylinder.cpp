@@ -194,7 +194,7 @@ void CMeshCylinder::Draw()
 	//テクスチャの設定
 	pDevice->SetTexture(0, m_apTexMeshCylinder);
 
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);	//カリング戻し
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);	//カリング両面に
 
 
 	//ポリゴンの描画

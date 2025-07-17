@@ -9,6 +9,9 @@
 #include "player_keyUI.h"
 #include "floor_stone.h"
 #include "stage1_boss.h"
+#include "player_armState.h"
+#include "player_behavior.h"
+#include "player_UI.h"
 
 #include "inimanager.h"
 #include "json.hpp"
@@ -40,12 +43,12 @@ namespace
 		std::string section;	//セクション名
 		std::string keyword;	//キーワード名
 	};
-	_FILENAME st_filename = {		//プレイヤーのモデル・モーション用ファイルパス
+	_FILENAME st_filename = {				//プレイヤーのモデル・モーション用ファイルパス
 		"data\\TEXT\\Config.ini",
 		 "ModelData",
 		 "PlayerMotion"
 	};
-	std::vector<D3DXVECTOR3> RayPos = {			//地形判定用レイの飛ばす座標
+	std::vector<D3DXVECTOR3> RayPos = {		//地形判定用レイの飛ばす座標
 		{0.0f,10.0f,0.0f},
 		{0.0f,50.0f,0.0f}
 	};
@@ -59,6 +62,7 @@ namespace
 //==========================================================================================
 CPlayerX::CPlayerX(int nPriority) :CCharacter(nPriority), m_bAttackCt(false), m_nPushedKey(0), m_LastCamDis(0.0f)
 {
+	m_pLifeGauge = nullptr;
 	m_pCctBarUI = nullptr;
 	m_vButtonUI = {};
 }
@@ -82,9 +86,13 @@ void CPlayerX::Init()
 	CCharacter::SetRadius(_BODY_RADIUS);										//当たり判定を設定(円柱)
 	m_LastCamDis = CManager::GetInstance()->GetCamera()->GetCameraDistance();	//カメラ距離設定
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);		//デバッグ用線の生成
-	SetState(std::make_shared<State_Nutoral>());	//ステートをニュートラルに設定
+	SetState(std::make_shared<State_Nutoral>());								//ステートをニュートラルに設定
 	SetAttackBehavior(std::make_shared<Attack_None>());
 	SetLockOnState(std::make_shared<LockDisable>());
+	SetArmState(std::make_shared<Arm_Normal>());
+	m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
+	m_pLifeGauge = CGaugeLife::Create(MAX_LIFE);
+	CCharacter::SetLife(MAX_LIFE);
 }
 
 //==========================================================================================
@@ -92,6 +100,11 @@ void CPlayerX::Init()
 //==========================================================================================
 void CPlayerX::Uninit()
 {
+	if (m_pLifeGauge != nullptr)
+	{
+		m_pLifeGauge->Release();
+		m_pLifeGauge = nullptr;
+	}
 	CCharacter::Uninit();
 }
 
@@ -109,25 +122,34 @@ void CPlayerX::Update()
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	m_PlayerState->Parry(this);			//パリィ中の制御
-
-	m_PlayerState->Attack(this);		//攻撃中の制御
-
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) == true)
 	{
 		m_LockOnState->Swicth(this);
 	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_9) == true)
+	{
+		CCharacter::SetLife(CCharacter::GetLife() - 100);
+	}
 
 	m_LockOnState->UpdateCam(this);
+
+	m_PlayerState->Parry(this);			//パリィ中の制御
+
+	m_PlayerState->Attack(this);		//攻撃中の制御
+
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F4))
 	{
 		SetArmParts(G_ARM_JSONNAME);
+		SetArmState(std::make_shared<Arm_Gorira>());
+		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Gorira>());
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F6))
 	{
 		SetArmParts(N_ARM_JSONNAME);
+		SetArmState(std::make_shared<Arm_Normal>());
+		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	}
-	
+
 	CCharacter::Update();
 }
 
@@ -152,6 +174,7 @@ void CPlayerX::Draw()
 
 	//ステンシルバッファへの書き込みを無効化
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
 	m_pDebugLine->Draw(CCharacter::GetPos());
 
 }
@@ -222,8 +245,7 @@ bool CPlayerX::PMove(float fCamRotZ)
 
 	CCharacter::AddMove({ sinf(moveYrot) * _MOVE_SPEED,-_GRAVITY,cosf(moveYrot) * _MOVE_SPEED });
 
-	CCharacter::SetNextMotion(MOTION_WALK);
-	
+	m_ArmState->WalkMotion(this);
 	return true;
 }
 
@@ -591,6 +613,7 @@ void CPlayerX::ToEnemyAttack()
 				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
 				{
 					pTest->SetNextMotion(4);
+					pAttackCircle->SetInvincible(true);
 					pTest->BeDamaged();
 					return;
 				}
@@ -662,11 +685,11 @@ void CPlayerX::SetArmParts(std::string filename)
 	for (auto& [key, value] : j.items()) {
 		D3DXVECTOR3 pos = { value.at("POS").at("X").get<float>(),  value.at("POS").at("Y").get<float>(), value.at("POS").at("Z").get<float>() };
 		D3DXVECTOR3 rot = { value.at("ROT").at("X").get<float>(),  value.at("ROT").at("Y").get<float>(), value.at("ROT").at("Z").get<float>() };
-		std::string filename = value.at("FILENAME").get<std::string>();
+		std::string s_filename = value.at("FILENAME").get<std::string>();
 		int Parent = value.at("PARENT").get<int>();
 		int index = value.at("INDEX").get<int>();
 
-		CModelParts* instance = CModelParts::Create({0.0f,0.0f,0.0f},filename.c_str());
+		CModelParts* instance = CModelParts::Create({0.0f,0.0f,0.0f}, s_filename.c_str());
 		instance->SetPos(pos);
 		instance->SetRot(rot);
 
