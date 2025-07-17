@@ -13,6 +13,7 @@
 constexpr int MAX_TREESET_NUM = 260;
 
 class CField_Manager;
+class CFloorNumberUI;
 
 class CGame : public CScene
 {
@@ -27,6 +28,7 @@ public:
 private:
 	void MakeRandTree();
 	std::shared_ptr< CField_Manager> m_FieldManager;
+	CFloorNumberUI* m_FloorNumberUI;
 };
 
 #endif

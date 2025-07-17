@@ -23,6 +23,7 @@
 
 #include "floor.h"
 #include "floorUI.h"
+#include "score.h"
 
 CGame::CGame()
 {
@@ -46,11 +47,13 @@ HRESULT CGame::Init()
 	CPlayerX::Create({ 200.0f,1000.0f,0.0f });
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
 	CAreaGate::Create({ 0.0f,0.0f,700.0f });
-
+	CFloorUI::Create({ 1150.0f, 75.0f, 0.0f });
+	m_FloorNumberUI = CFloorNumberUI::Create({ 900.0f, 75.0f, 0.0f });
 
 	CPlayerMask::Create();
 	CField_Manager::GetInstance()->Init();
 	CPlayerObserver::GetInstance()->PlayerSearch();
+
 	return S_OK;
 }
 
@@ -79,10 +82,9 @@ void CGame::Update()
 	{
 		CField_Manager::GetInstance()->SetField();
 	}
-	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_F))
+	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_U))
 	{
-		CFloorUI::Create(D3DXVECTOR3(1150.0f, 75.0f, 0.0f));
-		CFloorNumberUI::Create(D3DXVECTOR3(900.0f, 75.0f, 0.0f));
+		m_FloorNumberUI->AddScore(1);
 	}
 #endif // _DEBUG
 	CField_Manager::GetInstance()->Update();
