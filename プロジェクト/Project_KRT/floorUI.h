@@ -18,8 +18,15 @@ public:
 	void Init()override;				//初期化
 	void Update()override;				//更新
 
+	void SetFloorNumberUI();
+
+	void AddScore(int ntexpos) { m_nTexPos += ntexpos; SetFloorNumberUI(); SaveScore = m_nTexPos; }
+	void SetTexPos(int ntexpos) { m_nTexPos = ntexpos; }
+
 	static CBaseFloorUI* Create(D3DXVECTOR3 pos);
 private:
+	int  m_nTexPos;
+	static int SaveScore;
 };
 
 class CFloorUI : public CBaseFloorUI
@@ -35,24 +42,30 @@ public:
 private:
 };
 
+class CFloorHyphenUI : public CBaseFloorUI
+{
+public:
+	CFloorHyphenUI() {};						//コンストラクタ
+	~CFloorHyphenUI()override = default;		//デストラクタ
+	void Init()override;				//初期化
+	void Update()override;				//更新
+	void Draw()override;				//描画
+
+	static CFloorHyphenUI* Create(D3DXVECTOR3 pos);
+private:
+};
+
 class CFloorNumberUI : public CBaseFloorUI
 {
 public:
-	CFloorNumberUI();						//コンストラクタ
+	CFloorNumberUI() {};						//コンストラクタ
 	~CFloorNumberUI()override = default;		//デストラクタ
 	void Init()override;				//初期化
 	void Update()override;				//更新
 	void Draw()override;				//描画
-	
-	inline void SetScore(int nScore) { m_nTexPos = nScore; SetFloorNumberUI(); SaveScore = m_nTexPos; }
-	void AddScore(int ntexpos) { m_nTexPos += ntexpos; SetFloorNumberUI(); SaveScore = m_nTexPos; }
-	void SetTexPos(int ntexpos) { m_nTexPos = ntexpos; }
 
 	static CFloorNumberUI* Create(D3DXVECTOR3 pos);
 private:
-	void SetFloorNumberUI();
-	static int  m_nTexPos;
-	static int SaveScore;
 };
 
 class CFloorTypeUI : public CBaseFloorUI
