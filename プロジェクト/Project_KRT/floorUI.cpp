@@ -10,13 +10,13 @@
 
 namespace
 {
-	D3DXVECTOR2 FloorSize = { 200.0f, 100.0f };
-	D3DXVECTOR2 FloorNumberSize = { 50.0f, 100.0f };
-	D3DXVECTOR2 FloorTypeSize = { 100.0f, 100.0f };
+	D3DXVECTOR2 FloorSize = { 50.0f, 100.0f };
+	D3DXVECTOR2 FloorHyphenSize = { 50.0f, 50.0f };
+	D3DXVECTOR2 FloorNumberSize = { 75.0f, 100.0f };
+	D3DXVECTOR2 FloorTypeSize = { 75.0f, 100.0f };
 }
 
-int CFloorNumberUI::SaveScore = 0;
-int CFloorNumberUI::m_nTexPos = 0;
+int CBaseFloorUI::SaveScore = 0;
 
 void CBaseFloorUI::Init()
 {
@@ -27,6 +27,17 @@ void CBaseFloorUI::Init()
 void CBaseFloorUI::Update()
 {
 	CObject2D::Update();
+}
+
+void CBaseFloorUI::SetFloorNumberUI()
+{
+	int nType = 1;
+	int nValue = m_nTexPos;		//スコアをローカルにコピー
+	int Num = 0;
+	nType *= 10;			//桁数計算用の数値を設定
+	Num = (nValue % nType * 10) / nType;	//指定桁数の数字を抜き出す
+
+	CObject2D::SetAnim({ (float)Num,CObject2D::GetAnim().y });
 }
 
 CBaseFloorUI* CBaseFloorUI::Create(D3DXVECTOR3 pos)
@@ -60,17 +71,39 @@ CFloorUI* CFloorUI::Create(D3DXVECTOR3 pos)
 
 	floorUI->SetPolygonParam(pos, FloorSize.y, FloorSize.x);
 	floorUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\FAB-.png");
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\F.png");
 	floorUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
 
 	return floorUI;
 }
  
-CFloorNumberUI::CFloorNumberUI()
+void CFloorHyphenUI::Init()
 {
-
+	CObject2D::Init();
 }
 
+void CFloorHyphenUI::Update()
+{
+	CObject2D::Update();
+}
+
+void CFloorHyphenUI::Draw()
+{
+	CObject2D::Draw();
+}
+
+CFloorHyphenUI* CFloorHyphenUI::Create(D3DXVECTOR3 pos)
+{
+	CFloorHyphenUI* floorhyphenUI = new CFloorHyphenUI;
+
+	floorhyphenUI->SetPolygonParam(pos, FloorHyphenSize.y, FloorHyphenSize.x);
+	floorhyphenUI->Init();
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\-.png");
+	floorhyphenUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	return floorhyphenUI;
+}
+ 
 void CFloorNumberUI::Init()
 {
 	CObject2D::Init();
@@ -84,17 +117,6 @@ void CFloorNumberUI::Update()
 void CFloorNumberUI::Draw()
 {
 	CObject2D::Draw();
-}
-
-void CFloorNumberUI::SetFloorNumberUI()
-{
-	int nType = 1;
-	int nValue = m_nTexPos;		//スコアをローカルにコピー
-	int Num = 0;
-	nType *= 10;			//桁数計算用の数値を設定
-	Num = (nValue % nType * 10) / nType;	//指定桁数の数字を抜き出す
-
-	CObject2D::SetAnim({ (float)Num,CObject2D::GetAnim().y });
 }
 
 CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos)
@@ -130,8 +152,8 @@ CFloorTypeUI* CFloorTypeUI::Create(D3DXVECTOR3 pos)
 
 	FloorTypeUI->SetPolygonParam(pos, FloorTypeSize.y, FloorTypeSize.x);
 	FloorTypeUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\AB-.png");
-	FloorTypeUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\AB.png");
+	FloorTypeUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 2, 1);
 
 	return FloorTypeUI;
 }
