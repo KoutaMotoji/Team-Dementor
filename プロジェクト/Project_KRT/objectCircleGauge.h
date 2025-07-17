@@ -25,8 +25,9 @@ public:
         D3DXVECTOR2 tex;
       
     };
-
     static CObjectCircleGauge* Create(float radius);
+
+    static CObjectCircleGauge* Create(float radius,bool RotateReverse);
     void Init();
     void Uninit();
     void Update();
@@ -37,9 +38,6 @@ public:
     bool GetPercentCharged() const { return m_nPercent >= 1.0f; }
     void SetPolygonParam(D3DXVECTOR3 pos, float radius);
 private:
-    // =====================
-    // ÉÅÉìÉoïœêî
-    // =====================
     LPDIRECT3DVERTEXBUFFER9 m_pVtxBuffer;
     LPDIRECT3DTEXTURE9 m_pTexture;
 
@@ -47,6 +45,7 @@ private:
     float m_nPercent;
     D3DXCOLOR m_color;
     D3DXVECTOR3 m_pos;
+    bool m_bGaugeRotate;
 
     int m_nResolution;
 };

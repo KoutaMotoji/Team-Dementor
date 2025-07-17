@@ -7,6 +7,7 @@
 
 #include "xxx_player.h"
 #include "stage1_boss.h"
+#include "player_armState.h"
 #include "collision.h"
 
 //通常時のステート
@@ -35,7 +36,7 @@ void State_Nutoral::ToParry(CPlayerX* pPlayer)
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
 	{
-		pPlayer->CCharacter::SetNextMotion(CPlayerX::MOTION_PARRY);
+		pPlayer->GetArmState()->ParryMotion(pPlayer);
 		pPlayer->SetState(std::make_shared<State_Parry>());
 	}
 }
@@ -61,7 +62,7 @@ void State_Attack::ToParry(CPlayerX* pPlayer)
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
 	{
-		pPlayer->CCharacter::SetNextMotion(CPlayerX::MOTION_PARRY);
+		pPlayer->GetArmState()->ParryMotion(pPlayer);
 		pPlayer->SetState(std::make_shared<State_Parry>());
 	}
 }
@@ -75,13 +76,14 @@ void State_Parry::Parry(CPlayerX* pPlayer)
 	//パリィ状態の時のみ通す処理
 	if (pPlayer->GetNowMotion() != CPlayerX::MOTION_PARRY && pPlayer->GetNowMotion() != CPlayerX::MOTION_PARRY_ATTACK && pPlayer->GetNextMotion() != CPlayerX::MOTION_PARRY_ATTACK)
 	{
-		pPlayer->CCharacter::SetNextMotion(CPlayerX::MOTION_PARRY_STAY);
+		pPlayer->GetArmState()->ParryStayMotion(pPlayer);
+
 	}
 	pPlayer->SetParry();
 	if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetRelease(DIK_L))
 	{
-		pPlayer->CCharacter::SetNextMotion(CPlayerX::MOTION_NUTORAL);
+		pPlayer->GetArmState()->ParryMotion(pPlayer);
 		pPlayer->SetState(std::make_shared<State_Nutoral>());
 	}
 }

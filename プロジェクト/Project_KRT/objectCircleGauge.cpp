@@ -11,7 +11,7 @@
 CObjectCircleGauge::CObjectCircleGauge(int nPriority) : CObject(nPriority),
                                         m_pVtxBuffer(nullptr), m_pTexture(nullptr),
                                         m_fRadius(100.0f), m_nPercent(1.0f), m_color(D3DXCOLOR(1, 1, 1, 1)),
-                                        m_nResolution(60), m_pos({0.0f,0.0f,0.0f})
+                                        m_nResolution(60), m_pos({0.0f,0.0f,0.0f}), m_bGaugeRotate(false)
 {
 }
 
@@ -45,7 +45,10 @@ void CObjectCircleGauge::Init()
 
     for (int i = 0; i <= m_nResolution; ++i)
     {
-        float angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * i / m_nResolution * m_nPercent);
+        float t = static_cast<float>(i) / m_nResolution;
+        float angle;
+        if (m_bGaugeRotate) angle = -D3DX_PI / 2 - (2.0f * D3DX_PI * m_nPercent * t);
+        else  angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * m_nPercent * t);
         float x = cx + cosf(angle) * m_fRadius;
         float y = cy + sinf(angle) * m_fRadius;
 
@@ -64,11 +67,6 @@ void CObjectCircleGauge::Uninit()
         m_pVtxBuffer->Release();
         m_pVtxBuffer = nullptr;
     }
-
-    if (m_pTexture) {
-        m_pTexture->Release();
-        m_pTexture = nullptr;
-    }
 }
 
 void CObjectCircleGauge::Update()
@@ -79,19 +77,24 @@ void CObjectCircleGauge::Update()
     float cx = m_fRadius;
     float cy = m_fRadius;
 
-    pVtx[0] = { { cx, cy, 0.0f },1.0f, m_color, {0.5f, 0.5f} };
+    pVtx[0] = { { cx + m_pos.x, cy + m_pos.y, 0.0f },1.0f, m_color, {0.5f, 0.5f} };
 
     for (int i = 0; i <= m_nResolution; ++i)
     {
         float t = static_cast<float>(i) / m_nResolution;
-        float angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * m_nPercent * t);
-        float x = cx + sinf(angle) * m_fRadius;
-        float y = cy + cosf(angle) * m_fRadius;
+        float angle;
+        if(m_bGaugeRotate) angle = -D3DX_PI / 2 - (2.0f * D3DX_PI * m_nPercent * t);
+        else  angle = -D3DX_PI / 2 + (2.0f * D3DX_PI * m_nPercent * t);
 
-        float u = 0.5f + sinf(angle) * 0.5f;
-        float v = 0.5f + cosf(angle) * 0.5f;
+        float x = cx + cosf(angle) * m_fRadius;
+        float y = cy + sinf(angle) * m_fRadius;
 
-        pVtx[i + 1] = { { m_pos.x + x, m_pos.y + y, 0.0f },1.0f, m_color, {u, v }  };
+        float u = 0.5f + cosf(angle) * 0.5f;
+        float v = 0.5f + sinf(angle) * 0.5f;
+        x += m_pos.x;
+        y += m_pos.y;
+
+        pVtx[i + 1] = { {x, y, 0.0f },1.0f, m_color, {u, v }  };
     }
 
     m_pVtxBuffer->Unlock();
@@ -102,10 +105,11 @@ void CObjectCircleGauge::Draw()
     LPDIRECT3DDEVICE9 pDevice;
     //デバイスの取得
     pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+    pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);	//カリング両面に
 
-    pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+    /*pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
     pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);*/
 
     pDevice->SetStreamSource(0, m_pVtxBuffer, 0, sizeof(VERTEX));
 
@@ -116,6 +120,8 @@ void CObjectCircleGauge::Draw()
     pDevice->DrawPrimitive(D3DPT_TRIANGLEFAN,
                              0,
                              m_nResolution);
+    pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);	//カリング戻し
+
 }
 
 
@@ -135,6 +141,20 @@ CObjectCircleGauge* CObjectCircleGauge::Create(float radius)
     CObjectCircleGauge* gauge = new CObjectCircleGauge();
     gauge->m_fRadius = radius;
     gauge->Init();
+    gauge->m_bGaugeRotate = false;
+    return gauge;
+}
+
+
+//==========================================================================================
+//生成処理
+//==========================================================================================
+CObjectCircleGauge* CObjectCircleGauge::Create(float radius,bool RotateReverse)
+{
+    CObjectCircleGauge* gauge = new CObjectCircleGauge();
+    gauge->m_fRadius = radius;
+    gauge->Init();
+    gauge->m_bGaugeRotate = RotateReverse;
     return gauge;
 }
 
