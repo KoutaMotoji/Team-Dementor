@@ -11,6 +11,7 @@
 #include "object2D.h"
 #include "objectCircleGauge.h"
 
+//プレイヤーHPゲージ本体
 class CGaugeLife :public CObject2D
 {
 public:
@@ -25,6 +26,7 @@ private:
 	void SetGauge();
 };
 
+//プレイヤーHPゲージの外側フレーム
 class CGaugeLiFrame :public CObject2D
 {
 public:
@@ -37,6 +39,7 @@ public:
 private:
 };
 
+//プレイヤーHPゲージの裏側
 class CGaugeLiBack :public CObject2D
 {
 public:
@@ -49,6 +52,7 @@ public:
 private:
 };
 
+//プレイヤーHPゲージの装飾
 class CGaugeLiDeco :public CObject2D
 {
 public:
@@ -61,6 +65,7 @@ public:
 private:
 };
 
+//円形ゲージ(用途未定)
 class CGaugeCircle :public CObjectCircleGauge
 {
 public:
@@ -74,6 +79,7 @@ public:
 private:
 };
 
+//円形ゲージ裏側
 class CGaugeCircleDeco :public CObject2D
 {
 public:
@@ -83,6 +89,52 @@ public:
 	void Draw()override;		//描画
 
 	static CGaugeCircleDeco* Create();
+private:
+};
+
+//腕パーツUI-文字
+class CWeaponUI_Sub :public CObject2D
+{
+public:
+	CWeaponUI_Sub(int nPriority = 4) : CObject2D(nPriority) {};		//コンストラクタ
+	~CWeaponUI_Sub()override = default;				//デストラクタ
+	void Init()override;		//初期化
+
+	static CWeaponUI_Sub* Create();
+private:
+};
+//腕パーツUI-背景
+class CWeaponUI_Back :public CObject2D
+{
+public:
+	CWeaponUI_Back(int nPriority = 3) : CObject2D(nPriority) {};		//コンストラクタ
+	~CWeaponUI_Back()override = default;				//デストラクタ
+	void Init()override;		//初期化
+
+	static CWeaponUI_Back* Create();
+private:
+};
+
+//腕パーツUI-なにもなし
+class CWeaponUI_Main :public CObject2D
+{
+public:
+	CWeaponUI_Main(int nPriority = 4) : CObject2D(nPriority) {};		//コンストラクタ
+	~CWeaponUI_Main()override = default;				//デストラクタ
+	void Init()override;		//初期化
+
+	static CWeaponUI_Main* Create();
+private:
+};
+//腕パーツUI-ゴリラ
+class CWeaponUI_Main_Gorira :public CWeaponUI_Main
+{
+public:
+	CWeaponUI_Main_Gorira()  {};		//コンストラクタ
+	~CWeaponUI_Main_Gorira()override = default;				//デストラクタ
+	void Init()override;		//初期化
+
+	static CWeaponUI_Main_Gorira* Create();
 private:
 };
 

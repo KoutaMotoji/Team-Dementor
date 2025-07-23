@@ -17,25 +17,25 @@ private:
 
 public:
 	//腕の状態によって変化するモーションを別々に扱う用の関数(攻撃モーションは別で管理)
-	virtual void WalkMotion(CPlayerX* pPlayer) = 0;
-	virtual void ParryMotion(CPlayerX* pPlayer) = 0;
-	virtual void ParryStayMotion(CPlayerX* pPlayer) = 0;
+	virtual void WalkMotion([[maybe_unused]]CPlayerX* pPlayer) = 0;
+	virtual void ParryMotion([[maybe_unused]]CPlayerX* pPlayer) = 0;
+	virtual void ParryStayMotion([[maybe_unused]]CPlayerX* pPlayer) = 0;
 };
 
 //通常腕の時の振る舞いを管理するクラス
 class Arm_Normal : public PlayerArm_State
 {
-	void WalkMotion(CPlayerX* pPlayer)override;
-	void ParryMotion(CPlayerX* pPlayer) override;
-	void ParryStayMotion(CPlayerX* pPlayer) override;
+	void WalkMotion([[maybe_unused]]CPlayerX* pPlayer)override;
+	void ParryMotion([[maybe_unused]]CPlayerX* pPlayer) override;
+	void ParryStayMotion([[maybe_unused]]CPlayerX* pPlayer) override;
 };
 
 //ゴリラ腕の時の振る舞いを管理するクラス
 class Arm_Gorira : public PlayerArm_State
 {
-	void WalkMotion(CPlayerX* pPlayer)override;
-	void ParryMotion(CPlayerX* pPlayer) override;
-	void ParryStayMotion(CPlayerX* pPlayer) override;
+	void WalkMotion([[maybe_unused]]CPlayerX* pPlayer)override;
+	void ParryMotion([[maybe_unused]]CPlayerX* pPlayer) override;
+	void ParryStayMotion([[maybe_unused]]CPlayerX* pPlayer) override;
 };
 
 

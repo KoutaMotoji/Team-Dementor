@@ -93,6 +93,7 @@ void CPlayerX::Init()
 	m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	m_pLifeGauge = CGaugeLife::Create(MAX_LIFE);
 	CCharacter::SetLife(MAX_LIFE);
+	m_pWeaponIcon = CWeaponUI_Main::Create();
 }
 
 //==========================================================================================
@@ -104,6 +105,11 @@ void CPlayerX::Uninit()
 	{
 		m_pLifeGauge->Release();
 		m_pLifeGauge = nullptr;
+	}
+	if (m_pWeaponIcon != nullptr)
+	{
+		m_pWeaponIcon->Release();
+		m_pWeaponIcon = nullptr;
 	}
 	CCharacter::Uninit();
 }
@@ -140,12 +146,18 @@ void CPlayerX::Update()
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F4))
 	{
 		SetArmParts(G_ARM_JSONNAME);
+		m_pWeaponIcon->Release();
+		m_pWeaponIcon = nullptr;
+		m_pWeaponIcon = CWeaponUI_Main_Gorira::Create();
 		SetArmState(std::make_shared<Arm_Gorira>());
 		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Gorira>());
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F6))
 	{
 		SetArmParts(N_ARM_JSONNAME);
+		m_pWeaponIcon->Release();
+		m_pWeaponIcon = nullptr;
+		m_pWeaponIcon = CWeaponUI_Main::Create();
 		SetArmState(std::make_shared<Arm_Normal>());
 		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	}

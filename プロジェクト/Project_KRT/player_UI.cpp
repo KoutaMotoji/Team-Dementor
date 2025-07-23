@@ -18,12 +18,26 @@ namespace
 	std::string _FILENAME_HP_DECO = "data\\TEXTURE\\playerHPdeco.png";
 	std::string _FILENAME_HP_CIRCLEGAUGE = "data\\TEXTURE\\UI000.png";
 
+	std::string _FILENAME_WEAPON_SUB = "data\\TEXTURE\\weapon.png";
+	std::string _FILENAME_WEAPON_BACK = "data\\TEXTURE\\WeaponUI_Sub.png";
+	std::string _FILENAME_WEAPON_MAIN = "data\\TEXTURE\\Weapn_free.png";
+	std::string _FILENAME_WEAPON_GORIRA = "data\\TEXTURE\\Boss000.png";
 
-	D3DXVECTOR2 _HP_GAUGE_SIZE = {400.0f,70.0f};
-	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = {600.0f,80.0f};
-	D3DXVECTOR3 _HP_GAUGE_POS = { (_HP_GAUGE_DECO_SIZE.x * 0.5f) - 50.0f,SCREEN_HEIGHT - (_HP_GAUGE_DECO_SIZE.y * 0.5f),0.0f };
-	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x + 50.0f,_HP_GAUGE_POS.y,0.0f };
+
+
+	D3DXVECTOR2 _HP_GAUGE_SIZE = {400.0f,70.0f};		//HPƒQ[ƒW‚ÌUIƒTƒCƒY
+	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = {600.0f,80.0f};	//HPƒQ[ƒW‘•üƒTƒCƒY
+	D3DXVECTOR3 _HP_GAUGE_POS = { (_HP_GAUGE_DECO_SIZE.x * 0.5f) - 50.0f,SCREEN_HEIGHT - (_HP_GAUGE_DECO_SIZE.y * 0.5f),0.0f };		//HPƒQ[ƒW‚ÌUIÀ•W
+	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x + 50.0f,_HP_GAUGE_POS.y,0.0f };		//HPƒQ[ƒW‚ÌUIÀ•W
 	D3DXVECTOR3 _HP_GAUGE_CIRCLE_POS = { 1000.0f,500.0f,0.0f };
+
+	D3DXVECTOR3 _WEAPON_SUBUI_POS = { _HP_GAUGE_POS.x ,_HP_GAUGE_POS.y - 60.0f,0.0f };
+	D3DXVECTOR3 _WEAPON_SUBUI_SIZE = { 500.0f ,80.0f,0.0f };
+	D3DXVECTOR3 _WEAPON_BACKUI_POS = { _WEAPON_SUBUI_POS.x - 50.0f,_WEAPON_SUBUI_POS.y ,0.0f };
+	D3DXVECTOR3 _WEAPON_BACKUI_SIZE = { 150.0f ,30.0f,0.0f };
+	D3DXVECTOR3 _WEAPON_UI_POS = { _WEAPON_SUBUI_POS.x + 100.0f,_WEAPON_SUBUI_POS.y ,0.0f };
+	D3DXVECTOR3 _WEAPON_UI_SIZE = { 80.0f ,80.0f,0.0f };
+
 
 	float _GAUGE_RADIUS = 100.0f;
 
@@ -54,6 +68,8 @@ void CGaugeLife::Init()
 	CGaugeLiDeco::Create();
 	CGaugeCircle::Create();
 	CGaugeCircleDeco::Create();
+	CWeaponUI_Sub::Create();
+	CWeaponUI_Back::Create();
 
 	CObject::SetType(TYPE_2D_UI);
 	CObject2D::Init();
@@ -353,6 +369,106 @@ CGaugeCircleDeco* CGaugeCircleDeco::Create()
 		0.0f
 	};
 	gauge->SetPolygonParam(pos, _GAUGE_RADIUS * 2, _GAUGE_RADIUS * 2, { 1.0f,1.0f,1.0f,0.4f });
+	gauge->Init();
+
+	return gauge;
+}
+
+//==========================================================================================
+//‘•”õUI•¶š‚Ì‰Šú‰»
+//==========================================================================================
+void CWeaponUI_Sub::Init()
+{
+	//ƒeƒNƒXƒ`ƒƒ‚Ì“o˜^EŠ„‚è“–‚Ä
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_WEAPON_SUB.c_str());
+	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	CObject::SetType(TYPE_2D_UI);
+	CObject2D::Init();
+}
+
+//==========================================================================================
+//‘•”õUI•¶š‚Ì¶¬
+//==========================================================================================
+CWeaponUI_Sub* CWeaponUI_Sub::Create()
+{
+	CWeaponUI_Sub* gauge = new CWeaponUI_Sub;
+	gauge->SetPolygonParam(_WEAPON_BACKUI_POS, _WEAPON_BACKUI_SIZE.y, _WEAPON_BACKUI_SIZE.x);
+	gauge->Init();
+
+	return gauge;
+}
+
+//==========================================================================================
+//‘•”õUI”wŒi‚Ì‰Šú‰»
+//==========================================================================================
+void CWeaponUI_Back::Init()
+{
+	//ƒeƒNƒXƒ`ƒƒ‚Ì“o˜^EŠ„‚è“–‚Ä
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_WEAPON_BACK.c_str());
+	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	CObject::SetType(TYPE_2D_UI);
+	CObject2D::Init();
+}
+
+//==========================================================================================
+//‘•”õUI”wŒi‚Ì¶¬
+//==========================================================================================
+CWeaponUI_Back* CWeaponUI_Back::Create()
+{
+	CWeaponUI_Back* gauge = new CWeaponUI_Back;
+	gauge->SetPolygonParam(_WEAPON_SUBUI_POS, _WEAPON_SUBUI_SIZE.y, _WEAPON_SUBUI_SIZE.x);
+	gauge->Init();
+
+	return gauge;
+}
+
+//==========================================================================================
+//‘•”õUI(‚È‚µ)‚Ì‰Šú‰»
+//==========================================================================================
+void CWeaponUI_Main::Init()
+{
+	//ƒeƒNƒXƒ`ƒƒ‚Ì“o˜^EŠ„‚è“–‚Ä
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_WEAPON_MAIN.c_str());
+	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	CObject::SetType(TYPE_2D_UI);
+	CObject2D::Init();
+}
+
+//==========================================================================================
+//‘•”õUI(‚È‚µ)‚Ì¶¬
+//==========================================================================================
+CWeaponUI_Main* CWeaponUI_Main::Create()
+{
+	CWeaponUI_Main* gauge = new CWeaponUI_Main;
+	gauge->SetPolygonParam(_WEAPON_UI_POS, _WEAPON_UI_SIZE.y, _WEAPON_UI_SIZE.x);
+	gauge->Init();
+
+	return gauge;
+}
+
+//==========================================================================================
+//‘•”õUI(ƒSƒŠƒ‰)‚Ì‰Šú‰»
+//==========================================================================================
+void CWeaponUI_Main_Gorira::Init()
+{
+	//ƒeƒNƒXƒ`ƒƒ‚Ì“o˜^EŠ„‚è“–‚Ä
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_WEAPON_GORIRA.c_str());
+	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
+
+	CObject::SetType(TYPE_2D_UI);
+	CObject2D::Init();
+}
+
+//==========================================================================================
+//‘•”õUI(ƒSƒŠƒ‰)‚Ì¶¬
+//==========================================================================================
+CWeaponUI_Main_Gorira* CWeaponUI_Main_Gorira::Create()
+{
+	CWeaponUI_Main_Gorira* gauge = new CWeaponUI_Main_Gorira;
+	gauge->SetPolygonParam(_WEAPON_UI_POS, _WEAPON_UI_SIZE.y, _WEAPON_UI_SIZE.x);
 	gauge->Init();
 
 	return gauge;
