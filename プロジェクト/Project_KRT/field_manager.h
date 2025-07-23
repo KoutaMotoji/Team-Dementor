@@ -13,6 +13,8 @@
 
 //ëOï˚êÈåæ
 class FieldDissolve;
+class CFloorNumberUI;
+class CFloorTypeUI;
 
 class CField_Manager
 {
@@ -22,7 +24,7 @@ private:
 
 	int m_FieldNum;
 	bool m_bActibateManager;
-	std::vector<CObjectX*> m_vecFieldObj;
+	std::vector<CObject*> m_vecFieldObj;
 public:
 	CField_Manager() :m_bActibateManager(false), m_FieldNum(0), m_FieldDissolve(nullptr){}
 	~CField_Manager() { }
@@ -38,8 +40,11 @@ public:
 	void Uninit();
 	void Update();
 	void ChangeField(int Num) { m_vecFieldObj.clear(); m_FieldNum = Num; };
-	void RegistObj(CObjectX* objX) {m_vecFieldObj.push_back(objX); }
+	void RegistObj(CObject* obj) {m_vecFieldObj.push_back(obj); }
 	void SetField();
+
+	CFloorNumberUI* m_FloorNumberUI;
+	CFloorTypeUI* m_FloorTypeUI;
 };
 
 class FieldDissolve : public CObject2D

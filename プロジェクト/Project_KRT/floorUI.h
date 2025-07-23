@@ -64,7 +64,7 @@ public:
 	void Update()override;				//更新
 	void Draw()override;				//描画
 
-	static CFloorNumberUI* Create(D3DXVECTOR3 pos);
+	static CFloorNumberUI* Create(D3DXVECTOR3 pos,int i);
 private:
 };
 
@@ -77,7 +77,7 @@ public:
 	void Update()override;					//更新
 	void Draw()override;					//描画
 		
-	static CFloorTypeUI* Create(D3DXVECTOR3 pos);
+	static CFloorTypeUI* Create(D3DXVECTOR3 pos, int i);
 private:
 	int  m_nTexPos;
 };

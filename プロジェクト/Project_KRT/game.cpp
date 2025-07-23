@@ -48,9 +48,9 @@ HRESULT CGame::Init()
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
 	CAreaGate::Create({ 0.0f,0.0f,700.0f });
 	CFloorUI::Create({ 1050.0f, 75.0f, 0.0f });
-	m_FloorNumberUI = CFloorNumberUI::Create({ 1110.0f, 75.0f, 0.0f });
+	m_FloorNumberUI = CFloorNumberUI::Create({ 1110.0f, 75.0f, 0.0f },1);
 	CFloorHyphenUI::Create({ 1160.0f, 75.0f, 0.0f });
-	m_FloorTypeUI = CFloorTypeUI::Create({ 1225.0f,75.0f,0.0f });
+	m_FloorTypeUI = CFloorTypeUI::Create({ 1225.0f,75.0f,0.0f },0);
 
 	CPlayerMask::Create();
 	CField_Manager::GetInstance()->Init();

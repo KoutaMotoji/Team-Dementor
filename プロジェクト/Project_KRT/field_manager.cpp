@@ -9,6 +9,7 @@
 #include "stage1_boss.h"
 
 #include "floor_stone.h"
+#include "floorUI.h"
 
 namespace
 {
@@ -66,6 +67,12 @@ void CField_Manager::Update()
 	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
 	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
 	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+
+	//フロアのUI生成
+	CFloorUI::Create({ 1050.0f, 75.0f, 0.0f });
+	m_FloorNumberUI = CFloorNumberUI::Create({ 1110.0f, 75.0f, 0.0f },1);
+	CFloorHyphenUI::Create({ 1160.0f, 75.0f, 0.0f });
+	m_FloorTypeUI = CFloorTypeUI::Create({ 1225.0f,75.0f,0.0f },1);
 
 	m_FieldDissolve->RestartDissolve();
 	m_bActibateManager = false;

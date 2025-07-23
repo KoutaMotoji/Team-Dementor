@@ -7,6 +7,7 @@
 
 #include "floorUI.h"
 #include "manager.h"
+#include "field_manager.h"
 
 namespace
 {
@@ -22,6 +23,7 @@ void CBaseFloorUI::Init()
 {
 	CObject::SetType(TYPE_2D_UI);
 	CObject2D::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 void CBaseFloorUI::Update()
@@ -53,6 +55,7 @@ CBaseFloorUI* CBaseFloorUI::Create(D3DXVECTOR3 pos)
 void CFloorUI::Init()
 {
 	CObject2D::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 void CFloorUI::Update()
@@ -80,6 +83,7 @@ CFloorUI* CFloorUI::Create(D3DXVECTOR3 pos)
 void CFloorHyphenUI::Init()
 {
 	CObject2D::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 void CFloorHyphenUI::Update()
@@ -107,6 +111,7 @@ CFloorHyphenUI* CFloorHyphenUI::Create(D3DXVECTOR3 pos)
 void CFloorNumberUI::Init()
 {
 	CObject2D::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 void CFloorNumberUI::Update()
@@ -119,7 +124,7 @@ void CFloorNumberUI::Draw()
 	CObject2D::Draw();
 }
 
-CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos)
+CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos, int i)
 {
 	CFloorNumberUI* FloorNumberUI = new CFloorNumberUI;
 
@@ -127,6 +132,7 @@ CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos)
 	FloorNumberUI->Init();
 	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\number000.png");
 	FloorNumberUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 10, 1);
+	FloorNumberUI->AddScore(i);
 
 	return FloorNumberUI;
 }
@@ -134,6 +140,7 @@ CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos)
 void CFloorTypeUI::Init()
 {
 	CObject2D::Init();
+	CField_Manager::GetInstance()->RegistObj(this);
 }
 
 void CFloorTypeUI::Update()
@@ -146,7 +153,7 @@ void CFloorTypeUI::Draw()
 	CObject2D::Draw();
 }
 
-CFloorTypeUI* CFloorTypeUI::Create(D3DXVECTOR3 pos)
+CFloorTypeUI* CFloorTypeUI::Create(D3DXVECTOR3 pos, int i)
 {
 	CFloorTypeUI* FloorTypeUI = new CFloorTypeUI;
 
@@ -154,6 +161,7 @@ CFloorTypeUI* CFloorTypeUI::Create(D3DXVECTOR3 pos)
 	FloorTypeUI->Init();
 	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\AB.png");
 	FloorTypeUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 2, 1);
+	FloorTypeUI->AddScore(i);
 
 	return FloorTypeUI;
 }
