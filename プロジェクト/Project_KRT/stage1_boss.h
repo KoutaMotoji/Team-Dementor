@@ -15,6 +15,7 @@
 
 //前方宣言
 class Stage1Boss_State;
+class CStage1BossGaugeLife;
 
 class CG_Gorira :public CCharacter
 {
@@ -58,7 +59,7 @@ private:
 
 	std::shared_ptr<Stage1Boss_State> m_State;
 	//ステータス用定数
-
+	CStage1BossGaugeLife* m_HPGauge;
 	D3DXVECTOR3 m_OldPos;					//過去の位置
 
 	void FloorCollision();					//床との当たり判定
