@@ -141,13 +141,102 @@ void LockEnable::UpdateCam([[maybe_unused]]CPlayerX* pPlayer)
 			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
 			if (pTest == nullptr) continue;
 
-			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(pPlayer->CCharacter::GetMatrix(), pTest->CCharacter::GetPos());
+			D3DXMATRIX mat = pPlayer->CCharacter::GetMatrix();
+			D3DXVECTOR3 posEnemy = pTest->CCharacter::GetPos();
+
+			D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
+
+			D3DXVECTOR3 pos = { 0.0f,200.0f,-700.0f };
+			D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
+
+			//マトリックスから位置を抽出
+			D3DXVECTOR3 mtxPos1 = {
+			mat._41,
+			mat._42,
+			mat._43
+			};
+
+			D3DXVECTOR3 PlayerPos = { mtxPos1.x,0.0f,mtxPos1.z };
+			D3DXVECTOR3 EnemyPos = { posEnemy.x,0.0f,posEnemy.z };
+
+			D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+			D3DXVec3Normalize(&dir, &dir);
+
+			float Yaw = atan2f(dir.x, dir.z);
+
+			D3DXMATRIX RotY;
+			D3DXVECTOR3 RotateOffset;
+
+			D3DXMatrixRotationY(&RotY, Yaw);
+			D3DXVec3TransformCoord(&RotateOffset, &pos, &RotY);
+
+			D3DXVECTOR3 CamPos = mtxPos1 + RotateOffset;
+
+			CManager::GetInstance()->GetCamera()->SetRotz(Yaw);
+
+			CManager::GetInstance()->GetCamera()->SetPlayerPos(PlayerPos);
+			CManager::GetInstance()->GetCamera()->SetEnemyPos(EnemyPos);
+			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(CamPos, EnemyPos);
 		}
 	}
 }
 
 //非ロックオン時のステート
 void LockDisable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj == nullptr) continue;
+
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
+			if (pTest == nullptr) continue;
+
+			D3DXMATRIX mat = pPlayer->CCharacter::GetMatrix();
+			D3DXMATRIX matEnemy = pTest->CCharacter::GetMatrix();
+			D3DXVECTOR3 posEnemy = pTest->CCharacter::GetPos();
+			D3DXVECTOR3 posPlayer = pPlayer->CCharacter::GetPos();
+
+			//マトリックスから位置を抽出
+			D3DXVECTOR3 mtxPos1 = {
+			mat._41,
+			mat._42,
+			mat._43
+			};
+
+			//マトリックスから位置を抽出
+			D3DXVECTOR3 mtxPos21 = {
+			matEnemy._41,
+			matEnemy._42,
+			matEnemy._43
+			};
+
+			D3DXVECTOR3 PlayerPos = { mtxPos1.x,0.0f,mtxPos1.z };
+			D3DXVECTOR3 EnemyPos = { mtxPos21.x,0.0f,mtxPos21.z };
+
+			D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
+
+			D3DXVECTOR3 pos = { 0.0f,200.0f,-700.0f };
+
+			D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+			D3DXVec3Normalize(&dir, &dir);
+
+			float Yaw = atan2f(dir.x, dir.z);
+
+			D3DXMATRIX RotY;
+			D3DXVECTOR3 RotateOffset;
+
+			D3DXMatrixRotationY(&RotY, Yaw);
+			D3DXVec3TransformCoord(&RotateOffset, &pos, &RotY);
+
+			D3DXVECTOR3 CamPos = mtxPos1 + RotateOffset;
+
+			CManager::GetInstance()->GetCamera()->SetPlayerPos(PlayerPos);
+			CManager::GetInstance()->GetCamera()->SetEnemyPos(EnemyPos);
+			CManager::GetInstance()->GetCamera()->SetFreeCam(&CamPos, &EnemyPos, 40);
+		}
+	}
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
 
