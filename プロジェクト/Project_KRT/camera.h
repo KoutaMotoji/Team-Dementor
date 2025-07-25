@@ -26,10 +26,10 @@ public:
 	inline D3DXVECTOR3 GetPosV() { return m_posV; }
 	inline D3DXVECTOR3& GetPlayerPos() { return m_PlayerPos; }
 	inline void SetPlayerPos(D3DXVECTOR3 pos) { m_PlayerPos = pos; m_bLockOnCam = false;}
+	void SetEnemyPos(const D3DXVECTOR3& pos) { m_EnemyPos = pos; }
 	inline void SetLockOnPos(D3DXVECTOR3 pos) { m_LockOnPos = pos; m_bLockOnCam = true; }
 	inline float GetRotZ() { return m_fRotZ; }
-
-	void SetFreeCam(D3DXVECTOR3 destPosV, D3DXVECTOR3 destPosR, int Frame);
+	void SetFreeCam(D3DXVECTOR3* destPosV, D3DXVECTOR3* destPosR, int Frame);
 	inline void DefuseFreeCam() { m_bFreeCam = false; }
 	void SetRotz(float rot);
 	inline void AddRotz(float rot) { m_fRotZ += rot; }
@@ -48,12 +48,12 @@ public:
 		m_fRotZ = 0.0f;
 	};
 
-	void UpdateLockOnCam(D3DXMATRIX mat, D3DXVECTOR3 posEnemy);
+	void UpdateLockOnCam(D3DXVECTOR3 posPlayer, D3DXVECTOR3 posEnemy);
 
 private:
 	void UpdateNormalCam();
 	void UpdateFreeCam();
-	D3DXVECTOR3 m_posV, m_posR, m_posU,m_rot,m_PlayerPos,m_LockOnPos;
+	D3DXVECTOR3 m_posV, m_posR, m_posU,m_rot,m_PlayerPos, m_EnemyPos,m_LockOnPos;
 	D3DXMATRIX m_mtxProjection, m_mtxView;
 	float m_fRotZ;
 	float m_camDistance;
@@ -61,7 +61,13 @@ private:
 	int m_nShakeFlame;
 	float m_fShalePower;
 
-	D3DXVECTOR3 m_DestPosV, m_DestPosR,m_LastPosV,m_LastPosR;
+	D3DXVECTOR3 m_DestPosV;
+	D3DXVECTOR3 m_DestPosR;
+	D3DXVECTOR3 m_LastPosV;
+	D3DXVECTOR3 m_LastPosR;
+	D3DXVECTOR3 m_StartPlayerPos;
+	D3DXVECTOR3 m_StartEnemyPos;
+
 	int m_DestFrame,m_NowFrame;
 	bool m_bFreeCam,m_bLockOnCam;
 
