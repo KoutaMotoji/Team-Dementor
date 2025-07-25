@@ -22,6 +22,8 @@ public:
 	static CMeshCylinder* Create(D3DXVECTOR3 pos);
 
 	inline D3DXVECTOR3 GetPos() { return m_pos; }
+	void SetTexture(const LPDIRECT3DDEVICE9 pDevice,std::string filename);
+
 private:
 	int m_nVtx;
 

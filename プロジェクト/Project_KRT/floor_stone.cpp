@@ -91,7 +91,7 @@ CMeshGround* CMeshGround::Create(D3DXVECTOR3 pos)
 CMeshGround* CMeshGround::Create(D3DXVECTOR3 pos,int i)
 {
 	CMeshGround* enemy = new CMeshGround;
-	enemy->BindModel("data\\MODEL\\FieldKari2.x");
+	enemy->BindModel("data\\MODEL\\boss_field000.x");
 	enemy->SetModelParam(pos);
 	enemy->Init();
 	return enemy;

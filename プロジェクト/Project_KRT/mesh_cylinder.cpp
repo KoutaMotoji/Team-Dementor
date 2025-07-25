@@ -47,10 +47,7 @@ void CMeshCylinder::Init()
 	CObject::SetType(TYPE_BG);
 
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();;
-	//テクスチャの読み込み
-	D3DXCreateTextureFromFile(pDevice,
-		"data\\TEXTURE\\sky_bg001.png",
-		&m_apTexMeshCylinder);
+	SetTexture(pDevice, "data\\TEXTURE\\sky_bg001.png");
 	//頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * MAX_VTX,
 		D3DUSAGE_WRITEONLY,
@@ -123,6 +120,7 @@ void CMeshCylinder::Init()
 
 	m_pIdxBuffMeshCylinder->Unlock();
 }
+
 
 //==========================================================================================
 //終了処理
@@ -219,4 +217,12 @@ CMeshCylinder* CMeshCylinder::Create(D3DXVECTOR3 pos)
 	field->m_pos = pos;
 	field->m_pos.y += MAX_HEIGHT * 0.6;
 	return field;
+}
+
+void CMeshCylinder::SetTexture(const LPDIRECT3DDEVICE9 pDevice, std::string filename)
+{
+	//テクスチャの読み込み
+	D3DXCreateTextureFromFile(pDevice,
+		filename.c_str(),
+		&m_apTexMeshCylinder);
 }

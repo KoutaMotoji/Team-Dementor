@@ -34,6 +34,8 @@ namespace
 	D3DXCOLOR _DRAW_COLOR_SPHIRE = { 0.1f,1.0f,1.0f,1.0f };
 
 }
+bool CDebugLine::m_bDraw = false;
+
 CDebugLine::~CDebugLine()
 {
 	m_IdxPair.clear();
@@ -53,7 +55,10 @@ void CDebugLine::Init()
 
 void CDebugLine::Draw(D3DXVECTOR3 pos)
 {
-
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_F10))
+	{
+		m_bDraw = !m_bDraw;
+	}
 }
 
 
@@ -118,11 +123,18 @@ void CDebugLineSphire::Init()
 
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	D3DXCreateLine(pDevice, &m_pLine);
+#ifdef _DEBUG
+	m_bDraw = true;
+	return;
+#endif // _DEBUG
+	m_bDraw = false;
 }
 
 void CDebugLineSphire::Draw(D3DXVECTOR3 pos)
 {
 #ifdef _DEBUG
+	CDebugLine::Draw({ 0.0f,0.0f,0.0f });
+	if (!m_bDraw)return;
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	// ライトの無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
@@ -226,6 +238,11 @@ void CDebugLineCylinder::Init()
 
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	D3DXCreateLine(pDevice, &m_pLine);
+#ifdef _DEBUG
+	m_bDraw = true;
+	return;
+#endif // _DEBUG
+	m_bDraw = false;
 }
 
 
@@ -233,6 +250,8 @@ void CDebugLineCylinder::Init()
 void CDebugLineCylinder::Draw(D3DXVECTOR3 pos)
 {
 #ifdef _DEBUG
+	CDebugLine::Draw({ 0.0f,0.0f,0.0f });
+	if (!m_bDraw)return;
 
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
 	// ライトの無効化

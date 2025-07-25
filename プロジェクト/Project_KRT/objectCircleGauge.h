@@ -33,6 +33,8 @@ public:
     void Update();
     void Draw();
 
+    void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }
+    void SetColor(D3DXCOLOR col) { m_color = col; }
     void BindTexture(LPDIRECT3DTEXTURE9 pTex);
     void SetGaugePercent(float percent);   // 0.0f ~ 1.0f
     bool GetPercentCharged() const { return m_nPercent >= 1.0f; }

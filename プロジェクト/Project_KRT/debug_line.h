@@ -26,8 +26,9 @@ protected:
 	};
 	std::vector<IdxPair>m_IdxPair;
 	LPD3DXLINE m_pLine;
+	static bool m_bDraw;
 private:
-
+	
 };
 
 class CDebugLineSphire : public CDebugLine

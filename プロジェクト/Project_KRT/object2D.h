@@ -31,6 +31,8 @@ public:
 	inline void SetPos(D3DXVECTOR3 pos) { m_pos = pos; }		//座標変更
 	inline D3DXVECTOR3 GetRot() { return m_rot; }				//角度取得
 	inline void AddRot(D3DXVECTOR3 rot) { m_rot += rot; }		//角度移動
+	inline void SetRot(D3DXVECTOR3 rot) { m_rot = rot; }		//角度移動
+
 	inline D3DXVECTOR2 GetAnim() { return { (float)m_AnimU,(float)m_AnimV }; }					//アニメーション取得
 	inline void SetAnim(D3DXVECTOR2 Anim) {m_AnimU = (int)Anim.x; m_AnimV = (int)Anim.y;}		//アニメーション移動
 	inline float GetSize() {return m_fLength * m_fZoom;}					//大きさ取得

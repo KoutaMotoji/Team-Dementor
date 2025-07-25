@@ -45,6 +45,7 @@ public:
 	CTitleBG() {};		//コンストラクタ
 	~CTitleBG()override = default;				//デストラクタ
 	void Init()override;		//初期化
+	void Draw()override;		//初期化
 
 	static CTitleBG* Create();
 private:

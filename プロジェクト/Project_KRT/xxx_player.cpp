@@ -128,7 +128,8 @@ void CPlayerX::Update()
 
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
-	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) == true)
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) ||
+		CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_THUMB))
 	{
 		m_LockOnState->Swicth(this);
 	}
@@ -308,7 +309,6 @@ void CPlayerX::FloorCollision()
 			// ----- 接地時処理 -----
 			if (bIsHit)
 			{
-				CamFloorCollision(pMesh);
 				CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
 				FloorbumpyMesh(pMesh);
 				return;
@@ -632,51 +632,6 @@ void CPlayerX::ToEnemyAttack()
 			}	
 		}
 	}
-}
-
-//==========================================================================================
-// 地形とカメラの当たり判定
-//==========================================================================================
-void CPlayerX::CamFloorCollision(LPD3DXMESH pMesh)
-{
-	D3DXVECTOR3 HeadPos;
-	CModelParts* HeadModel = nullptr;
-	for (auto& e : CCharacter::GetModelPartsVec())
-	{
-		if (e != nullptr)
-		{
-			if (e->GetIndex() == 2)
-			{
-				HeadModel = e;
-			}
-		}
-	}
-	HeadPos = {
-		HeadModel->GetWorldMatrix()._41,
-		HeadModel->GetWorldMatrix()._42,
-		HeadModel->GetWorldMatrix()._43
-	};
-
-	// 地形判定
-	BOOL  bIsHit = false;
-	float fLandDistance{};
-	DWORD dwHitIndex = 0U;
-	float fHitU{};
-	float fHitV{};
-	
-	D3DXVECTOR3 dir{};
-	dir = CManager::GetInstance()->GetCamera()->GetPosV() - HeadPos;
-
-	D3DXVec3Normalize(&dir, &dir);
-
-	D3DXIntersect(pMesh, &HeadPos, &dir, &bIsHit, &dwHitIndex, &fHitU, &fHitV, &fLandDistance, nullptr, nullptr);
-	
-	if (bIsHit)
-	{
-		CManager::GetInstance()->GetCamera()->SetCameraDistance(fLandDistance);
-		return;
-	}
-	CManager::GetInstance()->GetCamera()->SetCameraDistance(m_LastCamDis);
 }
 
 //==========================================================================================

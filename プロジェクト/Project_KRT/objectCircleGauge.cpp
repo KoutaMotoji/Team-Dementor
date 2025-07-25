@@ -107,10 +107,6 @@ void CObjectCircleGauge::Draw()
     pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
     pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);	//ƒJƒŠƒ“ƒO—¼–Ê‚É
 
-    /*pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-    pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);*/
-
     pDevice->SetStreamSource(0, m_pVtxBuffer, 0, sizeof(VERTEX));
 
     pDevice->SetFVF(D3DFVF_GAUGEVERTEX);

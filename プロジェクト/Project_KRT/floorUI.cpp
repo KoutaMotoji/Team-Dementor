@@ -11,10 +11,16 @@
 
 namespace
 {
-	D3DXVECTOR2 FloorSize = { 50.0f, 100.0f };
-	D3DXVECTOR2 FloorHyphenSize = { 50.0f, 50.0f };
-	D3DXVECTOR2 FloorNumberSize = { 75.0f, 100.0f };
-	D3DXVECTOR2 FloorTypeSize = { 75.0f, 100.0f };
+	std::string _FILENAME_FLOORUI = "data\\TEXTURE\\Floor.png";
+	std::string _FILENAME_FLOORNUMBER = "data\\TEXTURE\\number000.png";
+
+
+	D3DXVECTOR2 FloorSize = { 75.0f * 2.5, 75.0f };
+	D3DXVECTOR2 FloorNumberSize = { 50.0f, 75.0f };
+
+	D3DXVECTOR3 _FLOOR_UI_POS = { SCREEN_WIDTH - FloorSize.x * 0.5f - FloorNumberSize.x - 20.0f, 50.0f, 0.0f };
+	D3DXVECTOR3 _FLOOR_UI_NUMBER_POS = { SCREEN_WIDTH - FloorNumberSize.x * 0.5f - 20.0f, 50.0f, 0.0f };
+
 }
 
 int CBaseFloorUI::SaveScore = 0;
@@ -68,50 +74,24 @@ void CFloorUI::Draw()
 	CObject2D::Draw();
 }
 
-CFloorUI* CFloorUI::Create(D3DXVECTOR3 pos)
+CFloorUI* CFloorUI::Create()
 {
 	CFloorUI* floorUI = new CFloorUI;
 
-	floorUI->SetPolygonParam(pos, FloorSize.y, FloorSize.x);
+	floorUI->SetPolygonParam(_FLOOR_UI_POS, FloorSize.y, FloorSize.x);
 	floorUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\F.png");
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_FLOORUI.c_str());
 	floorUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
 
 	return floorUI;
 }
  
-void CFloorHyphenUI::Init()
-{
-	CObject2D::Init();
-	CField_Manager::GetInstance()->RegistObj(this);
-}
-
-void CFloorHyphenUI::Update()
-{
-	CObject2D::Update();
-}
-
-void CFloorHyphenUI::Draw()
-{
-	CObject2D::Draw();
-}
-
-CFloorHyphenUI* CFloorHyphenUI::Create(D3DXVECTOR3 pos)
-{
-	CFloorHyphenUI* floorhyphenUI = new CFloorHyphenUI;
-
-	floorhyphenUI->SetPolygonParam(pos, FloorHyphenSize.y, FloorHyphenSize.x);
-	floorhyphenUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\-.png");
-	floorhyphenUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
-
-	return floorhyphenUI;
-}
  
 void CFloorNumberUI::Init()
 {
 	CObject2D::Init();
 	CField_Manager::GetInstance()->RegistObj(this);
+	CFloorUI::Create();
 }
 
 void CFloorNumberUI::Update()
@@ -121,48 +101,26 @@ void CFloorNumberUI::Update()
 
 void CFloorNumberUI::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+
+	//テクスチャ拡大時に色を近似値にする
+	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+
 	CObject2D::Draw();
+
+	//テクスチャ拡大時の色を線形補間
+	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 }
 
-CFloorNumberUI* CFloorNumberUI::Create(D3DXVECTOR3 pos, int i)
+CFloorNumberUI* CFloorNumberUI::Create(int number)
 {
 	CFloorNumberUI* FloorNumberUI = new CFloorNumberUI;
 
-	FloorNumberUI->SetPolygonParam(pos, FloorNumberSize.y, FloorNumberSize.x);
+	FloorNumberUI->SetPolygonParam(_FLOOR_UI_NUMBER_POS, FloorNumberSize.y, FloorNumberSize.x);
 	FloorNumberUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\number000.png");
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist(_FILENAME_FLOORNUMBER.c_str());
 	FloorNumberUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 10, 1);
-	FloorNumberUI->AddScore(i);
+	FloorNumberUI->AddScore(number);
 
 	return FloorNumberUI;
 }
-
-void CFloorTypeUI::Init()
-{
-	CObject2D::Init();
-	CField_Manager::GetInstance()->RegistObj(this);
-}
-
-void CFloorTypeUI::Update()
-{
-	CObject2D::Update();
-}
-
-void CFloorTypeUI::Draw()
-{
-	CObject2D::Draw();
-}
-
-CFloorTypeUI* CFloorTypeUI::Create(D3DXVECTOR3 pos, int i)
-{
-	CFloorTypeUI* FloorTypeUI = new CFloorTypeUI;
-
-	FloorTypeUI->SetPolygonParam(pos, FloorTypeSize.y, FloorTypeSize.x);
-	FloorTypeUI->Init();
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\AB.png");
-	FloorTypeUI->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 2, 1);
-	FloorTypeUI->AddScore(i);
-
-	return FloorTypeUI;
-}
-

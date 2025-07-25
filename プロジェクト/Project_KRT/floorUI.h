@@ -13,7 +13,7 @@
 class CBaseFloorUI : public CObject2D
 {
 public:
-	CBaseFloorUI() {};					//コンストラクタ
+	CBaseFloorUI(int nPriority = 3):CObject2D(nPriority) {};					//コンストラクタ
 	~CBaseFloorUI()override = default;	//デストラクタ
 	void Init()override;				//初期化
 	void Update()override;				//更新
@@ -38,20 +38,7 @@ public:
 	void Update()override;				//更新
 	void Draw()override;				//描画
 
-	static CFloorUI* Create(D3DXVECTOR3 pos);
-private:
-};
-
-class CFloorHyphenUI : public CBaseFloorUI
-{
-public:
-	CFloorHyphenUI() {};						//コンストラクタ
-	~CFloorHyphenUI()override = default;		//デストラクタ
-	void Init()override;				//初期化
-	void Update()override;				//更新
-	void Draw()override;				//描画
-
-	static CFloorHyphenUI* Create(D3DXVECTOR3 pos);
+	static CFloorUI* Create();
 private:
 };
 
@@ -64,22 +51,10 @@ public:
 	void Update()override;				//更新
 	void Draw()override;				//描画
 
-	static CFloorNumberUI* Create(D3DXVECTOR3 pos,int i);
+	static CFloorNumberUI* Create(int number);
 private:
 };
 
-class CFloorTypeUI : public CBaseFloorUI
-{
-public:
-	CFloorTypeUI() {};						//コンストラクタ
-	~CFloorTypeUI()override = default;		//デストラクタ
-	void Init()override;					//初期化
-	void Update()override;					//更新
-	void Draw()override;					//描画
-		
-	static CFloorTypeUI* Create(D3DXVECTOR3 pos, int i);
-private:
-	int  m_nTexPos;
-};
+
 
 #endif

@@ -16,6 +16,7 @@
 //前方宣言
 class Stage1Boss_State;
 class CStage1BossGaugeLife;
+class G_AttackBehavior;
 
 class CG_Gorira :public CCharacter
 {
@@ -31,12 +32,12 @@ public:
 	void Move();
 
 	_forceinline void SetState(std::shared_ptr<Stage1Boss_State>pState) {
-		if (m_State != nullptr)
-		{
+		if (m_State != nullptr)		{
 			m_State = nullptr;
 		}
 		m_State = pState;
 	}
+	_forceinline void SetAttackState(std::shared_ptr<G_AttackBehavior>pState);
 
 	void BeDamaged() ;			//外部から呼ぶ用
 	void Damaged();				//Stateの中で呼ぶ用
@@ -58,6 +59,7 @@ private:
 	std::vector<std::shared_ptr<CHitCircle>> m_pHC_BodyCollision;	//円の当たり判定配列
 
 	std::shared_ptr<Stage1Boss_State> m_State;
+	std::shared_ptr<G_AttackBehavior> m_AttackState;
 	//ステータス用定数
 	CStage1BossGaugeLife* m_HPGauge;
 	D3DXVECTOR3 m_OldPos;					//過去の位置

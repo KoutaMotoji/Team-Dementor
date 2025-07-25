@@ -111,7 +111,6 @@ private:
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス
 
 	void FloorCollision();					//床との当たり判定
-	void CamFloorCollision(LPD3DXMESH pMesh);
 	bool FloorbumpyMesh(LPD3DXMESH pMesh);
 
 	void SetArmParts(std::string filename);

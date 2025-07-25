@@ -15,6 +15,7 @@
 #include "stencile_mask.h"
 #include "area_move_gate.h"
 #include "player_observer.h"
+#include "clock.h"
 
 
 #include "field_manager.h"
@@ -42,16 +43,16 @@ HRESULT CGame::Init()
 	CScene::Init();
 	CManager::GetInstance()->GetCamera()->SetCameraHeigjt(400.0f);
 	CManager::GetInstance()->GetCamera()->SetCameraDistance(1200.0f);
+	CManager::GetInstance()->GetCamera()->DefuseFreeCam();
 
 	CMeshGround::Create({ 0.0f,0.0f,0.0f });
 	CPlayerX::Create({ 200.0f,1000.0f,0.0f });
 	CMeshCylinder::Create({ 0.0f,0.0f,0.0f });
 	CAreaGate::Create({ 0.0f,0.0f,700.0f });
-	CFloorUI::Create({ 1050.0f, 75.0f, 0.0f });
-	m_FloorNumberUI = CFloorNumberUI::Create({ 1110.0f, 75.0f, 0.0f },1);
-	CFloorHyphenUI::Create({ 1160.0f, 75.0f, 0.0f });
-	m_FloorTypeUI = CFloorTypeUI::Create({ 1225.0f,75.0f,0.0f },0);
-
+	CFloorNumberUI::Create(1);
+	CClock::GetInstance()->SetClock(240);
+	CClockGauge::Create();
+	CClock::GetInstance()->SetTimerStop(true);
 	CPlayerMask::Create();
 	CField_Manager::GetInstance()->Init();
 	CPlayerObserver::GetInstance()->PlayerSearch();
@@ -84,17 +85,11 @@ void CGame::Update()
 	{
 		CField_Manager::GetInstance()->SetField();
 	}
-	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_U))
-	{
-		m_FloorNumberUI->AddScore(1);
-	}
-	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_Y))
-	{
-		m_FloorTypeUI->AddScore(1);
-	}
 #endif // _DEBUG
+	CClock::GetInstance()->Update();
 	CField_Manager::GetInstance()->Update();
 	CScene::Update();
+	CClock::GetInstance()->FrameFragDisable();
 }
 
 //==========================================================================================

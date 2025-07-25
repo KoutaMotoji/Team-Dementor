@@ -15,14 +15,13 @@ namespace
 	std::string _FILENAME_HP_GAUGE = "data\\TEXTURE\\bossHP.png";
 	std::string _FILENAME_HP_FRAME = "data\\TEXTURE\\bossHPframe.png";
 	std::string _FILENAME_HP_BACK = "data\\TEXTURE\\bossHPback.png";
-	std::string _FILENAME_HP_DECO = "data\\TEXTURE\\bossdeco.png";
-
+	std::string _FILENAME_HP_DECO = "data\\TEXTURE\\bossback.png";
 
 
 	D3DXVECTOR2 _HP_GAUGE_SIZE = { 520.0f,40.0f };		//HPゲージのUIサイズ
-	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = { 740.0f,60.0f };	//HPゲージ装飾サイズ
-	D3DXVECTOR3 _HP_GAUGE_POS = { SCREEN_WIDTH * 0.5f,(_HP_GAUGE_DECO_SIZE.y * 0.5f) + 30.0f,0.0f };		//HPゲージのUI座標
-	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x + 50.0f,_HP_GAUGE_POS.y - 30.0f,0.0f };		//HPゲージのUI座標
+	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = { 630.0f,85.0f };	//HPゲージ装飾サイズ
+	D3DXVECTOR3 _HP_GAUGE_POS = { SCREEN_WIDTH * 0.5f,(_HP_GAUGE_DECO_SIZE.y * 0.5f) + 15.0f,0.0f };		//HPゲージのUI座標
+	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x,_HP_GAUGE_POS.y - 15.0f,0.0f };		//HPゲージのUI座標
 
 	D3DXCOLOR _GAUGE_COLOR = { 1.0f,0.0f,0.0f,1.0f };
 }

@@ -9,6 +9,7 @@
 #include "floor_stone.h"
 #include "stage1_bossUI.h"
 #include "player_observer.h"
+#include "stage1_boss_AttackState.h"
 
 #include "inimanager.h"
 #include "game.h"
@@ -55,6 +56,7 @@ void CG_Gorira::Init()
 	CCharacter::SetRadius(100.0f);
 	CCharacter::SetLife(_MAX_LIFE);
 	SetState(std::make_shared<Stage1Boss_Nutoral>());
+	SetAttackState(std::make_shared<G_Attack_None>());
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
 	for (const auto& e : CCharacter::GetModelPartsVec())
 	{
@@ -89,10 +91,10 @@ void CG_Gorira::Uninit()
 void CG_Gorira::Update()
 {
 	m_OldPos = CCharacter::GetPos();
-	m_State->Move(this);
+	/*m_State->Move(this);
 	m_State->Attack(this);
-	m_State->Wait(this);
-
+	m_State->Wait(this);*/
+	m_AttackState->G_AttackUpdate(this);
 	FloorCollision();	//ƒvƒŒƒCƒ„[ˆÚ“®§ŒÀ‚Ì“–‚½‚è”»’è
 
 	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
@@ -100,6 +102,10 @@ void CG_Gorira::Update()
 	if (CCharacter::GetLife() <= 0)
 	{
 		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_RESULT);
+	}
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_6))
+	{
+		SetAttackState(std::make_shared<G_Attack_Dive>());
 	}
 	m_HPGauge->SetGauge(CCharacter::GetLife());
 	CCharacter::Update();
@@ -257,3 +263,10 @@ void CG_Gorira::Damaged()
 	CCharacter::SetLife(CCharacter::GetLife() - 10);
 }	
 
+void CG_Gorira::SetAttackState(std::shared_ptr<G_AttackBehavior>pState) {
+	if (m_AttackState != nullptr) {
+		m_AttackState = nullptr;
+	}
+	m_AttackState = pState;
+	m_AttackState->G_AttackInit(this);
+}
