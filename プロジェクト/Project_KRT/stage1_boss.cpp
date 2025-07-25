@@ -7,6 +7,7 @@
 #include "stage1_boss.h"
 #include "character.h"
 #include "floor_stone.h"
+#include "stage1_bossUI.h"
 #include "player_observer.h"
 
 #include "inimanager.h"
@@ -66,6 +67,7 @@ void CG_Gorira::Init()
 	{
 		e->SetEnable();
 	}
+	m_HPGauge = CStage1BossGaugeLife::Create(_MAX_LIFE);
 }
 
 //==========================================================================================
@@ -73,6 +75,11 @@ void CG_Gorira::Init()
 //==========================================================================================
 void CG_Gorira::Uninit()
 {
+	if (m_HPGauge != nullptr)
+	{
+		m_HPGauge->Release();
+		m_HPGauge = nullptr;
+	}
 	CCharacter::Uninit();
 }
 
@@ -94,7 +101,7 @@ void CG_Gorira::Update()
 	{
 		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_RESULT);
 	}
-
+	m_HPGauge->SetGauge(CCharacter::GetLife());
 	CCharacter::Update();
 }
 

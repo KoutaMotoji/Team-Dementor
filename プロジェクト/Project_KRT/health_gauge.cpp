@@ -108,6 +108,12 @@ void HealthGauge::Update()
 //=====================================================================================================================
 void HealthGauge::Draw()
 {
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
+
+	//ステンシルマスクの設定時に無効化したZバッファをもとにもどす
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	//描画処理を行う
 	this->m_pHealthFill->Draw();   //体力
 	this->m_pDamageFill->Draw();   //ダメージ

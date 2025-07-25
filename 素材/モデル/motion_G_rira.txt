@@ -14,16 +14,16 @@ NUM_MODEL = 10
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/G－rira改/00_body.x		# [0]体
-MODEL_FILENAME = data/MODEL/G－rira改/01_head.x		# [1]頭
-MODEL_FILENAME = data/MODEL/G－rira改/02_kataR.x	# [2]右肩
-MODEL_FILENAME = data/MODEL/G－rira改/03_hijiR.x	# [3]右ひじ
-MODEL_FILENAME = data/MODEL/G－rira改/04_armR.x		# [4]右腕
-MODEL_FILENAME = data/MODEL/G－rira改/05_handR.x	# [5]右手
-MODEL_FILENAME = data/MODEL/G－rira改/06_kataL.x	# [6]左肩
-MODEL_FILENAME = data/MODEL/G－rira改/07_hijiL.x	# [7]左ひじ
-MODEL_FILENAME = data/MODEL/G－rira改/08_armL.x		# [8]左腕
-MODEL_FILENAME = data/MODEL/G－rira改/09_handL.x	# [9]左手
+MODEL_FILENAME = data/MODEL/G_rira/00_body.x		# [0]体
+MODEL_FILENAME = data/MODEL/G_rira/01_head.x		# [1]頭
+MODEL_FILENAME = data/MODEL/G_rira/02_kataR.x		# [2]右肩
+MODEL_FILENAME = data/MODEL/G_rira/03_hijiR.x		# [3]右ひじ
+MODEL_FILENAME = data/MODEL/G_rira/04_armR.x		# [4]右腕
+MODEL_FILENAME = data/MODEL/G_rira/05_handR.x		# [5]右手
+MODEL_FILENAME = data/MODEL/G_rira/06_kataL.x		# [6]左肩
+MODEL_FILENAME = data/MODEL/G_rira/07_hijiL.x		# [7]左ひじ
+MODEL_FILENAME = data/MODEL/G_rira/08_armL.x		# [8]左腕
+MODEL_FILENAME = data/MODEL/G_rira/09_handL.x		# [9]左手
 
 #------------------------------------------------------------------------------
 # キャラクター情報
