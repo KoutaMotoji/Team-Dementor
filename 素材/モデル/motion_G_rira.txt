@@ -14,16 +14,16 @@ NUM_MODEL = 10
 #------------------------------------------------------------------------------
 # ÉÇÉfÉãÉtÉ@ÉCÉãñº
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/GÅ|rira/00_body.x		# [0]ëÃ
-MODEL_FILENAME = data/MODEL/GÅ|rira/01_head.x		# [1]ì™
-MODEL_FILENAME = data/MODEL/GÅ|rira/02_kataR.x	# [2]âEå®
-MODEL_FILENAME = data/MODEL/GÅ|rira/03_hijiR.x	# [3]âEÇ–Ç∂
-MODEL_FILENAME = data/MODEL/GÅ|rira/04_armR.x		# [4]âEòr
-MODEL_FILENAME = data/MODEL/GÅ|rira/05_handR.x	# [5]âEéË
-MODEL_FILENAME = data/MODEL/GÅ|rira/06_kataL.x	# [6]ç∂å®
-MODEL_FILENAME = data/MODEL/GÅ|rira/07_hijiL.x	# [7]ç∂Ç–Ç∂
-MODEL_FILENAME = data/MODEL/GÅ|rira/08_armL.x		# [8]ç∂òr
-MODEL_FILENAME = data/MODEL/GÅ|rira/09_handL.x	# [9]ç∂éË
+MODEL_FILENAME = data/MODEL/G_rira/00_body.x		# [0]ëÃ
+MODEL_FILENAME = data/MODEL/G_rira/01_head.x		# [1]ì™
+MODEL_FILENAME = data/MODEL/G_rira/02_kataR.x		# [2]âEå®
+MODEL_FILENAME = data/MODEL/G_rira/03_hijiR.x		# [3]âEÇ–Ç∂
+MODEL_FILENAME = data/MODEL/G_rira/04_armR.x		# [4]âEòr
+MODEL_FILENAME = data/MODEL/G_rira/05_handR.x		# [5]âEéË
+MODEL_FILENAME = data/MODEL/G_rira/06_kataL.x		# [6]ç∂å®
+MODEL_FILENAME = data/MODEL/G_rira/07_hijiL.x		# [7]ç∂Ç–Ç∂
+MODEL_FILENAME = data/MODEL/G_rira/08_armL.x		# [8]ç∂òr
+MODEL_FILENAME = data/MODEL/G_rira/09_handL.x		# [9]ç∂éË
 
 #------------------------------------------------------------------------------
 # ÉLÉÉÉâÉNÉ^Å[èÓïÒ
