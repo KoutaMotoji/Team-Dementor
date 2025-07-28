@@ -14,21 +14,21 @@ NUM_MODEL = 15
 #------------------------------------------------------------------------------
 # モデルファイル名
 #------------------------------------------------------------------------------
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/00_bodyD.x	# [0]腹
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/01_bodyU.x	# [1]胸
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/02_head.x	# [2]頭
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/03_armUR.x	# [3]右上腕
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/04_armDR.x	# [4]右前腕
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/05_handR.x	# [5]右手
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/06_armUL.x	# [6]左上腕
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/07_armDL.x	# [7]左前腕
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/08_handL.x	# [8]左手
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/09_legUR.x	# [9]右腿
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/10_legDR.x	# [10]右脛
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/11_footR.x	# [11]右足
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/12_legUL.x	# [12]左腿
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/13_legDL.x	# [13]左脛
-MODEL_FILENAME = data/MODEL/KRTplayer_ver2/14_footL.x	# [14]左足
+MODEL_FILENAME = data/MODEL/KRTplayer/00_bodyD.x	# [0]腹
+MODEL_FILENAME = data/MODEL/KRTplayer/01_bodyU.x	# [1]胸
+MODEL_FILENAME = data/MODEL/KRTplayer/02_head.x		# [2]頭
+MODEL_FILENAME = data/MODEL/KRTplayer/03_armUR.x	# [3]右上腕
+MODEL_FILENAME = data/MODEL/KRTplayer/04_armDR.x	# [4]右前腕
+MODEL_FILENAME = data/MODEL/KRTplayer/05_handR.x	# [5]右手
+MODEL_FILENAME = data/MODEL/KRTplayer/06_armUL.x	# [6]左上腕
+MODEL_FILENAME = data/MODEL/KRTplayer/07_armDL.x	# [7]左前腕
+MODEL_FILENAME = data/MODEL/KRTplayer/08_handL.x	# [8]左手
+MODEL_FILENAME = data/MODEL/KRTplayer/09_legUR.x	# [9]右腿
+MODEL_FILENAME = data/MODEL/KRTplayer/10_legDR.x	# [10]右脛
+MODEL_FILENAME = data/MODEL/KRTplayer/11_footR.x	# [11]右足
+MODEL_FILENAME = data/MODEL/KRTplayer/12_legUL.x	# [12]左腿
+MODEL_FILENAME = data/MODEL/KRTplayer/13_legDL.x	# [13]左脛
+MODEL_FILENAME = data/MODEL/KRTplayer/14_footL.x	# [14]左足
 
 #------------------------------------------------------------------------------
 # キャラクター情報
