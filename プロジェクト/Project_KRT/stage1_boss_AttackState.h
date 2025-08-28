@@ -86,7 +86,7 @@ public:
 	void G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)override;
 	void G_AttackUninit([[maybe_unused]] CG_Gorira* pGorira)override {};
 	void G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)override;
-	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override {};
+	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override;
 
 };
 class G_Attack_DoubleHammer : public G_AttackBehavior	//ダブルスレッジハンマー

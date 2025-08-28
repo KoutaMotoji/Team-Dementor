@@ -177,7 +177,7 @@ void G_Attack_Spin::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
     float Yaw = atan2f(dir.x, dir.z);
     pGorira->SetRot({ 0.0f,Yaw,0.0f });
 
-    pGorira->CCharacter::SetNextMotion(, false);
+    pGorira->CCharacter::SetNextMotion(8, false);
 }
 
 void G_Attack_Spin::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
