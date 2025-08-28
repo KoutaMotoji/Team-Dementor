@@ -144,4 +144,5 @@ void FieldDissolve::RestartDissolve()
 	m_bDraw = true;
 	CObject2D::SetPos({SCREEN_WIDTH*0.5f,SCREEN_HEIGHT*0.5f,0.0f});
 }
+
 //=================================================================================================================

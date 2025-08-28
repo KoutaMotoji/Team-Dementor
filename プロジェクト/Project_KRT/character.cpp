@@ -220,6 +220,7 @@ void CCharacter::SetNextMotion(int nNextMotionNum,bool bBlend)
 	m_NowFrame = 0;
 	m_NowAllFrame = 0;
 	m_bBlend = bBlend;
+	if (!m_bBlend)m_CurMotion = nNextMotionNum;
 }
 //==========================================================================================
 //次のキーのモーション処理

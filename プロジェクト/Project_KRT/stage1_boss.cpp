@@ -55,13 +55,13 @@ void CG_Gorira::Init()
 	CCharacter::SetSize({ _SETSIZE,_SETSIZE,_SETSIZE });
 	CCharacter::SetRadius(100.0f);
 	CCharacter::SetLife(_MAX_LIFE);
+	m_bBossAI = std::make_shared<Gorira_AI>();
 	SetState(std::make_shared<Stage1Boss_Nutoral>());
 	SetAttackState(std::make_shared<G_Attack_None>());
 	m_pDebugLine = CDebugLineCylinder::Create(CCharacter::GetRadius().x);
 	for (const auto& e : CCharacter::GetModelPartsVec())
 	{
 		D3DXVECTOR3 radius = *e->GetRadius();
-		//radius.x = radius.y = radius.z *= 3;
 		m_pHC_BodyCollision.push_back(CHitCircle::Create(radius, e->GetPos(), e->GetIndex(), 0, 2, 0));
 		m_pDL_BodyCollision.push_back(CDebugLineSphire::Create(radius.x, { 0.1f,1.0f,0.1f,1.0f }));
 	}
@@ -107,8 +107,12 @@ void CG_Gorira::Update()
 	{
 		SetAttackState(std::make_shared<G_Attack_Dive>());
 	}
+	CCharacter::AddPos({ 0.0f,-_GRAVITY,0.0f });
+
+	D3DXVECTOR3 pos = CCharacter::GetPos();
 	m_HPGauge->SetGauge(CCharacter::GetLife());
 	CCharacter::Update();
+
 }
 
 //==========================================================================================
@@ -146,6 +150,16 @@ CG_Gorira* CG_Gorira::Create(D3DXVECTOR3 pos)
 	gorira->Init();
 	gorira->SetPos(pos);
 	return gorira;
+}
+
+//==========================================================================================
+// モーション終了時に呼ばれる関数(オーバーライド)
+//==========================================================================================
+bool  CG_Gorira::EndMotion()
+{
+	m_AttackState->G_AttackFinish(this);
+
+	return true;
 }
 
 //==========================================================================================

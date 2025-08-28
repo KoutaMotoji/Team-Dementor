@@ -16,6 +16,7 @@ void Gorira_AI::AI_Init()
 
 void Gorira_AI::AI_Update([[maybe_unused]]CG_Gorira* pGorira)
 {
+    if (m_bDoing)return;
 	if (!GetIsThinking()) {
 		--m_Timer;
 		return;
@@ -27,15 +28,20 @@ void Gorira_AI::SetNextAction([[maybe_unused]] CG_Gorira* pGorira)
 {
 	if (SearchPlayer(pGorira))
 	{
-
+        pGorira->SetAttackState(std::make_shared<G_Attack_Dive>());
 	}
+    else
+    {
+        pGorira->SetAttackState(std::make_shared<G_Attack_Spin>());
+    }
+    m_bDoing = true;
 }
 
 void Gorira_AI::SetThinkValue()
 {
 	std::random_device rnd;				// 非決定的な乱数生成器でシード生成機を生成
 	std::mt19937 mt(rnd());				//  メルセンヌツイスターの32ビット版、引数は初期シード
-	std::uniform_int_distribution<> rand_num(30, 50);     // [0, 20] 範囲の一様乱数
+	std::uniform_int_distribution<> rand_num(30, 50);     // [30, 50] 範囲の一様乱数
 
 	m_Timer = rand_num(mt);
 }
@@ -57,7 +63,7 @@ bool Gorira_AI::SearchPlayer([[maybe_unused]] CG_Gorira* pGorira)
 //以下ボス行動制御
 
 
-
+// ==================== 飛び込み攻撃 ==================== 
 void G_Attack_Dive::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
 {
 	D3DXVECTOR3 EnemyPos = pGorira->GetPos();
@@ -66,10 +72,11 @@ void G_Attack_Dive::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
 	float Distance = sqrtf((PosMinuts.x * PosMinuts.x) + (PosMinuts.z * PosMinuts.z));
 
 	m_DestFrame = Distance * 0.1f;
-    float FrameDig = 194.0f / m_DestFrame;
+    float FrameDig = m_DestFrame / 194.0f;
 	m_NowFrame = 0;
 	m_LastPos = EnemyPos;
-    pGorira->CCharacter::SetNextMotion(7);
+    m_LastPlayerPos = PlayerPos;
+    pGorira->CCharacter::SetNextMotion(7,false);
 
     pGorira->CCharacter::SetMotionMag(FrameDig);
 }
@@ -97,11 +104,14 @@ void G_Attack_Dive::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
         pGorira->CCharacter::SetNextMotion(0);
     }
 }
-
+void G_Attack_Dive::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
+{
+  
+}
 void G_Attack_Dive::SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira, float frame)
 {
     D3DXVECTOR3 EnemyPos = m_LastPos;
-    D3DXVECTOR3 PlayerPos = CPlayerObserver::GetInstance()->GetPlayerPos();
+    D3DXVECTOR3 PlayerPos = m_LastPlayerPos;
 
     // 中心点Cを計算
     D3DXVECTOR3 C = (EnemyPos + PlayerPos) * 0.5f;
@@ -124,7 +134,10 @@ void G_Attack_Dive::SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira, fl
     float lenA = D3DXVec3Length(&vecA);
     float lenB = D3DXVec3Length(&vecB);
     float cosTheta = dot / (lenA * lenB);
-    cosTheta = max(-1.0f, min(1.0f, cosTheta)); // Clamp
+
+    if (cosTheta > 1.0f) cosTheta = 1.0f;
+    if (cosTheta < -1.0f) cosTheta = -1.0f;
+
     float angle = acosf(cosTheta); // ラジアン
 
     // 回転クオータニオン作成（axis, angle）
@@ -144,8 +157,34 @@ void G_Attack_Dive::SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira, fl
     D3DXVECTOR3 rotatedVec;
     D3DXVec3TransformCoord(&rotatedVec, &vecA, &rotMat);
 
+    rotatedVec.y = abs(rotatedVec.y);
+
     // 中心点に加算
     D3DXVECTOR3 result = C + rotatedVec;
 
     pGorira->SetPos(result);
+}
+
+// ==================== スイング攻撃 ==================== 
+void G_Attack_Spin::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
+{
+    D3DXVECTOR3 EnemyPos = pGorira->GetPos();
+    D3DXVECTOR3 PlayerPos = CPlayerObserver::GetInstance()->GetPlayerPos();
+
+    D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+    D3DXVec3Normalize(&dir, &dir);
+
+    float Yaw = atan2f(dir.x, dir.z);
+    pGorira->SetRot({ 0.0f,Yaw,0.0f });
+
+    pGorira->CCharacter::SetNextMotion(, false);
+}
+
+void G_Attack_Spin::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
+{
+
+}
+void G_Attack_Spin::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
+{
+
 }

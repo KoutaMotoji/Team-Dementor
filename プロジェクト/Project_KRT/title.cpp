@@ -44,7 +44,10 @@ HRESULT CTitle::Init()
 	CT_Graound::Create();
 	CT_Player::Create();
 	CMeshCylinder::Create({ 0.0f,1000.0f,0.0f });
-	CManager::GetInstance()->GetCamera()->SetFreeCam({ 300.0f,-100.0f,-200.0f }, { 120.0f,-20.0f,-30.0f },120);
+	D3DXVECTOR3 posA, posB;
+	posA = { 300.0f,-100.0f,-200.0f };
+	posB = { 120.0f,-20.0f,-30.0f };
+	CManager::GetInstance()->GetCamera()->SetFreeCam(posA,posB ,120,true);
 	CTitleBG::Create();
 	return S_OK;
 }

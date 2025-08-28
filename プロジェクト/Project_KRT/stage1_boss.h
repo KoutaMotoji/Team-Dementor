@@ -17,6 +17,7 @@
 class Stage1Boss_State;
 class CStage1BossGaugeLife;
 class G_AttackBehavior;
+class Gorira_AI;
 
 class CG_Gorira :public CCharacter
 {
@@ -30,6 +31,7 @@ public:
 
 	void DoAttack();
 	void Move();
+	bool EndMotion()override;
 
 	_forceinline void SetState(std::shared_ptr<Stage1Boss_State>pState) {
 		if (m_State != nullptr)		{
@@ -59,6 +61,7 @@ private:
 	std::vector<std::shared_ptr<CHitCircle>> m_pHC_BodyCollision;	//円の当たり判定配列
 
 	std::shared_ptr<Stage1Boss_State> m_State;
+	std::shared_ptr<Gorira_AI>m_bBossAI;
 	std::shared_ptr<G_AttackBehavior> m_AttackState;
 	//ステータス用定数
 	CStage1BossGaugeLife* m_HPGauge;

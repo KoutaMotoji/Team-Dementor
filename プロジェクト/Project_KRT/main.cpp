@@ -9,7 +9,7 @@
 
 //マクロ定義
 #define CLASS_NAME	"WindowClass" //ウィンドウクラスの名前
-#define WINDOW_NAME	"Test"
+#define WINDOW_NAME	"Project-KRT"
 #define ID_BUTTON_RESET	(101)
 
 //プロトタイプ宣言
