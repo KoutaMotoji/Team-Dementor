@@ -10,6 +10,9 @@
 #include "player_armState.h"
 #include "collision.h"
 
+D3DXVECTOR3 LockEnable::s_savedPosV = { 0,0,0 };
+D3DXVECTOR3 LockEnable::s_savedPosR = { 0,0,0 };
+
 //通常時のステート
 void State_Nutoral::Attack([[maybe_unused]]CPlayerX* pPlayer) {
 	//pPlayer->PAttackInfo();
@@ -122,121 +125,119 @@ void State_Damage::ToParry([[maybe_unused]]CPlayerX* pPlayer) {
 
 //ロックオン時のステート
 void LockEnable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
+	CCamera* cam = CManager::GetInstance()->GetCamera();
+
+	// プレイヤー位置をセット（UpdateNormalCamに必要）
+	cam->SetPlayerPos(pPlayer->CCharacter::GetPos());
+
+	// 現在のカメラ座標を退避
+	D3DXVECTOR3 currentV = cam->GetPosV();
+	D3DXVECTOR3 currentR = cam->GetPosR();
+
+	// 一時的に通常カメラの理想座標を計算
+	cam->UpdateNormalCam();
+
+	D3DXVECTOR3 followV = cam->GetPosV();
+	D3DXVECTOR3 followR = cam->GetPosR();
+
+	// 元の座標に戻す（計算だけ利用したので）
+	cam->SetCamPos(currentV, currentR);
+
+	// 通常カメラの理想座標に向かって補間
+	cam->SetFreeCam(followV, followR, 30, false);
+
+	// ステート切り替え
 	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
 }
 
 void LockEnable::UpdateCam([[maybe_unused]]CPlayerX* pPlayer)
-{
-	D3DXVECTOR3 SetPos{};
-	D3DXVECTOR3 a{};
-	D3DXVECTOR3 b{};
-
+{	
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
 			if (pObj == nullptr) continue;
 
-			CObject::TYPE type = pObj->GetType();
-			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
-			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
-			if (pTest == nullptr) continue;
+			if (pObj->GetType() != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			CG_Gorira* pEnemy = dynamic_cast<CG_Gorira*>(pObj);
+			if (!pEnemy) continue;
 
-			D3DXMATRIX mat = pPlayer->CCharacter::GetMatrix();
-			D3DXVECTOR3 posEnemy = pTest->CCharacter::GetPos();
+			// プレイヤーと敵の位置
+			D3DXVECTOR3 playerPos = pPlayer->CCharacter::GetPos();
+			D3DXVECTOR3 enemyPos = pEnemy->CCharacter::GetPos();
 
-			D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
-
-			D3DXVECTOR3 pos = { 0.0f,200.0f,-700.0f };
-			D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
-
-			//マトリックスから位置を抽出
-			D3DXVECTOR3 mtxPos1 = {
-			mat._41,
-			mat._42,
-			mat._43
-			};
-
-			D3DXVECTOR3 PlayerPos = { mtxPos1.x,0.0f,mtxPos1.z };
-			D3DXVECTOR3 EnemyPos = { posEnemy.x,0.0f,posEnemy.z };
-
-			D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+			// プレイヤーと敵の水平距離からYawを算出
+			D3DXVECTOR3 dir = enemyPos - playerPos;
+			dir.y = 0.0f;
 			D3DXVec3Normalize(&dir, &dir);
+			float yaw = atan2f(dir.x, dir.z);
 
-			float Yaw = atan2f(dir.x, dir.z);
+			// 回転オフセットをYawに応じて回転
+			D3DXVECTOR3 offset = { 0.0f, 200.0f, -700.0f };
+			D3DXMATRIX rotY;
+			D3DXMatrixRotationY(&rotY, yaw);
+			D3DXVECTOR3 rotatedOffset;
+			D3DXVec3TransformCoord(&rotatedOffset, &offset, &rotY);
 
-			D3DXMATRIX RotY;
-			D3DXVECTOR3 RotateOffset;
+			// カメラ位置と注視点を算出
+			D3DXVECTOR3 camPos = playerPos + rotatedOffset;
 
-			D3DXMatrixRotationY(&RotY, Yaw);
-			D3DXVec3TransformCoord(&RotateOffset, &pos, &RotY);
-
-			D3DXVECTOR3 CamPos = mtxPos1 + RotateOffset;
-
-			CManager::GetInstance()->GetCamera()->SetRotz(Yaw);
-
-			CManager::GetInstance()->GetCamera()->SetPlayerPos(PlayerPos);
-			CManager::GetInstance()->GetCamera()->SetEnemyPos(EnemyPos);
-			CManager::GetInstance()->GetCamera()->UpdateLockOnCam(CamPos, EnemyPos);
+			// カメラに位置をセット
+			CCamera* cam = CManager::GetInstance()->GetCamera();
+			cam->SetRotz(yaw);
+			cam->SetPlayerPos(playerPos);
+			cam->SetEnemyPos(enemyPos);
+			cam->UpdateLockOnCam(camPos, enemyPos);
 		}
 	}
 }
 
 //非ロックオン時のステート
 void LockDisable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
+	CCamera* cam = CManager::GetInstance()->GetCamera();
+
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
-			if (pObj == nullptr) continue;
+			if (!pObj) continue;
 
-			CObject::TYPE type = pObj->GetType();
-			if (type != CObject::TYPE::TYPE_3D_BOSS_1) continue;
-			CG_Gorira* pTest = dynamic_cast<CG_Gorira*>(pObj);
-			if (pTest == nullptr) continue;
+			if (pObj->GetType() != CObject::TYPE::TYPE_3D_BOSS_1) continue;
+			CG_Gorira* pEnemy = dynamic_cast<CG_Gorira*>(pObj);
+			if (!pEnemy) continue;
 
-			D3DXMATRIX mat = pPlayer->CCharacter::GetMatrix();
-			D3DXMATRIX matEnemy = pTest->CCharacter::GetMatrix();
-			D3DXVECTOR3 posEnemy = pTest->CCharacter::GetPos();
-			D3DXVECTOR3 posPlayer = pPlayer->CCharacter::GetPos();
+			// プレイヤーと敵の位置
+			D3DXVECTOR3 playerPos = pPlayer->CCharacter::GetPos();
+			D3DXVECTOR3 enemyPos = pEnemy->CCharacter::GetPos();
 
-			//マトリックスから位置を抽出
-			D3DXVECTOR3 mtxPos1 = {
-			mat._41,
-			mat._42,
-			mat._43
-			};
+			// 現在のカメラ位置を保存（解除時に戻す用）
+			LockEnable::s_savedPosV = cam->GetPosV(); 
+			LockEnable::s_savedPosR = cam->GetPosR();
 
-			//マトリックスから位置を抽出
-			D3DXVECTOR3 mtxPos21 = {
-			matEnemy._41,
-			matEnemy._42,
-			matEnemy._43
-			};
-
-			D3DXVECTOR3 PlayerPos = { mtxPos1.x,0.0f,mtxPos1.z };
-			D3DXVECTOR3 EnemyPos = { mtxPos21.x,0.0f,mtxPos21.z };
-
-			D3DXMATRIX SetMtx{}, mtxTrans{}, mtxRot{};
-
-			D3DXVECTOR3 pos = { 0.0f,200.0f,-700.0f };
-
-			D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+			// Yaw計算
+			D3DXVECTOR3 dir = enemyPos - playerPos;
+			dir.y = 0.0f;
 			D3DXVec3Normalize(&dir, &dir);
+			float yaw = atan2f(dir.x, dir.z);
 
-			float Yaw = atan2f(dir.x, dir.z);
+			// カメラオフセット回転
+			D3DXVECTOR3 offset = { 0.0f, 200.0f, -700.0f };
+			D3DXMATRIX rotY;
+			D3DXMatrixRotationY(&rotY, yaw);
+			D3DXVECTOR3 rotatedOffset;
+			D3DXVec3TransformCoord(&rotatedOffset, &offset, &rotY);
 
-			D3DXMATRIX RotY;
-			D3DXVECTOR3 RotateOffset;
+			// 補間後のカメラ位置
+			D3DXVECTOR3 targetCamPos = playerPos + rotatedOffset;
 
-			D3DXMatrixRotationY(&RotY, Yaw);
-			D3DXVec3TransformCoord(&RotateOffset, &pos, &RotY);
+			// プレイヤーと敵の位置をセット
+			cam->SetPlayerPos(playerPos);
+			cam->SetEnemyPos(enemyPos);
 
-			D3DXVECTOR3 CamPos = mtxPos1 + RotateOffset;
-
-			CManager::GetInstance()->GetCamera()->SetPlayerPos(PlayerPos);
-			CManager::GetInstance()->GetCamera()->SetEnemyPos(EnemyPos);
-			CManager::GetInstance()->GetCamera()->SetFreeCam(&CamPos, &EnemyPos, 40);
+			// 現在のカメラ位置から補間開始
+			cam->SetFreeCam(targetCamPos, enemyPos, 30, true); // 40フレーム補間
 		}
 	}
+
+	// ロックオンを有効化
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
 

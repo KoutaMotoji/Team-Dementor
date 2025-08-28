@@ -231,6 +231,8 @@ private:
 class LockEnable : public LockOn_State
 {	//ロックオン状態クラス
 public:
+	static D3DXVECTOR3 s_savedPosV; // 保存用のカメラ視点
+	static D3DXVECTOR3 s_savedPosR; // 保存用のカメラ注視点
 	virtual void Swicth([[maybe_unused]]CPlayerX* pPlayer)override;
 	virtual void UpdateCam([[maybe_unused]]CPlayerX* pPlayer)override;
 private:

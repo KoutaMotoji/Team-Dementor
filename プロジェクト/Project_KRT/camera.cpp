@@ -21,8 +21,8 @@ namespace
 	float _CAM_MIN_ZOOM = 100.0f;
 }
 
-CCamera::CCamera():m_nShakeFlame(0)
-					,m_fShalePower(0.0f), m_camHeight(1000.0f), m_DestFrame(0),m_NowFrame(0), m_bFreeCam(false), m_bLockOnCam(false)
+CCamera::CCamera() :m_nShakeFlame(0)
+, m_fShalePower(0.0f), m_camHeight(1000.0f), m_DestFrame(0), m_NowFrame(0), m_bFreeCam(false), m_bLockOnCam(false), m_bRelative(false)
 					,m_DestPosR({ 0.0f,0.0f,0.0f }),m_DestPosV({ 0.0f,0.0f,0.0f }),m_LastPosR({ 0.0f,0.0f,0.0f }),m_LastPosV({ 0.0f,0.0f,0.0f })
 {
 
@@ -191,7 +191,7 @@ void CCamera::UpdateNormalCam()
 
 	m_posR.x = m_PlayerPos.x;
 	m_posR.z = m_PlayerPos.z;
-	m_posR.y = m_PlayerPos.y + 50.0f;
+	m_posR.y = m_PlayerPos.y + 150.0f;
 }
 
 void CCamera::UpdateLockOnCam(D3DXVECTOR3 posPlayer, D3DXVECTOR3 posEnemy)
@@ -207,55 +207,100 @@ void CCamera::UpdateLockOnCam(D3DXVECTOR3 posPlayer, D3DXVECTOR3 posEnemy)
 
 void CCamera::UpdateFreeCam()
 {
-	// 補間の進行度を計算 (0.0～1.0) smoothstepで滑らかに
-	float t = (float)m_NowFrame / (float)m_DestFrame;
-	t = t * t * (3 - 2 * t);
+	//// 補間の進行度を計算 (0.0～1.0) smoothstepで滑らかに
+	//float t = (float)m_NowFrame / (float)m_DestFrame;
+	//t = t * t * (3 - 2 * t);
 
-	// ---- カメラ位置の補間 ----
-	// 開始時のプレイヤー位置から見た「カメラ相対位置」
-	D3DXVECTOR3 startCamOffset = m_LastPosV - m_StartPlayerPos;
-	D3DXVECTOR3 destCamOffset = m_DestPosV - m_StartPlayerPos;
+	//// ---- カメラ位置の補間 ----
+	//// 開始時のプレイヤー位置から見た「カメラ相対位置」
+	//D3DXVECTOR3 startCamOffset = m_LastPosV - m_StartPlayerPos;
+	//D3DXVECTOR3 destCamOffset = m_DestPosV - m_StartPlayerPos;
 
-	// 相対位置を補間
-	D3DXVECTOR3 interpCamOffset;
-	D3DXVec3Lerp(&interpCamOffset, &startCamOffset, &destCamOffset, t);
+	//// 相対位置を補間
+	//D3DXVECTOR3 interpCamOffset;
+	//D3DXVec3Lerp(&interpCamOffset, &startCamOffset, &destCamOffset, t);
 
-	// 実際のカメラ位置 = 現在のプレイヤー位置 + 補間済みの相対位置
-	m_posV = m_PlayerPos + interpCamOffset;
+	//// 実際のカメラ位置 = 現在のプレイヤー位置 + 補間済みの相対位置
+	//m_posV = m_PlayerPos + interpCamOffset;
 
-	// ---- 注視点の補間 ----
-	D3DXVECTOR3 startTargetOffset = m_LastPosR - m_StartPlayerPos;
-	D3DXVECTOR3 destTargetOffset = m_DestPosR - m_StartPlayerPos;
+	//// ---- 注視点の補間 ----
+	//D3DXVECTOR3 startTargetOffset = m_LastPosR - m_StartPlayerPos;
+	//D3DXVECTOR3 destTargetOffset = m_DestPosR - m_StartPlayerPos;
 
-	D3DXVECTOR3 interpTargetOffset;
-	D3DXVec3Lerp(&interpTargetOffset, &startTargetOffset, &destTargetOffset, t);
+	//D3DXVECTOR3 interpTargetOffset;
+	//D3DXVec3Lerp(&interpTargetOffset, &startTargetOffset, &destTargetOffset, t);
 
-	// 実際の注視点 = 現在のプレイヤー位置 + 補間済みの注視点相対位置
-	m_posR = m_PlayerPos + interpTargetOffset;
-	m_posR.y += 150.0f; // 少し上に注視
+	//// 実際の注視点 = 現在のプレイヤー位置 + 補間済みの注視点相対位置
+	//m_posR = m_PlayerPos + interpTargetOffset;
+	//m_posR.y += 150.0f; // 少し上に注視
 
-	// ---- 補間フレームを進める ----
+	//// ---- 補間フレームを進める ----
+	//++m_NowFrame;
+	//if (m_NowFrame >= m_DestFrame)
+	//{
+	//	m_bFreeCam = false; // 補間終了
+	//}
+
+	if (m_DestFrame <= 0) return;
+
+	D3DXVECTOR3 destV, destR;
+	float SetLerp = (1.0f / m_DestFrame) * m_NowFrame;
+
+	D3DXVECTOR3 startOffsetV = m_LastPosV - m_StartPlayerPos;
+	D3DXVECTOR3 startOffsetR = m_LastPosR - m_StartPlayerPos;
+
+	D3DXVECTOR3 destOffsetV, destOffsetR;
+
+	if (m_bLockOnCam)
+	{
+		// ロックオン理想位置を計算
+		D3DXVECTOR3 dir = m_EnemyPos - m_PlayerPos;
+		dir.y = 0.0f;
+		D3DXVec3Normalize(&dir, &dir);
+		float yaw = atan2f(dir.x, dir.z);
+
+		D3DXVECTOR3 offset = { 0.0f, 200.0f, -700.0f };
+		D3DXMATRIX rotY;
+		D3DXMatrixRotationY(&rotY, yaw);
+		D3DXVec3TransformCoord(&destOffsetV, &offset, &rotY);
+
+		destOffsetR = m_EnemyPos - m_PlayerPos;
+		destOffsetR.y += 150.0f;
+	}
+	else if (m_bFreeCamManual)
+	{
+		destOffsetV = m_DestPosV - m_StartPlayerPos;
+		destOffsetR = m_DestPosR - m_StartPlayerPos;
+	}
+	else
+	{
+		D3DXVECTOR3 backupV = m_posV;
+		D3DXVECTOR3 backupR = m_posR;
+
+		UpdateNormalCam();
+		destOffsetV = m_posV - m_PlayerPos;
+		destOffsetR = m_posR - m_PlayerPos;
+
+		m_posV = backupV;
+		m_posR = backupR;
+	}
+
+	// 開始オフセットから目的オフセットへの補間
+	D3DXVECTOR3 interpV, interpR;
+	D3DXVec3Lerp(&interpV, &startOffsetV, &destOffsetV, SetLerp);
+	D3DXVec3Lerp(&interpR, &startOffsetR, &destOffsetR, SetLerp);
+
+	// 補間済みオフセットを現在のプレイヤー位置に足す
+	m_posV = m_PlayerPos + interpV;
+	m_posR = m_PlayerPos + interpR;
+
 	++m_NowFrame;
 	if (m_NowFrame >= m_DestFrame)
 	{
-		m_bFreeCam = false; // 補間終了
+		m_bFreeCam = false;
+		m_posV = m_PlayerPos + destOffsetV;
+		m_posR = m_PlayerPos + destOffsetR;
 	}
-
-	//// 補間進行度
-	//float t = (float)m_NowFrame / (float)m_DestFrame;
-	//t = t * t * (3 - 2 * t); // smoothstep
-
-	//D3DXVECTOR3 destV, destR;
-	//D3DXVec3Lerp(&destV, &m_LastPosV, &m_DestPosV, t);
-	//D3DXVec3Lerp(&destR, &m_LastPosR, &m_DestPosR, t);
-
-	//m_posV = destV;
-	//m_posR = destR;
-
-	//++m_NowFrame;
-	//if (m_NowFrame >= m_DestFrame) {
-	//	m_bFreeCam = false;
-	//}
 
 	//D3DXVECTOR3 destV, destR;
 	//float SetLerp = (1.0f / m_DestFrame) * m_NowFrame;
@@ -273,12 +318,12 @@ void CCamera::UpdateFreeCam()
 	//}
 }
 
-void CCamera::SetFreeCam(D3DXVECTOR3* destPosV, D3DXVECTOR3* destPosR, int Frame)
+void CCamera::SetFreeCam(D3DXVECTOR3 destPosV, D3DXVECTOR3 destPosR, int Frame, bool relative)
 {
 	m_LastPosR = m_posR;
 	m_LastPosV = m_posV;
-	m_DestPosR = *destPosR;
-	m_DestPosV = *destPosV;
+	m_DestPosR = destPosR;
+	m_DestPosV = destPosV;
 	m_DestFrame = Frame;
 	m_NowFrame = 0;
 	m_bFreeCam = true;
@@ -286,4 +331,7 @@ void CCamera::SetFreeCam(D3DXVECTOR3* destPosV, D3DXVECTOR3* destPosR, int Frame
 	// 補間開始時のプレイヤーと敵の位置を記録
 	m_StartPlayerPos = m_PlayerPos;
 	m_StartEnemyPos = m_EnemyPos;
+
+	m_bRelative = relative;
+	m_bFreeCamManual = true;
 }
