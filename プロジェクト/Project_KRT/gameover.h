@@ -21,6 +21,10 @@ public:
 	void Update()override;
 	void Draw()override;
 private:
+	CScore* m_pScore;
+	CScore* m_ptime_m;
+	CScore* m_ptime_s;
+	CScore* m_pkill;
 	bool m_bSelect;
 };
 

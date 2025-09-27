@@ -24,7 +24,9 @@ public:
 private:
 	bool m_bSelect;
 	CScore* m_pScore;
-
+	CScore* m_ptime_m;
+	CScore* m_ptime_s;
+	CScore* m_pkill;
 };
 
 #endif

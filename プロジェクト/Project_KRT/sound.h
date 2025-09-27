@@ -17,6 +17,7 @@ public:
 	typedef enum
 	{
 		SOUND_LABEL_BGM_TITLE = 0,
+		SOUND_LABEL_BGM_GAME,
 		SOUND_LABEL_BGM_RESULT,
 		SOUND_LABEL_SE_PARRY,
 		SOUND_LABEL_SE_BOSS1_ATTACK,
@@ -53,6 +54,7 @@ private:
 	SOUNDINFO m_aSoundInfo[SOUND_LABEL_MAX] =
 	{
 		{"data/SOUND/BGM/title.wav", -1,0.2f},	//タイトル画面BGM
+		{"data/SOUND/BGM/game.wav", -1,0.1f},	//タイトル画面BGM
 		{"data/SOUND/BGM/result.wav", -1,0.2f},	//チュートリアル画面BGM
 		{"data/SOUND/SE/super_parry.wav", 0,0.1f},		//パリィSE
 		{"data/SOUND/SE/boss1_attack00.wav", 0,0.1f},	//ボス１通常攻撃SE

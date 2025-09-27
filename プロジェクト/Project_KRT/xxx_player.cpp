@@ -13,7 +13,7 @@
 #include "player_behavior.h"
 #include "player_UI.h"
 #include "parrycrit_effect.h"
-
+#include "enemy.h"
 #include "inimanager.h"
 #include "json.hpp"
 #include "game.h"
@@ -115,11 +115,8 @@ void CPlayerX::Uninit()
 		m_pWeaponIcon->Release();
 		m_pWeaponIcon = nullptr;
 	}
-	if (m_pWeapon != nullptr)
-	{
-		m_pWeapon->Release();
-		m_pWeapon = nullptr;
-	}
+	if(m_pWeapon != nullptr)	m_pWeapon = nullptr;
+
 	CCharacter::Uninit();
 }
 
@@ -136,7 +133,7 @@ void CPlayerX::Update()
 	m_PlayerState->Move(this);			//ˆÚ“®‚ð§Œä
 
 	FloorCollision();	//ƒvƒŒƒCƒ„[ˆÚ“®§ŒÀ‚Ì“–‚½‚è”»’è
-
+	if (GetLife() > 1000)SetLife(1000);
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_M) ||
 		CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_THUMB))
 	{
@@ -571,7 +568,74 @@ void CPlayerX::SetParry(int AddDmg)
 				pTest->BeDamaged(40 + AddDmg);
 				D3DXVECTOR3 effpos = CCharacter::GetPos();
 				effpos.y += 80;
-				if (40 + AddDmg > 30)CParryCritEff::Create(effpos);
+				CManager::GetInstance()->GetGameInfo()->AddParryCnt();
+				if (40 + AddDmg > 30)
+				{
+					CParryCritEff::Create(effpos);
+					CManager::GetInstance()->GetGameInfo()->AddJustParryCnt();
+				}
+				return;
+			}
+		}
+	}
+	// ŽG‹›“G”»’è
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (!pObj) continue;
+
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_ENEMY) continue;
+
+			CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
+			if (!pEnemy) continue;
+
+			apVecHitCircle = pEnemy->CCharacter::GetVecHitCircle();
+			for (auto& e1 : apVecHitCircle)
+			{
+				// ’ÊíUŒ‚(2)‚Æ”ò‚Ñž‚ÝUŒ‚(4)—¼‘Î‰ž
+				if (e1->GetEnable() && (e1->GetMotionNum() == 2 || e1->GetMotionNum() == 4))
+				{
+					pBossAttackCircle = e1;
+					break;
+				}
+			}
+			if (!pBossAttackCircle) continue;
+
+			D3DXVECTOR3 MainPos, SubPos;
+			D3DXMATRIX MainMtx{}, SubMtx{};
+			int cnt = 0;
+
+			for (auto& e2 : CCharacter::GetModelPartsVec())
+			{
+				if (cnt == pParryCircle->GetParentNum())
+				{
+					MainMtx = e2->GetWorldMatrix();
+					break;
+				}
+				++cnt;
+			}
+			cnt = 0;
+			for (auto& e3 : pEnemy->CCharacter::GetModelPartsVec())
+			{
+				if (cnt == pBossAttackCircle->GetParentNum())
+				{
+					SubMtx = e3->GetWorldMatrix();
+					break;
+				}
+				++cnt;
+			}
+
+			MainPos = pParryCircle->CalcMtxPos(MainMtx);
+			SubPos = pBossAttackCircle->CalcMtxPos(SubMtx);
+
+			if (pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+			{
+				CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
+				pEnemy->SetNextMotion(3);
+				CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
+				SetState(std::make_shared<State_ParryAttack>());
+				CManager::GetInstance()->GetGameInfo()->AddParryCnt();
 				return;
 			}
 		}
@@ -671,6 +735,62 @@ void CPlayerX::ToEnemyAttack()
 					pAttackCircle->SetInvincible(true);
 					pTest->BeDamaged(m_AttackBehavior->GetAttackDamage());
 					CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PLAYER_ATTACK);
+					return;
+				}
+			}
+		}
+	}
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj == nullptr) continue;
+
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_ENEMY) continue;
+
+			CEnemy* pTest = dynamic_cast<CEnemy*>(pObj);
+			if (pTest == nullptr) continue;
+
+			std::vector<std::shared_ptr<CHitCircle>> BHC = pTest->GetBodyHitCircle();
+			for (auto& e : BHC)
+			{
+				if (!e->GetEnable())continue;
+
+				D3DXVECTOR3 MainPos, SubPos;
+				D3DXMATRIX MainMtx, SubMtx;
+				int cnt = 0;
+				for (auto& e1 : CCharacter::GetModelPartsVec())
+				{
+					if (pAttackCircle != nullptr)
+					{
+						if (cnt == pAttackCircle->GetParentNum())
+						{
+							MainMtx = e1->GetWorldMatrix();
+						}
+					}
+					++cnt;
+				}
+				cnt = 0;
+				for (auto& e2 : pTest->CCharacter::GetModelPartsVec())
+				{
+					if (e2 != nullptr)
+					{
+						if (cnt == e->GetParentNum())
+						{
+							SubMtx = e2->GetWorldMatrix();
+						}
+					}
+					++cnt;
+				}
+				MainPos = pAttackCircle->CalcMtxPos(MainMtx);
+				SubPos = pAttackCircle->CalcMtxPos(SubMtx);
+
+				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
+				{
+					pAttackCircle->SetInvincible(true);
+					CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PLAYER_ATTACK);
+
+					pTest->BeDamaged();
 					return;
 				}
 			}

@@ -11,7 +11,7 @@
 
 namespace
 {
-	int BOSSKILL_SCORE = 20000;
+	int BOSSKILL_SCORE = 50000;
 	int FRAME_DIGIT = 60;
 	int MAX_MITITUS = 5 * 60 * 60;
 	int PARRY_SCORE = 2000;
@@ -28,7 +28,7 @@ public:
 		int KillScore = BOSSKILL_SCORE * (int)BossKill;
 		int ClearTime = MAX_MITITUS - m_nTime;
 		int ParrySocre = PARRY_SCORE * m_ParryCnt;
-		int JustParrySocre = (PARRY_SCORE *5)* m_JustParryCnt;
+		int JustParrySocre = (PARRY_SCORE *4)* m_JustParryCnt;
 
 		return KillScore + ClearTime + ParrySocre + JustParrySocre;
 	}
@@ -40,6 +40,12 @@ public:
 		m_ParryCnt = 0;
 		m_JustParryCnt = 0;
 	}
+	int GetTime() { return m_nTime;}
+	int GetTimeMS() { return m_nTimeMS; }
+	int GetParry() { return m_ParryCnt; }
+	int GetJustParry() { return m_JustParryCnt; }
+	int GetEnemyKillCnt() { return m_nEnemyKillCnt; }
+
 	void TimeUpdate() { ++m_nTime; }
 	void AddEnemyKill() { ++m_nEnemyKillCnt; }
 	void AddParryCnt() { ++m_ParryCnt; }

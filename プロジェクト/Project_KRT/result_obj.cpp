@@ -9,22 +9,6 @@
 
 namespace
 {
-	struct _FILENAME	//ファイルのパス管理構造体
-	{
-		std::string config;		//ファイルのパス
-		std::string section;	//セクション名
-		std::string keyword;	//キーワード名
-	};
-	_FILENAME player_filename = {				//プレイヤーのモデル・モーション用ファイルパス
-		"data\\TEXT\\Config.ini",
-		 "ModelData",
-		 "ResultPlayerMotion"
-	};
-	_FILENAME enemy_filename = {				//プレイヤーのモデル・モーション用ファイルパス
-		"data\\TEXT\\Config.ini",
-		 "ModelData",
-		 "ResultBossMotion"
-	};
 	std::string GROUND_FILENAME = "data\\MODEL\\title_field.x";
 
 	D3DXVECTOR3 R_PLAYER_POS = { 100.0f,-110.0f,0.0f };

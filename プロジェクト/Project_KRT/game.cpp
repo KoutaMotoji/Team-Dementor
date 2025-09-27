@@ -16,7 +16,7 @@
 #include "area_move_gate.h"
 #include "player_observer.h"
 #include "clock.h"
-
+#include "enemy.h"
 
 #include "field_manager.h"
 
@@ -56,6 +56,9 @@ HRESULT CGame::Init()
 	CPlayerMask::Create();
 	CField_Manager::GetInstance()->Init();
 	CPlayerObserver::GetInstance()->PlayerSearch();
+	CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_BGM_GAME);
+
+	CManager::GetInstance()->GetGameInfo()->AllReset();
 
 	return S_OK;
 }
@@ -86,6 +89,7 @@ void CGame::Update()
 		CField_Manager::GetInstance()->SetField();
 	}
 #endif // _DEBUG
+	CManager::GetInstance()->GetGameInfo()->TimeUpdate();
 	CClock::GetInstance()->Update();
 	CField_Manager::GetInstance()->Update();
 	CScene::Update();

@@ -177,11 +177,11 @@ void CEnemy::Update()
 	CCharacter::Update();
 
 	// ヒットサークルの有効/無効
-	for (auto& hit : m_pHC_BodyCollision)
-	{
-		if (m_bHidden) hit->SetDisable();
-		else           hit->SetEnable();
-	}
+	//for (auto& hit : m_pHC_BodyCollision)
+	//{
+	//	if (m_bHidden) hit->SetDisable();
+	//	else           hit->SetEnable();
+	//}
 
 	// --- 死亡開始判定（ライフ <=0） ---
 	if (!m_bDying && CCharacter::GetLife() <= 0)
@@ -486,6 +486,8 @@ void CEnemy::Damaged()
 
 		SetAttackState(std::make_shared<E_Attack_None>());
 		CCharacter::SetNextMotion(MOTION_DIE);
+		CManager::GetInstance()->GetGameInfo()->AddEnemyKill();
+		CPlayerObserver::GetInstance()->GetPlayer()->SetLife(CPlayerObserver::GetInstance()->GetPlayerLife() + 300);
 	}
 	else
 	{
