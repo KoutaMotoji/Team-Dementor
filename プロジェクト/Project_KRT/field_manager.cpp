@@ -94,10 +94,10 @@ void CField_Manager::Update()
 
 	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
 	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
-	//CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
 	CEnemy::Create({ 1000.0f,-1000.0f,1000.0f });
-	CEnemy::Create({ 0.0f,-1000.0f,1000.0f });
-	CEnemy::Create({ 1000.0f,-1000.0f,0.0f });
+	//CEnemy::Create({ 0.0f,-1000.0f,1000.0f });
+	//CEnemy::Create({ 1000.0f,-1000.0f,0.0f });
 	CClock::GetInstance()->SetTimerStop(false);
 
 	//フロアのUI生成

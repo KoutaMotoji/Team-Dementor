@@ -22,7 +22,7 @@ private:
 	bool m_bCountedThisFrame;	//現在のフレーム内で2度以上更新されないようにするフラグ
 	bool m_bTimerStop;
 public:
-	CClock() :m_bCountedThisFrame(false), m_LastCount(0), m_FrameCnt(0), m_bTimerStop(false){}
+	CClock() :m_bCountedThisFrame(false), m_LastCount(0), m_FrameCnt(0), m_bTimerStop(false) {}
 	~CClock() = default;
 	_inline static std::shared_ptr<CClock> GetInstance() {
 		if (_instance == nullptr)
@@ -68,7 +68,7 @@ class CClockBack;
 class CClockGauge :public CObjectCircleGauge
 {
 public:
-	CClockGauge(int nPriority = 5) : CObjectCircleGauge(nPriority), m_pClockHands(nullptr){};		//コンストラクタ
+	CClockGauge(int nPriority = 5) : CObjectCircleGauge(nPriority), m_pClockHands(nullptr), m_bTimeUp(false) {};		//コンストラクタ
 	~CClockGauge()override = default;				//デストラクタ
 	void Init()override;		//初期化
 	void Uninit()override;
@@ -79,6 +79,7 @@ public:
 	static CClockGauge* Create();
 private:
 	void QuakeObj();
+	bool m_bTimeUp;
 	CClockHands* m_pClockHands;
 	CClockBack* m_pClockBack;
 };

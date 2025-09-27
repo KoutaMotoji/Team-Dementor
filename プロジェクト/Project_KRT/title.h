@@ -29,6 +29,7 @@ private:
 	bool m_bNowAnim;
 	int m_nSelect;
 
+
 	CTitleButton* m_tBut;
 	CTitleUI* m_tUI;
 
@@ -50,4 +51,18 @@ public:
 	static CTitleBG* Create();
 private:
 };
+class CTitleButton :public CObject2D
+{
+public:
+	CTitleButton() :m_LocalCol({ 1.0f,1.0f,1.0f,1.0f }), m_bSpeed(false), m_bColSwitch(false) {};		//コンストラクタ
+	~CTitleButton()override = default;				//デストラクタ
+	void Init()override;		//初期化
+	void Draw()override;		//初期化
+
+	static CTitleButton* Create();
+private:
+	bool m_bSpeed, m_bColSwitch;
+	D3DXCOLOR m_LocalCol;
+};
+
 #endif

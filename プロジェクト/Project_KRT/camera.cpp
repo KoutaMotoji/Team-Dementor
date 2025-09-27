@@ -23,7 +23,7 @@ namespace
 
 CCamera::CCamera() :m_nShakeFlame(0)
 , m_fShalePower(0.0f), m_camHeight(1000.0f), m_DestFrame(0), m_NowFrame(0), m_bFreeCam(false), m_bLockOnCam(false), m_bRelative(false)
-					,m_DestPosR({ 0.0f,0.0f,0.0f }),m_DestPosV({ 0.0f,0.0f,0.0f }),m_LastPosR({ 0.0f,0.0f,0.0f }),m_LastPosV({ 0.0f,0.0f,0.0f })
+, m_DestPosR({ 0.0f,0.0f,0.0f }), m_DestPosV({ 0.0f,0.0f,0.0f }), m_LastPosR({ 0.0f,0.0f,0.0f }), m_LastPosV({ 0.0f,0.0f,0.0f })
 {
 
 }
@@ -37,8 +37,8 @@ CCamera::~CCamera()
 HRESULT CCamera::Init(void)
 {
 	m_posV = D3DXVECTOR3(0.0f, 100.0f, -300.0f);
-	m_posR = D3DXVECTOR3(0.0f,0.0f,0.0f);
-	m_posU = D3DXVECTOR3(0.0f,1.0f,0.0f);
+	m_posR = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	m_posU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 	m_rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_PlayerPos = { 0.0f,0.0f,0.0f };
 	m_camDistance = 600.0f;
@@ -72,23 +72,25 @@ void CCamera::Update(void)
 
 	if (!m_bLockOnCam)
 	{
+		//カメラ移動系
 		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DLEFT) == true ||
 			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_LEFTARROW) == true)
 		{
-			m_fRotZ += _CAM_ROTSPEED;
-			if (m_fRotZ > D3DX_PI)
+			m_fRotZ -= _CAM_ROTSPEED;
+			if (m_fRotZ < -1 * D3DX_PI)
 			{
-				m_fRotZ = -D3DX_PI;
+				m_fRotZ = D3DX_PI;
 			}
 		}
 
 		if (CManager::GetInstance()->GetJoypad()->GetJoyStickR(CJoypad::JOYSTICK_DRIGHT) == true ||
 			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_RIGHTARROW) == true)
 		{
-			m_fRotZ -= _CAM_ROTSPEED;
-			if (m_fRotZ < -1 * D3DX_PI)
+
+			m_fRotZ += _CAM_ROTSPEED;
+			if (m_fRotZ > D3DX_PI)
 			{
-				m_fRotZ = D3DX_PI;
+				m_fRotZ = -D3DX_PI;
 			}
 		}
 
@@ -144,7 +146,7 @@ void CCamera::SetCamera(void)
 		std::mt19937 mt(rnd());				//  メルセンヌツイスターの32ビット版、引数は初期シード
 		std::uniform_int_distribution<> rand_value(-m_fShalePower, m_fShalePower);     // クエイク関数呼び出し時の引数での範囲の一様乱数
 
-		float randShake = (rand_value(mt) );
+		float randShake = (rand_value(mt));
 		adjust.x = randShake;
 		adjust.z = randShake;
 
@@ -159,22 +161,22 @@ void CCamera::SetCamera(void)
 	D3DXMatrixIdentity(&m_mtxProjection);
 	//プロジェクションマトリックスを作成
 	D3DXMatrixPerspectiveFovLH(&m_mtxProjection,
-								D3DXToRadian(45.0f),
-								(float)SCREEN_WIDTH/(float)SCREEN_HEIGHT,
-								10.0f,
-								20000.0f);
+		D3DXToRadian(45.0f),
+		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
+		10.0f,
+		20000.0f);
 	//プロジェクションマトリックスの設定
 	pDevice->SetTransform(D3DTS_PROJECTION,
 		&m_mtxProjection);
 
 	//ビューマトリックスの初期化
 	D3DXMatrixLookAtLH(&m_mtxView,
-						&m_posV,
-						&m_posR,
-						&m_posU);
+		&m_posV,
+		&m_posR,
+		&m_posU);
 	//ビューマトリックスの設定
 	pDevice->SetTransform(D3DTS_VIEW,
-							&m_mtxView);
+		&m_mtxView);
 }
 
 void CCamera::SetRotz(float rot)
@@ -207,39 +209,6 @@ void CCamera::UpdateLockOnCam(D3DXVECTOR3 posPlayer, D3DXVECTOR3 posEnemy)
 
 void CCamera::UpdateFreeCam()
 {
-	//// 補間の進行度を計算 (0.0～1.0) smoothstepで滑らかに
-	//float t = (float)m_NowFrame / (float)m_DestFrame;
-	//t = t * t * (3 - 2 * t);
-
-	//// ---- カメラ位置の補間 ----
-	//// 開始時のプレイヤー位置から見た「カメラ相対位置」
-	//D3DXVECTOR3 startCamOffset = m_LastPosV - m_StartPlayerPos;
-	//D3DXVECTOR3 destCamOffset = m_DestPosV - m_StartPlayerPos;
-
-	//// 相対位置を補間
-	//D3DXVECTOR3 interpCamOffset;
-	//D3DXVec3Lerp(&interpCamOffset, &startCamOffset, &destCamOffset, t);
-
-	//// 実際のカメラ位置 = 現在のプレイヤー位置 + 補間済みの相対位置
-	//m_posV = m_PlayerPos + interpCamOffset;
-
-	//// ---- 注視点の補間 ----
-	//D3DXVECTOR3 startTargetOffset = m_LastPosR - m_StartPlayerPos;
-	//D3DXVECTOR3 destTargetOffset = m_DestPosR - m_StartPlayerPos;
-
-	//D3DXVECTOR3 interpTargetOffset;
-	//D3DXVec3Lerp(&interpTargetOffset, &startTargetOffset, &destTargetOffset, t);
-
-	//// 実際の注視点 = 現在のプレイヤー位置 + 補間済みの注視点相対位置
-	//m_posR = m_PlayerPos + interpTargetOffset;
-	//m_posR.y += 150.0f; // 少し上に注視
-
-	//// ---- 補間フレームを進める ----
-	//++m_NowFrame;
-	//if (m_NowFrame >= m_DestFrame)
-	//{
-	//	m_bFreeCam = false; // 補間終了
-	//}
 
 	if (m_DestFrame <= 0) return;
 

@@ -9,76 +9,142 @@
 #include "player_observer.h"
 #include "collision.h"
 
+int G_Attack_Normal::m_ContNum = 0;
+
+namespace
+{
+    const std::vector<float> SearchRadius = {
+         300.0f,
+         500.0f
+    };
+    enum
+    {
+        ATTACK_SHORTRANGE_ = 1,
+        ATTACK_MIDRANGE_,
+    };
+}
+
 void Gorira_AI::AI_Init()
 {
 
 }
 
-void Gorira_AI::AI_Update([[maybe_unused]]CG_Gorira* pGorira)
+void Gorira_AI::AI_Update([[maybe_unused]] CG_Gorira* pGorira)
 {
     if (m_bDoing)return;
-	if (!GetIsThinking()) {
-		--m_Timer;
-		return;
-	}
-	SetNextAction(pGorira);
+    if (!GetIsThinking()) {
+        pGorira->AddRot({ 0.0f,-m_LeapRotValue,0.0f });
+        --m_Timer;
+        return;
+    }
+    SetNextAction(pGorira);
 }
 
 void Gorira_AI::SetNextAction([[maybe_unused]] CG_Gorira* pGorira)
 {
-	if (SearchPlayer(pGorira))
-	{
-        pGorira->SetAttackState(std::make_shared<G_Attack_Dive>());
-	}
+    pGorira->SetState(std::make_shared<Stage1Boss_Attack>());
+    m_bDoing = true;
+    int SearchNum = SearchPlayer(pGorira);
+    if (SearchNum != 0)
+    {
+        switch (SearchNum)
+        {
+        case ATTACK_SHORTRANGE_:
+            pGorira->SetAttackState(std::make_shared<G_Attack_Normal>());
+            break;
+        case ATTACK_MIDRANGE_:
+            pGorira->SetAttackState(std::make_shared<G_Attack_Spin>());
+            break;
+        default:
+            break;
+        }
+    }
     else
     {
-        pGorira->SetAttackState(std::make_shared<G_Attack_Spin>());
+        pGorira->SetAttackState(std::make_shared<G_Attack_Dive>());
     }
-    m_bDoing = true;
 }
 
 void Gorira_AI::SetThinkValue()
 {
-	std::random_device rnd;				// 非決定的な乱数生成器でシード生成機を生成
-	std::mt19937 mt(rnd());				//  メルセンヌツイスターの32ビット版、引数は初期シード
-	std::uniform_int_distribution<> rand_num(30, 50);     // [30, 50] 範囲の一様乱数
+    std::random_device rnd;				// 非決定的な乱数生成器でシード生成機を生成
+    std::mt19937 mt(rnd());				//  メルセンヌツイスターの32ビット版、引数は初期シード
+    std::uniform_int_distribution<> rand_num(20, 40);     // [20, 40] 範囲の一様乱数
 
-	m_Timer = rand_num(mt);
+    m_Timer = rand_num(mt);
 }
 
-bool Gorira_AI::SearchPlayer([[maybe_unused]] CG_Gorira* pGorira)
+void Gorira_AI::LookPlayer([[maybe_unused]] CG_Gorira* pGorira)
 {
-	CG_Gorira* gorira = pGorira;
-	std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();
+    D3DXVECTOR3 EnemyPos = pGorira->GetPos();
+    D3DXVECTOR3 PlayerPos = CPlayerObserver::GetInstance()->GetPlayerPos();
 
-	D3DXVECTOR3 PlayerRadius = {2.0f,2.0f,2.0f};
-	D3DXVECTOR3 EnemyRadius = {600.0f,600.0f,600.0f};
+    D3DXVECTOR3 dir = EnemyPos - PlayerPos;
+    D3DXVec3Normalize(&dir, &dir);
 
-	return !(pCollision->SphireCollosion(gorira->GetPos(), CPlayerObserver::GetInstance()->GetPlayerPos(), EnemyRadius, PlayerRadius));
+    float Yaw = atan2f(dir.x, dir.z);
+    float EnemyYaw = pGorira->GetRot().y;
+    m_LeapRotValue = (EnemyYaw - Yaw) / m_Timer;
+}
+
+int Gorira_AI::SearchPlayer([[maybe_unused]] CG_Gorira* pGorira)
+{
+    CG_Gorira* gorira = pGorira;
+    std::shared_ptr<CCollision>pCollision = std::make_shared<CCollision>();
+
+    D3DXVECTOR3 PlayerRadius = { 2.0f,2.0f,2.0f };
+    for (int i = 0; i < 2; ++i)
+    {
+        D3DXVECTOR3 EnemyRadius = { SearchRadius[i],SearchRadius[i],SearchRadius[i] };
+        if (pCollision->SphireCollosion(gorira->GetPos(), CPlayerObserver::GetInstance()->GetPlayerPos(), EnemyRadius, PlayerRadius))return i + 1;
+    }
+    return 0;
 }
 
 
 
 //=============================================================================================================
 //以下ボス行動制御
+// ==================== 通常攻撃 ==================== 
+void G_Attack_Normal::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
+{
+    ++m_ContNum;
+    if (m_ContNum > 2)
+    {
+        m_ContNum = 0;
+        pGorira->SetAttackState(std::make_shared<G_Attack_BackStep>());
+        return;
+    }
+    pGorira->SetMotionMag(0.25f);
+    pGorira->CCharacter::SetNextMotion(2, false);
+}
 
+void G_Attack_Normal::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
+{
+    pGorira->SetMotionMag(1.0f);
+    pGorira->SetState(std::make_shared<Stage1Boss_Nutoral>());
 
+    //pGorira->SetAttackState(std::make_shared<G_Attack_Spin>());
+
+}
 // ==================== 飛び込み攻撃 ==================== 
 void G_Attack_Dive::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
 {
-	D3DXVECTOR3 EnemyPos = pGorira->GetPos();
-	D3DXVECTOR3 PlayerPos = CPlayerObserver::GetInstance()->GetPlayerPos();
-	D3DXVECTOR3 PosMinuts = PlayerPos - EnemyPos;
-	float Distance = sqrtf((PosMinuts.x * PosMinuts.x) + (PosMinuts.z * PosMinuts.z));
+    D3DXVECTOR3 EnemyPos = pGorira->GetPos();
+    D3DXVECTOR3 PlayerPos = CPlayerObserver::GetInstance()->GetPlayerPos();
+    D3DXVECTOR3 PosMinuts = PlayerPos - EnemyPos;
+    float Distance = sqrtf((PosMinuts.x * PosMinuts.x) + (PosMinuts.z * PosMinuts.z));
 
-	m_DestFrame = Distance * 0.1f;
+    m_DestFrame = Distance * 0.1f;
     float FrameDig = m_DestFrame / 194.0f;
-	m_NowFrame = 0;
-	m_LastPos = EnemyPos;
+    m_NowFrame = 0;
+    m_LastPos = EnemyPos;
     m_LastPlayerPos = PlayerPos;
-    pGorira->CCharacter::SetNextMotion(7,false);
+    pGorira->CCharacter::SetNextMotion(9, false);
 
     pGorira->CCharacter::SetMotionMag(FrameDig);
+    CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_BOSS1_SWING);
+
 }
 
 void G_Attack_Dive::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
@@ -106,7 +172,7 @@ void G_Attack_Dive::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
 }
 void G_Attack_Dive::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
 {
-  
+    pGorira->SetState(std::make_shared<Stage1Boss_Nutoral>());
 }
 void G_Attack_Dive::SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira, float frame)
 {
@@ -186,5 +252,16 @@ void G_Attack_Spin::G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)
 }
 void G_Attack_Spin::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
 {
+    pGorira->SetState(std::make_shared<Stage1Boss_Nutoral>());
+}
 
+// ==================== バクステ攻撃 ==================== 
+void G_Attack_BackStep::G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)
+{
+    pGorira->CCharacter::SetNextMotion(12, false);
+}
+
+void G_Attack_BackStep::G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)
+{
+    pGorira->SetState(std::make_shared<Stage1Boss_Nutoral>());
 }

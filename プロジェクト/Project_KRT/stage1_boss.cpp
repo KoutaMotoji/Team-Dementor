@@ -1,6 +1,6 @@
 //===============================================================================
 //
-//  プレイヤー処理(playerX.cpp)
+//  ステージ1ボス処理(stage1_boss.cpp)
 //								制作：元地弘汰
 // 
 //===============================================================================
@@ -10,6 +10,7 @@
 #include "stage1_bossUI.h"
 #include "player_observer.h"
 #include "stage1_boss_AttackState.h"
+#include "clock.h"
 
 #include "inimanager.h"
 #include "game.h"
@@ -69,6 +70,13 @@ void CG_Gorira::Init()
 	{
 		e->SetEnable();
 	}
+	m_AttackMotionNum = {
+		MOTION_ATTACK,
+		MOTION_DOUBLEHUMMER,
+		MOTION_SWING,
+		MOTION_BACKSTEP
+	};
+	m_bBossAI->AI_Init();
 	m_HPGauge = CStage1BossGaugeLife::Create(_MAX_LIFE);
 }
 
@@ -91,16 +99,16 @@ void CG_Gorira::Uninit()
 void CG_Gorira::Update()
 {
 	m_OldPos = CCharacter::GetPos();
-	/*m_State->Move(this);
-	m_State->Attack(this);
-	m_State->Wait(this);*/
+
 	m_AttackState->G_AttackUpdate(this);
+	m_bBossAI->AI_Update(this);
 	FloorCollision();	//プレイヤー移動制限の当たり判定
 
 	std::vector<std::shared_ptr<CHitCircle>> phc = CCharacter::GetVecHitCircle();
 
 	if (CCharacter::GetLife() <= 0)
 	{
+		CClock::GetInstance()->SetTimerStop(true);
 		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_RESULT);
 	}
 	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_6))
@@ -112,7 +120,6 @@ void CG_Gorira::Update()
 	D3DXVECTOR3 pos = CCharacter::GetPos();
 	m_HPGauge->SetGauge(CCharacter::GetLife());
 	CCharacter::Update();
-
 }
 
 //==========================================================================================
@@ -158,7 +165,7 @@ CG_Gorira* CG_Gorira::Create(D3DXVECTOR3 pos)
 bool  CG_Gorira::EndMotion()
 {
 	m_AttackState->G_AttackFinish(this);
-
+	m_bBossAI->AI_DoFinish(this);
 	return true;
 }
 
@@ -169,19 +176,19 @@ void CG_Gorira::FloorCollision()
 {
 	if (CCharacter::GetPos().z < -_WORLD_WALL)
 	{
-		CCharacter::SetPos( { CCharacter::GetPos().x, CCharacter::GetPos().y, -_WORLD_WALL });
+		CCharacter::SetPos({ CCharacter::GetPos().x, CCharacter::GetPos().y, -_WORLD_WALL });
 	}
 	else if (CCharacter::GetPos().z > _WORLD_WALL)
 	{
-		CCharacter::SetPos( { CCharacter::GetPos().x, CCharacter::GetPos().y, _WORLD_WALL });
+		CCharacter::SetPos({ CCharacter::GetPos().x, CCharacter::GetPos().y, _WORLD_WALL });
 	}
 	if (CCharacter::GetPos().x < -_WORLD_WALL)
 	{
-		CCharacter::SetPos( { -_WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
+		CCharacter::SetPos({ -_WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
 	}
 	else if (CCharacter::GetPos().x > _WORLD_WALL)
 	{
-		CCharacter::SetPos( { _WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
+		CCharacter::SetPos({ _WORLD_WALL, CCharacter::GetPos().y, CCharacter::GetPos().z });
 	}
 
 	// 地形判定
@@ -208,7 +215,7 @@ void CG_Gorira::FloorCollision()
 			// ----- 接地時処理 -----
 			if (bIsHit)
 			{
-				CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f});
+				CCharacter::AddPos({ 0.0f, fLandDistance - CCharacter::GetMove().y - _GRAVITY,0.0f });
 				return;
 			}
 		}
@@ -264,18 +271,18 @@ void CG_Gorira::DoAttack()
 //==========================================================================================
 // キャラクターの被ダメ状態
 //==========================================================================================
-void CG_Gorira::BeDamaged()
+void CG_Gorira::BeDamaged(int value)
 {
-	m_State->Damage(this); 
-}	
+	m_State->Damage(this, value);
+}
 
 //==========================================================================================
 // キャラクターの被ダメ処理
 //==========================================================================================
-void CG_Gorira::Damaged()
+void CG_Gorira::Damaged(int value)
 {
-	CCharacter::SetLife(CCharacter::GetLife() - 10);
-}	
+	CCharacter::SetLife(CCharacter::GetLife() - value);
+}
 
 void CG_Gorira::SetAttackState(std::shared_ptr<G_AttackBehavior>pState) {
 	if (m_AttackState != nullptr) {

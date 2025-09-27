@@ -10,6 +10,20 @@
 #include "main.h"
 #include "xxx_player.h"
 
+namespace {
+	std::vector<int>ATTACK_DAMAGE = {
+		10,
+		15,
+		20,
+		30,
+		50,
+		80
+	};
+	const float NORMAL_DAMAGEMAG = 1.0f;
+	const float GORIRA_DAMAGEMAG = 1.5f;
+
+};
+
 //========================================================================================================
 //プレイヤーの腕によって特殊攻撃を変える用のステート
 
@@ -18,11 +32,15 @@ class ExAttack_State
 public:
 	virtual void Ex3(CPlayerX* pPlayer) = 0;
 	virtual void Ex6(CPlayerX* pPlayer) = 0;
+	float GetDamageMag() { return DamageStateMag; }
+protected:
+	float DamageStateMag;
 };
 
 class ExAttack_Normal : public ExAttack_State
 {
 public:
+	ExAttack_Normal() { DamageStateMag = NORMAL_DAMAGEMAG; }
 	void Ex3(CPlayerX* pPlayer)override;
 	void Ex6(CPlayerX* pPlayer)override;
 };
@@ -30,6 +48,7 @@ public:
 class ExAttack_Gorira : public ExAttack_State
 {
 public:
+	ExAttack_Gorira() { DamageStateMag = GORIRA_DAMAGEMAG; }
 	void Ex3(CPlayerX* pPlayer)override;
 	void Ex6(CPlayerX* pPlayer)override;
 };
@@ -50,6 +69,7 @@ protected:
 		int motion_num;
 	};
 	static std::shared_ptr<ExAttack_State> m_pExState;
+	int m_nThisAttackDamage;
 public:
 	bool m_bUse;
 	int m_MyMotionNum;
@@ -59,20 +79,20 @@ public:
 	virtual void UseDisable() {}
 	bool GetUse() { return m_bUse; }
 	int GetMyMotionNum() { return m_MyMotionNum; }
-	void SetExState(std::shared_ptr<ExAttack_State> pState)	{ 
+	void SetExState(std::shared_ptr<ExAttack_State> pState) {
 		if (m_pExState == nullptr)
 		{
 			m_pExState = std::make_shared<ExAttack_Normal>();
 		}
 		m_pExState = pState;
 	}
+	int GetAttackDamage() { return int(m_nThisAttackDamage * m_pExState->GetDamageMag()); }
 };
-
 
 class Attack_None : public AttackBehavior		//非攻撃状態
 {
 public:
-	Attack_None(MyInfo info = { true,CPlayerX::MOTION_NUTORAL }) :AttackBehavior(info) {}
+	Attack_None(MyInfo info = { true,CPlayerX::MOTION_NUTORAL }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[0]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 
@@ -80,7 +100,7 @@ public:
 class Attack_Normal1 : public AttackBehavior	//通常1段目
 {
 public:
-	Attack_Normal1(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N1 }) :AttackBehavior(info) {}
+	Attack_Normal1(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N1 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[0]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 
@@ -88,7 +108,7 @@ public:
 class Attack_Normal2 : public AttackBehavior	//通常2段目
 {
 public:
-	Attack_Normal2(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N2 }) :AttackBehavior(info) {}
+	Attack_Normal2(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N2 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[0]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 
@@ -96,56 +116,56 @@ public:
 class Attack_Normal3 : public AttackBehavior	//通常3段目
 {
 public:
-	Attack_Normal3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N3 }) :AttackBehavior(info) {}
+	Attack_Normal3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N3 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[1]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal4 : public AttackBehavior	//通常4段目
 {
 public:
-	Attack_Normal4(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N4 }) :AttackBehavior(info) {}
+	Attack_Normal4(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N4 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[2]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal5 : public AttackBehavior	//通常5段目
 {
 public:
-	Attack_Normal5(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N5 }) :AttackBehavior(info) {}
+	Attack_Normal5(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N5 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[2]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal6 : public AttackBehavior	//通常6段目
 {
 public:
-	Attack_Normal6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N6 }) :AttackBehavior(info) {}
+	Attack_Normal6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N6 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[2]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Normal7 : public AttackBehavior	//通常最終段目
 {
 public:
-	Attack_Normal7(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N7 }) :AttackBehavior(info) {}
+	Attack_Normal7(MyInfo info = { true,CPlayerX::MOTION_ATTACK_N7 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[3]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Extended3 : public AttackBehavior		//派生3段目
 {
 public:
-	Attack_Extended3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex3 }) :AttackBehavior(info) {}
+	Attack_Extended3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex3 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[1]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Extended5 : public AttackBehavior		//派生5段目
 {
 public:
-	Attack_Extended5(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex5 }) :AttackBehavior(info) {}
+	Attack_Extended5(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex5 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[2]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_Extended6 : public AttackBehavior		//派生6段目
 {
 public:
-	Attack_Extended6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex6 }) :AttackBehavior(info) {}
+	Attack_Extended6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_Ex6 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[3]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
@@ -153,14 +173,14 @@ public:
 class Attack_ExGorira3 : public AttackBehavior		//派生5段目
 {
 public:
-	Attack_ExGorira3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex3 }) :AttackBehavior(info) {}
+	Attack_ExGorira3(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex3 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[3]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
 class Attack_ExGorira4 : public AttackBehavior		//派生5段目
 {
 public:
-	Attack_ExGorira4(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex4 }) :AttackBehavior(info) {}
+	Attack_ExGorira4(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex4 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[2]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };
@@ -168,7 +188,7 @@ public:
 class Attack_ExGorira6 : public AttackBehavior		//派生6段目
 {
 public:
-	Attack_ExGorira6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex6 }) :AttackBehavior(info) {}
+	Attack_ExGorira6(MyInfo info = { true,CPlayerX::MOTION_ATTACK_G_Ex6 }) :AttackBehavior(info) { m_nThisAttackDamage = ATTACK_DAMAGE[5]; }
 	void NextAttack([[maybe_unused]] CPlayerX* pPlayer)override;
 	void UseDisable()override { m_bUse = false; }
 };

@@ -13,19 +13,26 @@
 class Gorira_AI
 {
 public:
-	Gorira_AI() :m_bDoing(false){};
+	Gorira_AI() :m_bDoing(false), m_LastPlayerPos({ 0.0f,0.0f,0.0f }), m_LeapRotValue(0) {};
 	~Gorira_AI() = default;
 	void AI_Init();
 	void AI_Update([[maybe_unused]] CG_Gorira* pGorira);
-	void AI_DoFinish() { m_bDoing = false; }
+	_forceinline void AI_DoFinish([[maybe_unused]] CG_Gorira* pGorira) {
+		m_bDoing = false;
+		SetThinkValue();
+		LookPlayer(pGorira);
+	}
 
 private:
 	void SetNextAction([[maybe_unused]] CG_Gorira* pGorira);		//次の行動を決定
+	void LookPlayer([[maybe_unused]] CG_Gorira* pGorira);
 	void SetThinkValue();		//思考する間隔を設定
-	bool SearchPlayer([[maybe_unused]] CG_Gorira* pGorira);		//遠い場合にtrueを返す
+	int SearchPlayer([[maybe_unused]] CG_Gorira* pGorira);		//遠い場合にtrueを返す
 	bool GetIsThinking() { return m_Timer <= 0; }
 	int m_Timer;
 	bool m_bDoing;
+	float m_LeapRotValue;
+	D3DXVECTOR3 m_LastPlayerPos;
 };
 
 //========================================================================================================
@@ -59,9 +66,9 @@ class G_Attack_Normal : public G_AttackBehavior	//通常攻撃
 public:
 	void G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)override;
 	void G_AttackUninit([[maybe_unused]] CG_Gorira* pGorira)override {};
-	void G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)override;
-	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override {};
-
+	void G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)override {};
+	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override;
+	static int m_ContNum;
 };
 class G_Attack_Dive : public G_AttackBehavior	//通常飛び込み
 {
@@ -72,7 +79,7 @@ public:
 	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override;
 
 private:
-	void SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira,float frame);
+	void SlerpRotatedPosition([[maybe_unused]] CG_Gorira* pGorira, float frame);
 	int m_NowFrame;			//現在の補間フレーム
 	int m_DestFrame;		//補間フレームの最大値
 	D3DXVECTOR3 m_LastPos;
@@ -96,7 +103,15 @@ public:
 	void G_AttackUninit([[maybe_unused]] CG_Gorira* pGorira)override {}
 	void G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)override;
 	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override {};
-
 };
+class G_Attack_BackStep : public G_AttackBehavior	//バクステ攻撃
+{
+public:
+	void G_AttackInit([[maybe_unused]] CG_Gorira* pGorira)override;
+	void G_AttackUninit([[maybe_unused]] CG_Gorira* pGorira)override {}
+	void G_AttackUpdate([[maybe_unused]] CG_Gorira* pGorira)override {}
+	void G_AttackFinish([[maybe_unused]] CG_Gorira* pGorira)override;
+};
+
 
 #endif 

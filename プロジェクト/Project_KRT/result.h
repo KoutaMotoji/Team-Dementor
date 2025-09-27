@@ -9,6 +9,7 @@
 
 #include "scene.h"
 #include "object2D.h"
+#include "score.h"
 
 
 class CResult : public CScene
@@ -22,17 +23,8 @@ public:
 	void Draw()override;
 private:
 	bool m_bSelect;
-};
+	CScore* m_pScore;
 
-class CResultBG :public CObject2D
-{
-public:
-	CResultBG() {};		//コンストラクタ
-	~CResultBG()override = default;				//デストラクタ
-	void Init()override;		//初期化
-
-	static CResultBG* Create();
-private:
 };
 
 #endif

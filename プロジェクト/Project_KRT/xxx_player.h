@@ -46,7 +46,8 @@ public:
 
 	inline D3DXVECTOR3 GetPos() { return CCharacter::GetPos(); };
 	inline D3DXVECTOR3 GetMove() { return CCharacter::GetMove(); };
-	void SetParry();
+	void SetParry(int AddDmg);
+	void DamageToEnemy();
 	inline std::shared_ptr<PlayerArm_State>GetArmState() { return m_ArmState; }
 	_forceinline void SetState(std::shared_ptr<PlayerState>pState) {
 		if (m_PlayerState != nullptr)
@@ -103,12 +104,19 @@ public:
 		MOTION_ATTACK_G_Ex6_toJump,
 		MOTION_ATTACK_G_Ex6,
 	};
-	bool ToPlayerCollision();
-	void EquipWeapon();
 	void EnemyCollision();
 	void ToEnemyAttack();
+	void ToDamage(int Damage)
+	{
+		CCharacter::SetLife(CCharacter::GetLife() - Damage);
+		if (CCharacter::GetLife() <= 0)
+		{
+			CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_GAMEOVER);
+		}
+	}
 private:
-
+	bool ToPlayerCollision();
+	void EquipWeapon();
 	static constexpr int MAX_LIFE = 1000;			//体力
 
 	D3DXVECTOR3 m_OldPos;					//過去の位置
@@ -123,9 +131,9 @@ private:
 		return ((CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().x != 0.0f ||
 			CManager::GetInstance()->GetJoypad()->GetJoyStickVecL().y != 0.0f) ||
 			(CManager::GetInstance()->GetKeyboard()->GetPress(DIK_W) ||
-			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_A) ||
-			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_S) ||
-			CManager::GetInstance()->GetKeyboard()->GetPress(DIK_D)));
+				CManager::GetInstance()->GetKeyboard()->GetPress(DIK_A) ||
+				CManager::GetInstance()->GetKeyboard()->GetPress(DIK_S) ||
+				CManager::GetInstance()->GetKeyboard()->GetPress(DIK_D)));
 	}
 	CCTBarUI* m_pCctBarUI;
 	bool m_bAttackCt;
@@ -133,6 +141,7 @@ private:
 	std::vector<CButtonUI*>m_vButtonUI;
 	float m_LastCamDis;
 	std::shared_ptr<CDebugLine>m_pDebugLine;
+	std::shared_ptr<CDebugLine>m_pHitCollision;
 
 	std::shared_ptr<PlayerState>m_PlayerState;
 	std::shared_ptr<PlayerArm_State>m_ArmState;
@@ -159,54 +168,57 @@ class PlayerState
 public:
 	//この状態になることは無いので純粋仮想関数化する
 	virtual void Move([[maybe_unused]] CPlayerX* pPlayer) = 0;
-	virtual void Attack([[maybe_unused]]CPlayerX* pPlayer) = 0;
-	virtual void Parry([[maybe_unused]]CPlayerX* pPlayer) = 0;
-	virtual void ToAttack([[maybe_unused]]CPlayerX* pPlayer) = 0;
-	virtual void ToParry([[maybe_unused]]CPlayerX* pPlayer) = 0;
+	virtual void Attack([[maybe_unused]] CPlayerX* pPlayer) = 0;
+	virtual void Parry([[maybe_unused]] CPlayerX* pPlayer) = 0;
+	virtual void ToAttack([[maybe_unused]] CPlayerX* pPlayer) = 0;
+	virtual void ToParry([[maybe_unused]] CPlayerX* pPlayer) = 0;
 private:
 };
 
 class State_Nutoral : public PlayerState
 {	//通常ステート
 public:
-	void Move([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Attack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Parry([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToAttack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToParry([[maybe_unused]]CPlayerX* pPlayer)override;
+	void Move([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Attack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Parry([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToAttack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToParry([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
 };
 
 class State_Attack : public PlayerState
 {	//攻撃ステート
 public:
-	void Move([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Attack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Parry([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToAttack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToParry([[maybe_unused]]CPlayerX* pPlayer)override;
+	void Move([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Attack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Parry([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToAttack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToParry([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
 };
 
 class State_Parry : public PlayerState
 {	//パリィステート(パリィ構え→パリィ待機→パリィ解除まで)
 public:
-	void Move([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Attack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Parry([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToAttack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToParry([[maybe_unused]]CPlayerX* pPlayer)override;
+	State_Parry() :m_nParryDmg(120), m_nDownValue(5) {}
+	void Move([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Attack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Parry([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToAttack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToParry([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
+	int m_nParryDmg;
+	int m_nDownValue;
 };
 
 class State_ParryAttack : public PlayerState
 {	//パリィステート(パリィ構え→パリィ待機→パリィ解除まで)
 public:
-	void Move([[maybe_unused]]CPlayerX* pPlayer)override {};
-	void Attack([[maybe_unused]]CPlayerX* pPlayer)override {};
-	void Parry([[maybe_unused]]CPlayerX* pPlayer)override {};
-	void ToAttack([[maybe_unused]]CPlayerX* pPlayer)override {};
-	void ToParry([[maybe_unused]]CPlayerX* pPlayer)override {};
+	void Move([[maybe_unused]] CPlayerX* pPlayer)override {};
+	void Attack([[maybe_unused]] CPlayerX* pPlayer)override {};
+	void Parry([[maybe_unused]] CPlayerX* pPlayer)override {};
+	void ToAttack([[maybe_unused]] CPlayerX* pPlayer)override {};
+	void ToParry([[maybe_unused]] CPlayerX* pPlayer)override {};
 
 private:
 
@@ -214,12 +226,14 @@ private:
 class State_Damage : public PlayerState
 {	//被ダメージステート
 public:
-	void Move([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Attack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void Parry([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToAttack([[maybe_unused]]CPlayerX* pPlayer)override;
-	void ToParry([[maybe_unused]]CPlayerX* pPlayer)override;
+	State_Damage() :m_CoolTime(0) {}
+	void Move([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Attack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void Parry([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToAttack([[maybe_unused]] CPlayerX* pPlayer)override;
+	void ToParry([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
+	int m_CoolTime;
 };
 
 //========================================================================================================
@@ -229,8 +243,8 @@ class LockOn_State
 {	//ロックオンステート基底クラス　
 public:
 	//この状態になることは無いので純粋仮想関数化する
-	virtual void Swicth([[maybe_unused]]CPlayerX* pPlayer) = 0;
-	virtual void UpdateCam([[maybe_unused]]CPlayerX* pPlayer) = 0;
+	virtual void Swicth([[maybe_unused]] CPlayerX* pPlayer) = 0;
+	virtual void UpdateCam([[maybe_unused]] CPlayerX* pPlayer) = 0;
 private:
 };
 
@@ -239,16 +253,16 @@ class LockEnable : public LockOn_State
 public:
 	static D3DXVECTOR3 s_savedPosV; // 保存用のカメラ視点
 	static D3DXVECTOR3 s_savedPosR; // 保存用のカメラ注視点
-	virtual void Swicth([[maybe_unused]]CPlayerX* pPlayer)override;
-	virtual void UpdateCam([[maybe_unused]]CPlayerX* pPlayer)override;
+	virtual void Swicth([[maybe_unused]] CPlayerX* pPlayer)override;
+	virtual void UpdateCam([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
 };
 
 class LockDisable : public LockOn_State
 {	//非ロックオン状態クラス
 public:
-	virtual void Swicth([[maybe_unused]]CPlayerX* pPlayer)override;
-	virtual void UpdateCam([[maybe_unused]]CPlayerX* pPlayer)override;
+	virtual void Swicth([[maybe_unused]] CPlayerX* pPlayer)override;
+	virtual void UpdateCam([[maybe_unused]] CPlayerX* pPlayer)override;
 private:
 };
 

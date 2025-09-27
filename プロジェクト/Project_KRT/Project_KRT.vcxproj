@@ -156,7 +156,11 @@
     <ClCompile Include="damage_fill.cpp" />
     <ClCompile Include="debug_line.cpp" />
     <ClCompile Include="durability_gauge.cpp" />
+    <ClCompile Include="enemy.cpp" />
+    <ClCompile Include="enemy_ai.cpp" />
+    <ClCompile Include="enemy_attack_state.cpp" />
     <ClCompile Include="enemy_manager.cpp" />
+    <ClCompile Include="enemy_state.cpp" />
     <ClCompile Include="fade.cpp" />
     <ClCompile Include="field_manager.cpp" />
     <ClCompile Include="fill.cpp" />
@@ -164,6 +168,7 @@
     <ClCompile Include="floorUI.cpp" />
     <ClCompile Include="floor_stone.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="gameover.cpp" />
     <ClCompile Include="gauge_background.cpp" />
     <ClCompile Include="health_fill.cpp" />
     <ClCompile Include="health_gauge.cpp" />
@@ -191,6 +196,7 @@
     <ClCompile Include="player_UI.cpp" />
     <ClCompile Include="renderer.cpp" />
     <ClCompile Include="result.cpp" />
+    <ClCompile Include="result_obj.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="score.cpp" />
     <ClCompile Include="sound.cpp" />
@@ -201,6 +207,7 @@
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="title.cpp" />
     <ClCompile Include="title_obj.cpp" />
+    <ClCompile Include="weapon.cpp" />
     <ClCompile Include="xxx_player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -213,6 +220,9 @@
     <ClInclude Include="damage_fill.h" />
     <ClInclude Include="debug_line.h" />
     <ClInclude Include="durability_fill.h" />
+    <ClInclude Include="enemy.h" />
+    <ClInclude Include="enemy_ai.h" />
+    <ClInclude Include="enemy_attack_state.h" />
     <ClInclude Include="enemy_manager.h" />
     <ClInclude Include="fade.h" />
     <ClInclude Include="field_manager.h" />
@@ -221,6 +231,7 @@
     <ClInclude Include="floorUI.h" />
     <ClInclude Include="floor_stone.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="gameover.h" />
     <ClInclude Include="gauge_background.h" />
     <ClInclude Include="health_fill.h" />
     <ClInclude Include="health_gauge.h" />
@@ -249,6 +260,7 @@
     <ClInclude Include="player_UI.h" />
     <ClInclude Include="renderer.h" />
     <ClInclude Include="result.h" />
+    <ClInclude Include="result_obj.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="score.h" />
     <ClInclude Include="sound.h" />
@@ -259,6 +271,7 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="title.h" />
     <ClInclude Include="title_obj.h" />
+    <ClInclude Include="weapon.h" />
     <ClInclude Include="xxx_player.h" />
   </ItemGroup>
   <ItemGroup>

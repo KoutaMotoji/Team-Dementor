@@ -17,7 +17,9 @@
 #include "camera.h"
 #include "light.h"
 #include "scene.h"
+#include "score.h"
 #include "fade.h"
+#include "game_info.h"
 
 class CManager
 {
@@ -48,19 +50,21 @@ public:
 	inline CLight* GetLight() { return m_pLight; };
 	inline CScene* GetScene() { return m_pScene; };
 	inline CFade* GetFade() { return m_pFade; };
-	 void SetMode(CScene::MODE mode);
-	 const int MAP_SLICE_X;
-	 const int MAP_SLICE_Y;
+	inline CGameInfo* GetGameInfo() { return m_pGameInfo; };
+	void SetMode(CScene::MODE mode);
+	const int MAP_SLICE_X;
+	const int MAP_SLICE_Y;
 private:
-	 CRenderer* m_pRenderer;
-	 CKeyboard* m_pKeyboard;
-	 CTexture* m_pTexture;
-	 CJoypad* m_pJoypad;
-	 CSound* m_pSound;
-	 CCamera* m_pCamera;
-	 CLight* m_pLight;
-	 CScene* m_pScene;
-	 CFade* m_pFade;
+	CGameInfo* m_pGameInfo;
+	CRenderer* m_pRenderer;
+	CKeyboard* m_pKeyboard;
+	CTexture* m_pTexture;
+	CJoypad* m_pJoypad;
+	CSound* m_pSound;
+	CCamera* m_pCamera;
+	CLight* m_pLight;
+	CScene* m_pScene;
+	CFade* m_pFade;
 };
 
 #endif

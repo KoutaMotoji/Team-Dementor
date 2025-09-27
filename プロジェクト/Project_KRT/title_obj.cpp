@@ -21,7 +21,7 @@ namespace
 	std::string TREE_FILENAME = "data\\TEXTURE\\Tree000.png";
 
 	D3DXVECTOR3 T_PLAYER_POS = { 100.0f,-110.0f,0.0f };
-	D3DXVECTOR3 T_FIELD_POS = {0.0f,500.0f,0.0f};
+	D3DXVECTOR3 T_FIELD_POS = { 0.0f,500.0f,0.0f };
 	float TREE_RADIUS = 200.0f;
 };
 
@@ -67,7 +67,11 @@ void CT_Player::Uninit()
 //==========================================================================================
 void CT_Player::Update()
 {
-	
+	if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_RETURN) ||
+		CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_A))
+	{
+		CCharacter::SetNextMotion(MOTION_ACTION);
+	}
 	CCharacter::Update();
 }
 

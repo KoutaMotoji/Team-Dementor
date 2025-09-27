@@ -9,7 +9,7 @@
 
 
 
-CNumber::CNumber(int nPriority) :CObject2D(nPriority),m_nNum(0)
+CNumber::CNumber(int nPriority) :CObject2D(nPriority), m_nNum(0)
 {
 
 }
@@ -25,8 +25,6 @@ CNumber::~CNumber()
 void CNumber::Init()
 {
 	//テクスチャの登録・割り当て
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\number000.png");
-	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 10, 1);
 
 	CObject::SetType(TYPE_2D_UI);
 	CObject2D::Init();
@@ -64,5 +62,22 @@ CNumber* CNumber::Create(D3DXVECTOR3 pos, float fWidth, float fHeight)
 	CNumber* number = new CNumber;
 	number->SetPolygonParam(pos, fHeight, fWidth, { 1.0f,1.0f,1.0f,1.0f });
 	number->Init();
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\number000.png");
+	number->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 10, 1);
+
+	return number;
+}
+
+//==========================================================================================
+//生成処理(オーバーロード)
+//==========================================================================================
+CNumber* CNumber::Create(D3DXVECTOR3 pos, float fWidth, float fHeight, int n)
+{
+	CNumber* number = new CNumber;
+	number->SetPolygonParam(pos, fHeight, fWidth, { 1.0f,1.0f,1.0f,1.0f });
+	number->Init();
+	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\number001.png");
+	number->BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 10, 1);
+
 	return number;
 }

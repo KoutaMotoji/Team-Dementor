@@ -21,10 +21,11 @@ public:
 	void Update()override;		//更新
 	void Draw()override;		//描画
 
-	static CNumber* Create(D3DXVECTOR3 pos,float Height,float Width);
+	static CNumber* Create(D3DXVECTOR3 pos, float Height, float Width);
+	static CNumber* Create(D3DXVECTOR3 pos, float Height, float Width, int n);
 
-	void SetNum(int Num) { 
-		m_nNum = Num;	
+	void SetNum(int Num) {
+		m_nNum = Num;
 		CObject2D::SetAnim({ (float)m_nNum,CObject2D::GetAnim().y });
 	};							//自身の桁の数字を取得、アニメーションを移動
 private:

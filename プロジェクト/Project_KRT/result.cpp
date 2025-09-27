@@ -10,7 +10,9 @@
 #include "object.h"
 #include "result.h"
 
-namespace 
+#include"result_obj.h"
+
+namespace
 {
 	D3DXVECTOR3 LogoPos = { 320.0f,150.0f, 0.0f };
 	D3DXVECTOR2 LogoSize = { 300.0f,300.0f };
@@ -19,7 +21,7 @@ namespace
 
 CResult::CResult()
 {
-	
+
 }
 
 CResult::~CResult()
@@ -34,8 +36,12 @@ HRESULT CResult::Init()
 {
 	CScene::Init();
 	CResultBG::Create();
+	CR_Graound::Create();
+	CResultBGBack::Create();
+	CResultReview::Create(false);
+	CResultRank::Create(0);
 	CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_BGM_RESULT);
-
+	m_pScore = CScore::Create({ 800.0f,460.0f,0.0f }, 6, 60.0f, 90.0f);
 	return S_OK;
 }
 
@@ -44,7 +50,12 @@ HRESULT CResult::Init()
 //==========================================================================================
 void CResult::Uninit()
 {
-
+	if (m_pScore != nullptr)
+	{
+		m_pScore->Uninit();
+		delete m_pScore;
+		m_pScore = nullptr;
+	}
 	CScene::Uninit();
 }
 
@@ -55,11 +66,9 @@ void CResult::Update()
 {
 	if (CManager::GetInstance()->GetKeyboard()->CKeyboard::GetTrigger(DIK_RETURN) || CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_A))
 	{
-
 		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_TITLE);
-		
 	}
-
+	m_pScore->Update();
 	CScene::Update();
 }
 
@@ -68,30 +77,6 @@ void CResult::Update()
 //==========================================================================================
 void CResult::Draw()
 {
+	m_pScore->Draw();
 	CScene::Draw();
-}
-
-//==========================================================================================
-//˜g‚Ì‰Šú‰»ˆ—
-//==========================================================================================
-void CResultBG::Init()
-{
-	int nIdx = CManager::GetInstance()->GetTexture()->Regist("data\\TEXTURE\\hotdog.png");
-	BindTexture(CManager::GetInstance()->GetTexture()->GetAddress(nIdx), 1, 1);
-
-	CObject::SetType(TYPE_2D_UI);
-	CObject2D::Init();
-}
-
-//==========================================================================================
-//˜g‚Ì¶¬ˆ—
-//==========================================================================================
-CResultBG* CResultBG::Create()
-{
-	CResultBG* bg = new CResultBG;
-
-	bg->SetPolygonParam({SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f}, LogoSize.x, LogoSize.y);
-	bg->Init();
-
-	return bg;
 }

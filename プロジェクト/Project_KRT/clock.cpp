@@ -62,6 +62,9 @@ void CClockGauge::Update()
 	m_pClockHands->SetRot({ 0.0f,0.0f,Radian });
 	if (CClock::GetInstance()->GetTimeUped())
 	{
+		if (!m_bTimeUp)		CManager::GetInstance()->GetFade()->SetFade(CFade::FADE_IN, CScene::MODE_GAMEOVER);
+		m_bTimeUp = true;
+
 		QuakeObj();
 	}
 	CObjectCircleGauge::Update();

@@ -256,7 +256,7 @@ void CEnemy::Draw()
 	m_pDebugLine->Draw(CCharacter::GetPos());
 	int cnt{};
 
-	for (const auto& e : m_pDL_BodyCollision)
+	for (auto& e : m_pDL_BodyCollision)
 	{
 		e->Draw({ model[cnt]->GetWorldMatrix()._41,model[cnt]->GetWorldMatrix()._42,model[cnt]->GetWorldMatrix()._43 });
 		++cnt;

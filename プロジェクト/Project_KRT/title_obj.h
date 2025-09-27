@@ -33,7 +33,7 @@ public:
 	enum
 	{
 		MOTION_NUTORAL = 0,
-		MOTION_WALK,
+		MOTION_ACTION,
 	};
 private:
 	D3DXMATRIX m_mtxWorld;					//ワールドマトリックス

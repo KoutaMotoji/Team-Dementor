@@ -19,6 +19,10 @@ public:
 		SOUND_LABEL_BGM_TITLE = 0,
 		SOUND_LABEL_BGM_RESULT,
 		SOUND_LABEL_SE_PARRY,
+		SOUND_LABEL_SE_BOSS1_ATTACK,
+		SOUND_LABEL_SE_BOSS1_SWING,
+		SOUND_LABEL_SE_ENEMY_ATTACK,
+		SOUND_LABEL_SE_PLAYER_ATTACK,
 		SOUND_LABEL_MAX
 
 	} SOUND_LABEL;
@@ -48,9 +52,14 @@ private:
 	// サウンドの情報
 	SOUNDINFO m_aSoundInfo[SOUND_LABEL_MAX] =
 	{
-		{"data/SOUND/BGM/title.wav", -1,0.4f},	//タイトル画面BGM
-		{"data/SOUND/BGM/result.wav", -1,0.4f},	//チュートリアル画面BGM
-		{"data/SOUND/SE/super_parry.wav", 0,0.1f},		//ゲーム画面BGM
+		{"data/SOUND/BGM/title.wav", -1,0.2f},	//タイトル画面BGM
+		{"data/SOUND/BGM/result.wav", -1,0.2f},	//チュートリアル画面BGM
+		{"data/SOUND/SE/super_parry.wav", 0,0.1f},		//パリィSE
+		{"data/SOUND/SE/boss1_attack00.wav", 0,0.1f},	//ボス１通常攻撃SE
+		{"data/SOUND/SE/boss1_attack01.wav", 0,0.1f},		//ボス１飛び込み攻撃SE
+		{"data/SOUND/SE/enemy_attack00.wav", 0,0.1f},		//雑魚敵攻撃SE
+		{"data/SOUND/SE/player_attack00.wav", 0,0.1f},		//プレイヤー攻撃SE
+
 	};
 };
 

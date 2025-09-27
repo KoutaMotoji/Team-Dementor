@@ -13,19 +13,26 @@
 D3DXVECTOR3 LockEnable::s_savedPosV = { 0,0,0 };
 D3DXVECTOR3 LockEnable::s_savedPosR = { 0,0,0 };
 
+namespace
+{
+	int DAMAGE_COOLTIME = 68;
+}
+
 //通常時のステート
-void State_Nutoral::Attack([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Nutoral::Attack([[maybe_unused]] CPlayerX* pPlayer) {
 	//pPlayer->PAttackInfo();
 }
-void State_Nutoral::Parry([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Nutoral::Parry([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Nutoral::Move([[maybe_unused]]CPlayerX* pPlayer)
+void State_Nutoral::Move([[maybe_unused]] CPlayerX* pPlayer)
 {
+	pPlayer->DamageToEnemy();
+
 	pPlayer->PMove(CManager::GetInstance()->GetCamera()->GetRotZ());
 	pPlayer->EnemyCollision();
 }
-void State_Nutoral::ToAttack([[maybe_unused]]CPlayerX* pPlayer)
+void State_Nutoral::ToAttack([[maybe_unused]] CPlayerX* pPlayer)
 {
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
@@ -34,7 +41,7 @@ void State_Nutoral::ToAttack([[maybe_unused]]CPlayerX* pPlayer)
 		pPlayer->SetState(std::make_shared<State_Attack>());
 	}
 }
-void State_Nutoral::ToParry([[maybe_unused]]CPlayerX* pPlayer)
+void State_Nutoral::ToParry([[maybe_unused]] CPlayerX* pPlayer)
 {
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
@@ -45,22 +52,24 @@ void State_Nutoral::ToParry([[maybe_unused]]CPlayerX* pPlayer)
 }
 
 //攻撃時のステート
-void State_Attack::Attack([[maybe_unused]]CPlayerX* pPlayer)
+void State_Attack::Attack([[maybe_unused]] CPlayerX* pPlayer)
 {
 	pPlayer->ToEnemyAttack();
 	pPlayer->PAttackInfo();
 
 }
-void State_Attack::Parry([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Attack::Parry([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Attack::Move([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Attack::Move([[maybe_unused]] CPlayerX* pPlayer) {
+	pPlayer->DamageToEnemy();
+
 	//攻撃時は移動不可のため移動の機能を実装しない
 }
-void State_Attack::ToAttack([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Attack::ToAttack([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Attack::ToParry([[maybe_unused]]CPlayerX* pPlayer)
+void State_Attack::ToParry([[maybe_unused]] CPlayerX* pPlayer)
 {
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_L))
@@ -71,18 +80,21 @@ void State_Attack::ToParry([[maybe_unused]]CPlayerX* pPlayer)
 }
 
 //パリィ時のステート
-void State_Parry::Attack([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Parry::Attack([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Parry::Parry([[maybe_unused]]CPlayerX* pPlayer)
+void State_Parry::Parry([[maybe_unused]] CPlayerX* pPlayer)
 {
+	m_nParryDmg -= m_nDownValue;
+	m_nDownValue * 5;
+	if (m_nParryDmg < 0)m_nParryDmg = 0;
 	//パリィ状態の時のみ通す処理
 	if (pPlayer->GetNowMotion() != CPlayerX::MOTION_PARRY && pPlayer->GetNowMotion() != CPlayerX::MOTION_PARRY_ATTACK && pPlayer->GetNextMotion() != CPlayerX::MOTION_PARRY_ATTACK)
 	{
 		pPlayer->GetArmState()->ParryStayMotion(pPlayer);
 
 	}
-	pPlayer->SetParry();
+	pPlayer->SetParry(m_nParryDmg);
 	if (CManager::GetInstance()->GetJoypad()->GetRelease(CJoypad::JOYPAD_RIGHT_SHOULDER) ||
 		CManager::GetInstance()->GetKeyboard()->GetRelease(DIK_L))
 	{
@@ -90,10 +102,10 @@ void State_Parry::Parry([[maybe_unused]]CPlayerX* pPlayer)
 		pPlayer->SetState(std::make_shared<State_Nutoral>());
 	}
 }
-void State_Parry::Move([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Parry::Move([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Parry::ToAttack([[maybe_unused]]CPlayerX* pPlayer)
+void State_Parry::ToAttack([[maybe_unused]] CPlayerX* pPlayer)
 {
 	if (CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_X) ||
 		CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_J))
@@ -102,29 +114,36 @@ void State_Parry::ToAttack([[maybe_unused]]CPlayerX* pPlayer)
 		pPlayer->SetState(std::make_shared<State_Attack>());
 	}
 }
-void State_Parry::ToParry([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Parry::ToParry([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
 
 //被ダメージ時のステート
-void State_Damage::Attack([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Damage::Attack([[maybe_unused]] CPlayerX* pPlayer) {
+	//pPlayer->PMove(CManager::GetInstance()->GetCamera()->GetRotZ());
+	pPlayer->CCharacter::SetNextMotion(pPlayer->MOTION_KNOCKBACK);
+
+	++m_CoolTime;
+	if (m_CoolTime > DAMAGE_COOLTIME)
+	{
+		pPlayer->SetState(std::make_shared<State_Nutoral>());
+	}
+}
+void State_Damage::Parry([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Damage::Parry([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Damage::Move([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Damage::Move([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Damage::ToAttack([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
-void State_Damage::ToAttack([[maybe_unused]]CPlayerX* pPlayer) {
-
-}
-void State_Damage::ToParry([[maybe_unused]]CPlayerX* pPlayer) {
+void State_Damage::ToParry([[maybe_unused]] CPlayerX* pPlayer) {
 
 }
 
 //ロックオン時のステート
-void LockEnable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
+void LockEnable::Swicth([[maybe_unused]] CPlayerX* pPlayer) {
 	CCamera* cam = CManager::GetInstance()->GetCamera();
 
 	// プレイヤー位置をセット（UpdateNormalCamに必要）
@@ -150,8 +169,8 @@ void LockEnable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockDisable>());
 }
 
-void LockEnable::UpdateCam([[maybe_unused]]CPlayerX* pPlayer)
-{	
+void LockEnable::UpdateCam([[maybe_unused]] CPlayerX* pPlayer)
+{
 	for (int j = 0; j < SET_PRIORITY; ++j) {
 		for (int i = 0; i < MAX_OBJECT; ++i) {
 			CObject* pObj = CObject::GetObjects(j, i);
@@ -192,7 +211,7 @@ void LockEnable::UpdateCam([[maybe_unused]]CPlayerX* pPlayer)
 }
 
 //非ロックオン時のステート
-void LockDisable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
+void LockDisable::Swicth([[maybe_unused]] CPlayerX* pPlayer) {
 	CCamera* cam = CManager::GetInstance()->GetCamera();
 
 	for (int j = 0; j < SET_PRIORITY; ++j) {
@@ -209,7 +228,7 @@ void LockDisable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
 			D3DXVECTOR3 enemyPos = pEnemy->CCharacter::GetPos();
 
 			// 現在のカメラ位置を保存（解除時に戻す用）
-			LockEnable::s_savedPosV = cam->GetPosV(); 
+			LockEnable::s_savedPosV = cam->GetPosV();
 			LockEnable::s_savedPosR = cam->GetPosR();
 
 			// Yaw計算
@@ -241,7 +260,7 @@ void LockDisable::Swicth([[maybe_unused]]CPlayerX* pPlayer) {
 	pPlayer->SetLockOnState(std::make_shared<LockEnable>());
 }
 
-void LockDisable::UpdateCam([[maybe_unused]]CPlayerX* pPlayer)
+void LockDisable::UpdateCam([[maybe_unused]] CPlayerX* pPlayer)
 {
 	CManager::GetInstance()->GetCamera()->SetPlayerPos(pPlayer->CCharacter::GetPos());
 }

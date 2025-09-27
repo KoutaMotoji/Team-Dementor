@@ -1,6 +1,6 @@
 //===============================================================================
 //
-//  プレイヤー処理(playerX.h)
+//  ステージ1ボス処理(stage1_boss.h)
 //								制作：元地弘汰
 // 
 //===============================================================================
@@ -34,15 +34,15 @@ public:
 	bool EndMotion()override;
 
 	_forceinline void SetState(std::shared_ptr<Stage1Boss_State>pState) {
-		if (m_State != nullptr)		{
+		if (m_State != nullptr) {
 			m_State = nullptr;
 		}
 		m_State = pState;
 	}
 	_forceinline void SetAttackState(std::shared_ptr<G_AttackBehavior>pState);
-
-	void BeDamaged() ;			//外部から呼ぶ用
-	void Damaged();				//Stateの中で呼ぶ用
+	inline std::vector<int> GetAttackNumVec() { return m_AttackMotionNum; }
+	void BeDamaged(int value);			//外部から呼ぶ用
+	void Damaged(int value);				//Stateの中で呼ぶ用
 	static CG_Gorira* Create(D3DXVECTOR3 pos);
 
 	enum
@@ -50,8 +50,16 @@ public:
 		MOTION_NUTORAL = 0,
 		MOTION_WALK,
 		MOTION_ATTACK,
+		MOTION_JUMP,
+		MOTION_LANDING,
 		MOTION_DAMAGE_BIG,
 		MOTION_DAMAGE_SMALL,
+		MOTION_DOUBLEHUMMER,
+		MOTION_SWING,
+		MOTION_BIGJUMP,
+		MOTION_STAMP,
+		MOTION_STAN,
+		MOTION_BACKSTEP
 	};
 	std::vector<std::shared_ptr<CHitCircle>> GetBodyHitCircle() { return m_pHC_BodyCollision; }
 private:
@@ -72,6 +80,7 @@ private:
 	int m_nAttackcnt;
 	bool m_moveFlag;
 	int m_nLife;
+	std::vector<int> m_AttackMotionNum;
 };
 
 //========================================================================================================
@@ -81,7 +90,7 @@ class Stage1Boss_State
 public:
 	virtual void Move(CG_Gorira* pGorira) = 0;
 	virtual void Attack(CG_Gorira* pGorira) = 0;
-	virtual void Damage(CG_Gorira* pGorira) = 0;
+	virtual void Damage(CG_Gorira* pGorira, int value) = 0;
 	virtual void Wait(CG_Gorira* pGorira) = 0;
 };
 
@@ -90,7 +99,7 @@ class Stage1Boss_Nutoral : public Stage1Boss_State
 public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
-	void Damage(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira, int value)override;
 	void Wait(CG_Gorira* pGorira)override;
 };
 
@@ -99,16 +108,16 @@ class Stage1Boss_Attack : public Stage1Boss_State
 public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
-	void Damage(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira, int value)override;
 	void Wait(CG_Gorira* pGorira)override;
 };
 
-class Stage1Boss_Damage: public Stage1Boss_State
+class Stage1Boss_Damage : public Stage1Boss_State
 {
 public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
-	void Damage(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira, int value)override;
 	void Wait(CG_Gorira* pGorira)override;
 };
 
@@ -117,7 +126,7 @@ class Stage1Boss_Death : public Stage1Boss_State
 public:
 	void Move(CG_Gorira* pGorira)override;
 	void Attack(CG_Gorira* pGorira)override;
-	void Damage(CG_Gorira* pGorira)override;
+	void Damage(CG_Gorira* pGorira, int value)override;
 	void Wait(CG_Gorira* pGorira)override;
 };
 #endif

@@ -11,6 +11,8 @@
 #include "game.h"
 #include "title.h"
 #include "result.h"
+#include "gameover.h"
+
 #include "manager.h"
 
 
@@ -80,6 +82,11 @@ CScene* CScene::Create(CScene::MODE mode)
 		break;
 	case MODE_RESULT:
 		scene = new CResult();
+		scene->m_mode = mode;
+		return scene;
+		break;
+	case MODE_GAMEOVER:
+		scene = new CGameover();
 		scene->m_mode = mode;
 		return scene;
 		break;

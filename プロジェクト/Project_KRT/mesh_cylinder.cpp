@@ -10,20 +10,20 @@
 
 namespace
 {
-	float MAX_WIDTH = 3000.0f;
-	float MAX_HEIGHT = 3000.0f;
-	
+	float MAX_WIDTH = 6000.0f;
+	float MAX_HEIGHT = 8000.0f;
+
 	int MAX_CORNER = 8;
-	
+
 	int MAX_VTX = MAX_CORNER * 2;
 	int MAX_INDEX = MAX_VTX + 2;
 }
 
 
 
-CMeshCylinder::CMeshCylinder(int nPriority): CObject(nPriority),
-				m_pos({0.0f,0.0f,0.0f}), 
-				m_rot({0.0f,0.0f,0.0f})
+CMeshCylinder::CMeshCylinder(int nPriority) : CObject(nPriority),
+m_pos({ 0.0f,0.0f,0.0f }),
+m_rot({ 0.0f,0.0f,0.0f })
 {
 
 }
@@ -108,15 +108,14 @@ void CMeshCylinder::Init()
 		++nLoop;
 
 		pIdx[nLoop] = X;
-
 		++nLoop;
 	}
 
-	pIdx[nLoop] = (MAX_CORNER);
+	pIdx[nLoop] = (MAX_CORNER)+1;
 
 	++nLoop;
 
-	pIdx[nLoop] = 0;
+	pIdx[nLoop] = 1;
 
 	m_pIdxBuffMeshCylinder->Unlock();
 }

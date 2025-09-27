@@ -14,7 +14,7 @@
 
 CManager* CManager::_instance = nullptr;
 
-CManager::CManager():MAP_SLICE_X(24), MAP_SLICE_Y(18)
+CManager::CManager() :MAP_SLICE_X(24), MAP_SLICE_Y(18)
 {
 
 }
@@ -37,6 +37,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_pLight = new CLight();
 	////サウンドの生成
 	m_pSound = new CSound();
+
 	//キーボードの生成
 	m_pKeyboard = new CKeyboard();
 	//ジョイパッドの生成
@@ -46,6 +47,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	m_pTexture = new CTexture();
 
 	m_pFade = new CFade();
+
+	m_pGameInfo = new CGameInfo();
 	//初期化設定
 	if (FAILED(m_pRenderer->Init(hWnd, TRUE)))
 	{//初期化が失敗した場合
@@ -54,13 +57,14 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	//キーボードの初期化設定
 	m_pKeyboard->Init(hInstance, hWnd);
 	//ジョイパッドの初期化
-	m_pJoypad->Init(hInstance,hWnd);
+	m_pJoypad->Init(hInstance, hWnd);
 	//カメラの初期化
 	m_pCamera->Init();
 	////サウンドの初期化
 	m_pSound->Init(hWnd);
 	//ライトの初期化
 	m_pLight->Init();
+
 
 	SetMode(CScene::MODE_TITLE);
 	m_pFade->SetFade(m_pFade->FADE_OUT, CScene::MODE_GAME);
@@ -83,6 +87,11 @@ void CManager::Uninit()
 		m_pScene->Uninit();
 		delete m_pScene;
 		m_pScene = nullptr;
+	}
+	if (m_pGameInfo != nullptr)
+	{
+		delete m_pGameInfo;
+		m_pGameInfo = nullptr;
 	}
 	if (m_pCamera != nullptr)
 	{
@@ -135,13 +144,13 @@ void CManager::Update()
 {
 
 	m_pFade->Update();
-	
+
 	m_pScene->Update();
 	m_pRenderer->Update();
 	m_pKeyboard->Update();
 	m_pJoypad->Update();
 	m_pCamera->Update();
-	
+
 }
 
 //==========================================================================================

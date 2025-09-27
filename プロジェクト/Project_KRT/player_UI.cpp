@@ -25,8 +25,8 @@ namespace
 
 
 
-	D3DXVECTOR2 _HP_GAUGE_SIZE = {400.0f,70.0f};		//HPゲージのUIサイズ
-	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = {600.0f,80.0f};	//HPゲージ装飾サイズ
+	D3DXVECTOR2 _HP_GAUGE_SIZE = { 400.0f,70.0f };		//HPゲージのUIサイズ
+	D3DXVECTOR2 _HP_GAUGE_DECO_SIZE = { 600.0f,80.0f };	//HPゲージ装飾サイズ
 	D3DXVECTOR3 _HP_GAUGE_POS = { (_HP_GAUGE_DECO_SIZE.x * 0.5f) - 50.0f,SCREEN_HEIGHT - (_HP_GAUGE_DECO_SIZE.y * 0.5f),0.0f };		//HPゲージのUI座標
 	D3DXVECTOR3 _HP_GAUGE_DECO_POS = { _HP_GAUGE_POS.x + 50.0f,_HP_GAUGE_POS.y,0.0f };		//HPゲージのUI座標
 	D3DXVECTOR3 _HP_GAUGE_CIRCLE_POS = { 1000.0f,500.0f,0.0f };
@@ -66,8 +66,6 @@ void CGaugeLife::Init()
 	CGaugeLiFrame::Create(CObject2D::GetPos(), _HP_GAUGE_SIZE.x, _HP_GAUGE_SIZE.y);
 	CGaugeLiBack::Create(CObject2D::GetPos(), _HP_GAUGE_SIZE.x, _HP_GAUGE_SIZE.y);
 	CGaugeLiDeco::Create();
-	CGaugeCircle::Create();
-	CGaugeCircleDeco::Create();
 	CWeaponUI_Sub::Create();
 	CWeaponUI_Back::Create();
 
@@ -243,7 +241,7 @@ void CGaugeLiDeco::Init()
 void CGaugeLiDeco::Draw()
 {
 	LPDIRECT3DDEVICE9 pDevice = CManager::GetInstance()->GetRenderer()->GetDevice();
-	
+
 	//テクスチャ拡大時に色を近似値にする
 	pDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 
