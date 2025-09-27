@@ -9,6 +9,8 @@
 #include "player_keyUI.h"
 #include "floor_stone.h"
 #include "stage1_boss.h"
+#include "enemy.h"
+#include"field_manager.h"
 #include "player_armState.h"
 #include "player_behavior.h"
 #include "player_UI.h"
@@ -111,6 +113,8 @@ void CPlayerX::Uninit()
 		m_pWeaponIcon->Release();
 		m_pWeaponIcon = nullptr;
 	}
+
+	m_pWeapon = nullptr;
 	CCharacter::Uninit();
 }
 
@@ -162,7 +166,19 @@ void CPlayerX::Update()
 		SetArmState(std::make_shared<Arm_Normal>());
 		m_AttackBehavior->SetExState(std::make_shared<ExAttack_Normal>());
 	}
-
+	if (ToPlayerCollision())
+	{
+		if (CManager::GetInstance()->GetKeyboard()->GetTrigger(DIK_O) || CManager::GetInstance()->GetJoypad()->GetTrigger(CJoypad::JOYPAD_A))
+		{
+			EquipWeapon();  // 装備
+			SetArmParts(G_ARM_JSONNAME);
+			m_pWeaponIcon->Release();
+			m_pWeaponIcon = nullptr;
+			m_pWeaponIcon = CWeaponUI_Main_Gorira::Create();
+			SetArmState(std::make_shared<Arm_Gorira>());
+			m_AttackBehavior->SetExState(std::make_shared<ExAttack_Gorira>());
+		}
+	}
 	CCharacter::Update();
 }
 
@@ -326,7 +342,9 @@ bool  CPlayerX::EndMotion()
 	{
 		SetState(std::make_shared<State_Nutoral>());
 	}
+
 	m_AttackBehavior->UseDisable();
+	
 	return true;
 }
 
@@ -458,6 +476,53 @@ bool CPlayerX::PAttackInfo()
 }
 
 //==========================================================================================
+//プレイヤーが当たり判定内にいるかチェック
+//==========================================================================================
+bool CPlayerX::ToPlayerCollision()
+{
+	m_pWeaponCandidate = nullptr;
+
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (!pObj) continue;
+
+			if (pObj->GetType() != CObject::TYPE::TYPE_WEAPON) continue;
+
+			CWeapon* pW = static_cast<CWeapon*>(pObj);
+			D3DXVECTOR3 wPos = pW->GetPos();
+			D3DXVECTOR3 pPos = GetPos();
+			float dx = pPos.x - wPos.x;
+			float dz = pPos.z - wPos.z;
+			float dist2 = dx * dx + dz * dz;
+			float r = GetRadius().x + 50.0f; // 武器の当たり半径
+
+			if (dist2 <= r * r) {
+				m_pWeaponCandidate = pW; // 近くの武器を候補として保持
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+void CPlayerX::EquipWeapon()
+{
+	if (m_pWeaponCandidate)
+	{
+		if (m_pWeapon) 
+		{
+			m_pWeapon->SetEquipped(false); // 前の武器は装備解除
+		}
+
+		m_pWeapon = m_pWeaponCandidate;
+		m_pWeapon->SetEquipped(true); // 装備中は配列から消さない
+		m_pWeaponCandidate = nullptr;
+	}
+}
+
+//==========================================================================================
 // プレイヤーのパリィ
 //==========================================================================================
 void CPlayerX::SetParry()
@@ -530,6 +595,69 @@ void CPlayerX::SetParry()
 			{
 				CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
 				pTest->SetNextMotion(3);
+				CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
+				SetState(std::make_shared<State_ParryAttack>());
+				return;
+			}
+		}
+	}
+
+	// 雑魚敵判定
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (!pObj) continue;
+
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_ENEMY) continue;
+
+			CEnemy* pEnemy = dynamic_cast<CEnemy*>(pObj);
+			if (!pEnemy) continue;
+
+			apVecHitCircle = pEnemy->CCharacter::GetVecHitCircle();
+			for (auto& e1 : apVecHitCircle)
+			{
+				// 通常攻撃(2)と飛び込み攻撃(4)両対応
+				if (e1->GetEnable() && (e1->GetMotionNum() == 2 || e1->GetMotionNum() == 4))
+				{
+					pBossAttackCircle = e1;
+					break;
+				}
+			}
+			if (!pBossAttackCircle) continue;
+
+			D3DXVECTOR3 MainPos, SubPos;
+			D3DXMATRIX MainMtx{}, SubMtx{};
+			int cnt = 0;
+
+			for (auto& e2 : CCharacter::GetModelPartsVec())
+			{
+				if (cnt == pParryCircle->GetParentNum())
+				{
+					MainMtx = e2->GetWorldMatrix();
+					break;
+				}
+				++cnt;
+			}
+
+			cnt = 0;
+			for (auto& e3 : pEnemy->CCharacter::GetModelPartsVec())
+			{
+				if (cnt == pBossAttackCircle->GetParentNum())
+				{
+					SubMtx = e3->GetWorldMatrix();
+					break;
+				}
+				++cnt;
+			}
+
+			MainPos = pParryCircle->CalcMtxPos(MainMtx);
+			SubPos = pBossAttackCircle->CalcMtxPos(SubMtx);
+
+			if (pCollision->SphireCollosion(MainPos, SubPos, pParryCircle->GetRadius(), pBossAttackCircle->GetRadius()))
+			{
+				CCharacter::SetNextMotion(MOTION_PARRY_ATTACK);
+				pEnemy->SetNextMotion(3);
 				CManager::GetInstance()->GetSound()->PlaySound(CSound::SOUND_LABEL_SE_PARRY);
 				SetState(std::make_shared<State_ParryAttack>());
 				return;
@@ -625,6 +753,61 @@ void CPlayerX::ToEnemyAttack()
 				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
 				{
 					pTest->SetNextMotion(4);
+					pAttackCircle->SetInvincible(true);
+					pTest->BeDamaged();
+					return;
+				}
+			}	
+		}
+	}
+
+	for (int j = 0; j < SET_PRIORITY; ++j) {
+		for (int i = 0; i < MAX_OBJECT; ++i) {
+			CObject* pObj = CObject::GetObjects(j, i);
+			if (pObj == nullptr) continue;
+			
+			CObject::TYPE type = pObj->GetType();
+			if (type != CObject::TYPE::TYPE_ENEMY) continue;
+		
+			CEnemy* pTest = dynamic_cast<CEnemy*>(pObj);
+			if (pTest == nullptr) continue;
+			
+			std::vector<std::shared_ptr<CHitCircle>> BHC = pTest->GetBodyHitCircle();
+			for (auto& e : BHC)
+			{
+				if (!e->GetEnable())continue;
+						
+				D3DXVECTOR3 MainPos, SubPos;
+				D3DXMATRIX MainMtx, SubMtx;
+				int cnt = 0;
+				for (auto& e1 : CCharacter::GetModelPartsVec())
+				{
+					if (pAttackCircle != nullptr)
+					{
+						if (cnt == pAttackCircle->GetParentNum())
+						{
+							MainMtx = e1->GetWorldMatrix();
+						}
+					}
+					++cnt;
+				}
+				cnt = 0;
+				for (auto& e2 : pTest->CCharacter::GetModelPartsVec())
+				{
+					if (e2 != nullptr)
+					{
+						if (cnt == e->GetParentNum())
+						{
+							SubMtx = e2->GetWorldMatrix();
+						}
+					}
+					++cnt;
+				}
+				MainPos = pAttackCircle->CalcMtxPos(MainMtx);
+				SubPos = pAttackCircle->CalcMtxPos(SubMtx);
+
+				if (pCollision->SphireCollosion(MainPos, SubPos, pAttackCircle->GetRadius(), e->GetRadius()))
+				{
 					pAttackCircle->SetInvincible(true);
 					pTest->BeDamaged();
 					return;

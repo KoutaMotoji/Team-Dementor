@@ -12,6 +12,7 @@
 #include "object2D.h"
 #include "modelparts.h"
 #include "debug_line.h"
+#include "weapon.h"
 
 #include "manager.h"
 
@@ -102,6 +103,8 @@ public:
 		MOTION_ATTACK_G_Ex6_toJump,
 		MOTION_ATTACK_G_Ex6,
 	};
+	bool ToPlayerCollision();
+	void EquipWeapon();
 	void EnemyCollision();
 	void ToEnemyAttack();
 private:
@@ -137,6 +140,8 @@ private:
 	std::shared_ptr<LockOn_State>m_LockOnState;
 	CGaugeLife* m_pLifeGauge;
 	CWeaponUI_Main* m_pWeaponIcon;
+	CWeapon* m_pWeapon;
+	CWeapon* m_pWeaponCandidate = nullptr;
 
 	//========================			クオータニオン用		====================================
 	D3DXMATRIX m_mtxRot;		//回転マトリックス(保存用)

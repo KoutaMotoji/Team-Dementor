@@ -10,7 +10,7 @@
 #include "main.h"
 #include "object.h"
 
-#define MAX_OBJ_TEX	(10)
+#define MAX_OBJ_TEX	(32)
 
 class CObjectX :public CObject
 {

@@ -7,6 +7,8 @@
 #include "manager.h"
 #include "field_manager.h"
 #include "stage1_boss.h"
+#include "enemy.h"
+#include "weapon.h"
 
 #include "floor_stone.h"
 #include "floorUI.h"
@@ -56,19 +58,46 @@ void CField_Manager::Update()
 	//ディゾルブが半分に到達しているか確認
 	if (!m_FieldDissolve->GetReach())return;
 
-
-	for (auto& e : m_vecFieldObj)
-	{
-		if (e != nullptr)
-		{
-			e->Release();
-			e = nullptr;
+	for (auto it = m_vecFieldObj.begin(); it != m_vecFieldObj.end(); ) {
+		if (*it) {
+			switch ((*it)->GetType()) {
+			case CObject::TYPE_ENEMY: {
+				CEnemy* enemy = dynamic_cast<CEnemy*>(*it);
+				if (enemy && enemy->IsHidden()) {
+					enemy->Uninit();
+					delete enemy;
+					it = m_vecFieldObj.erase(it);
+					continue;
+				}
+				break;
+			}
+			case CObject::TYPE_WEAPON: {
+				CWeapon* weapon = dynamic_cast<CWeapon*>(*it);
+				if (weapon) {
+					weapon->Uninit();
+					delete weapon;
+					it = m_vecFieldObj.erase(it);
+					continue;
+				}
+				break;
+			}
+									 // 他のオブジェクトタイプも必要に応じて処理
+			default: {
+				(*it)->Release();
+				break;
+			}
+			}
 		}
+		++it;
 	}
 	m_vecFieldObj.clear();
+
 	//次のマップを生成(今は仮、後々対応したファイル読み込みなどに置き換え)
 	CMeshGround::Create({ 0.0f,0.0f,0.0f }, 0);
-	CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+	//CG_Gorira::Create({ 0.0f,300.0f,500.0f });
+	CEnemy::Create({ 1000.0f,-1000.0f,1000.0f });
+	CEnemy::Create({ 0.0f,-1000.0f,1000.0f });
+	CEnemy::Create({ 1000.0f,-1000.0f,0.0f });
 	CClock::GetInstance()->SetTimerStop(false);
 
 	//フロアのUI生成
@@ -99,7 +128,7 @@ void FieldDissolve::Update()
 		CObject2D::AddPos({ 0.0f,DISSOLVE_SPEED,0.0f });
 	}
 	CObject2D::Update();
-	if ((CObject2D::GetPos().y >= (SCREEN_HEIGHT * 0.5f ) + DISSOLVE_SPEED && CObject2D::GetPos().y <= (SCREEN_HEIGHT * 0.5f) + (DISSOLVE_SPEED * 2)))
+	if ((CObject2D::GetPos().y >= (SCREEN_HEIGHT * 0.5f) + DISSOLVE_SPEED && CObject2D::GetPos().y <= (SCREEN_HEIGHT * 0.5f) + (DISSOLVE_SPEED * 2)))
 	{
 		m_bReachHalf = true;
 	}
@@ -142,7 +171,7 @@ void FieldDissolve::RestartDissolve()
 {
 	m_bReachHalf = false;
 	m_bDraw = true;
-	CObject2D::SetPos({SCREEN_WIDTH*0.5f,SCREEN_HEIGHT*0.5f,0.0f});
+	CObject2D::SetPos({ SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f });
 }
 
 //=================================================================================================================
